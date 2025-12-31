@@ -2,8 +2,9 @@ import passport from "passport";
 import {Strategy as GoogleStrategy} from "passport-google-oauth20"
 import {config} from "../config/environment"
 import container from "../../di/container"
-import { IAuthService } from "../../domain/interfaces/IAuthService";
 import {TYPES} from "../../di/types"
+import { GoogleAuthUseCase } from "../../application/use-cases/GoogleAuthUseCase";
+
 
 export const configurePassport=()=>{
     passport.use(
@@ -22,8 +23,8 @@ export const configurePassport=()=>{
                         name:profile.displayName,
                         picture:profile.photos?.[0]?.value
                     };
-                    const authService=container.get<IAuthService>(TYPES.AuthService)
-                    const result =await authService.googleAuth(googleData);
+                    const googleAuthUseCase=container.get<GoogleAuthUseCase>(TYPES.GoogleAuthUseCase);
+                    const result =await googleAuthUseCase.execute(googleData)
                     done(null,result);
                 }catch (error){
                     done(error as Error , undefined);

@@ -1,5 +1,12 @@
+
+
 export const TYPES={
-    AuthService:Symbol.for("AuthService"),
     UserRepository:Symbol.for("UserRepository"),
-    AuthController:Symbol.for("AuthController")
+    AuthController:Symbol.for("AuthController"),
+
+
+    SignupUseCase:Symbol.for("SignupUseCase"),
+    LoginUseCase:Symbol.for("LoginUseCase"),
+    GoogleAuthUseCase:Symbol.for("GoogleAuthUseCase")
+        
 }

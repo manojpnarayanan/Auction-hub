@@ -1,10 +1,10 @@
 import { Router } from "express";
-import container from "../di/container";
-import { validate } from "../presentation/middleware/validation.middleware";
-import { signupSchema, loginSchema } from "../presentation/validation/validation.schemas";
+import container from "../../di/container";
+import { validate } from "../middleware/validation.middleware";
+import { signupSchema, loginSchema } from "../validation/validation.schemas";
 import passport from 'passport'
-import { AuthController } from "../controller/authController";
-import {TYPES} from "../di/types"
+import { AuthController } from "../controllers/Authcontroller";
+import {TYPES} from "../../di/types"
 
 /**
  * Authentication routes

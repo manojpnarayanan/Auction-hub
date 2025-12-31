@@ -10,6 +10,8 @@ export interface CreateUserDTO {
     name: string;
     email: string;
     password: string;
+    googleId?:string;
+    role?: string;
 }
 
 /**

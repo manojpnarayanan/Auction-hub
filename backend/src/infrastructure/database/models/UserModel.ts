@@ -19,7 +19,7 @@ const UserSchema= new Schema<IUserDocument>({
     password:{type:String,required:false},
     role:{type:String, default:"user"},
     otp:{type:String},
-    otpExpiry:{type :String},
+    otpExpiry:{type :Date},
     googleId:{type:String,unique :true, sparse:true},
 },{timestamps:true});
 

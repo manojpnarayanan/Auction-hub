@@ -10,6 +10,8 @@ interface Config {
     mongoUrl: string;
     jwtSecret: string;
     jwtExpiry: string;
+    jwtRefreshSecret:string;
+    jwtRefreshExpiry:string;
     corsOrigin: string;
     nodeEnv: string;
     google:{
@@ -23,7 +25,13 @@ interface Config {
 /**
  * Required environment variables
  */
-const requiredEnvVars = ['MONGO_URL', 'JWT_SECRET' ,'GOOGLE_CLIENT_ID','GOOGLE_CLIENT_SECRET','REDIS_URL'];
+const requiredEnvVars = 
+    ['MONGO_URL', 
+    'JWT_SECRET' ,
+    "REFRESH_TOKEN_SECRET",
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'REDIS_URL'];
 
 /**
  * Validate that all required environment variables are present
@@ -42,7 +50,9 @@ export const config: Config = {
     port: parseInt(process.env.PORT || '3000', 10),
     mongoUrl: process.env.MONGO_URL!,
     jwtSecret: process.env.JWT_SECRET!,
-    jwtExpiry: process.env.JWT_EXPIRY || '1h',
+    jwtExpiry: process.env.JWT_EXPIRY || '15m',
+    jwtRefreshSecret:process.env.REFRESH_TOKEN_SECRET !,
+    jwtRefreshExpiry:process.env.JWT_REFRESH_EXPIRY || "7d",
     corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     nodeEnv: process.env.NODE_ENV || 'development',
     google:{

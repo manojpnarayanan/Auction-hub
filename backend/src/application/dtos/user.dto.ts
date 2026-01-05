@@ -39,6 +39,7 @@ export interface LoginDTO {
 export interface LoginResponseDTO {
     message: string;
     token: string;
+    refreshToken:string;
     user: UserResponseDTO;
 }
 
@@ -56,6 +57,7 @@ export interface GoogleAuthDTO{
 export interface OAuthResponseDTO{
     message:string;
     token:string;
+    refreshToken:string;
     user:UserResponseDTO;
     isNewUser:boolean;
 }

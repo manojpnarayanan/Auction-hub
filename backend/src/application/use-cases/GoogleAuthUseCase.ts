@@ -1,6 +1,7 @@
 import { injectable,inject } from "inversify";
 import {TYPES} from "../../di/types";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
+import { ICacheService } from "../../domain/interfaces/ICacheService";
 import { GoogleAuthDTO,OAuthResponseDTO } from "../dtos/user.dto";
 import jwt from "jsonwebtoken";
 import { config } from "../../infrastructure/config/environment";
@@ -9,7 +10,8 @@ import { config } from "../../infrastructure/config/environment";
 
 export class GoogleAuthUseCase{
     constructor(
-        @inject(TYPES.UserRepository)private UserRepository:IUserRepository
+        @inject(TYPES.UserRepository)private UserRepository:IUserRepository,
+        @inject(TYPES.CacheService) private cacheService:ICacheService
     ) {}
 
     async execute (data:GoogleAuthDTO):Promise<OAuthResponseDTO>{
@@ -34,10 +36,17 @@ export class GoogleAuthUseCase{
             {id:user.id,email:user!.email,role:user!.role},
             config.jwtSecret,
             {expiresIn:config.jwtExpiry as any}
+        );
+        const refreshToken=jwt.sign(
+            {id:user.id},
+            config.jwtRefreshSecret,
+            {expiresIn:config.jwtRefreshExpiry as any}
         )
+        await this.cacheService.set(`refresh_Token:${user.id}`,refreshToken,7*24*60*60)
         return {
             message:isNewUser? "User created successfully":"Login successfull",
             token,
+            refreshToken,
             isNewUser,
             user:{
                 id:user.id,

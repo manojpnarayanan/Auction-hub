@@ -9,6 +9,7 @@ export interface IUserDocument extends Document {
     otp?:string;
     otpExpiry?:Date;
     googleId?:string;
+    isVerified:boolean;
     createdAt:Date;
     updatedAt:Date;
 }
@@ -21,6 +22,7 @@ const UserSchema= new Schema<IUserDocument>({
     otp:{type:String},
     otpExpiry:{type :Date},
     googleId:{type:String,unique :true, sparse:true},
+    isVerified:{type:Boolean,default:false}
 },{timestamps:true});
 
 export const UserModel=model<IUserDocument>("User",UserSchema)

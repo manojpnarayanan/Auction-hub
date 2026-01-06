@@ -12,6 +12,7 @@ export interface CreateUserDTO {
     password: string;
     googleId?:string;
     role?: string;
+    isVerified?:boolean;
 }
 
 /**

@@ -51,3 +51,5 @@ export default router;
 // RefresToken route
 
 router.post("/refresh-token",authController.refreshToken);
+// router.post('/send-otp',authController.sendOtp);
+router.post('/verify-otp',authController.verifyOTP);

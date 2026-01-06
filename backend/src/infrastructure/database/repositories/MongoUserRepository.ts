@@ -26,7 +26,14 @@ export class MongoUserRepository implements IUserRepository{
         const userDoc=await UserModel.findOne({googleId});
         return userDoc ? this.mapToEntity(userDoc):null;
     }
-
+    async updateUnVerifiedUser(userId:string,userData:CreateUserDTO):Promise<User>{
+        const userDoc=await UserModel.findByIdAndUpdate(userId,userData,{new:true});
+        if(!userDoc) throw new Error("User not found");
+        return this.mapToEntity(userDoc);
+    }
+    async updateVerifyStatus(userId: string, isVerified: boolean): Promise<void> {
+        await UserModel.updateOne({_id:userId},{isVerified})
+    }
     private mapToEntity(doc:IUserDocument):User{
         return new User(
             (doc._id as any).toString(),
@@ -38,7 +45,8 @@ export class MongoUserRepository implements IUserRepository{
             doc.updatedAt,
             doc.otp,
             doc.otpExpiry,
-            doc.googleId
+            doc.googleId,
+            doc.isVerified
         )
     }
 }

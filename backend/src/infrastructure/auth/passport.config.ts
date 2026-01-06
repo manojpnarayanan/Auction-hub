@@ -21,7 +21,7 @@ export const configurePassport=()=>{
                         googleId:profile.id,
                         email:profile.emails?.[0].value || "",
                         name:profile.displayName,
-                        picture:profile.photos?.[0]?.value
+                        picture:profile.photos?.[0]?.value,
                     };
                     const googleAuthUseCase=container.get<GoogleAuthUseCase>(TYPES.GoogleAuthUseCase);
                     const result =await googleAuthUseCase.execute(googleData)

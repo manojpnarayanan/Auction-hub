@@ -3,7 +3,7 @@ import {useNavigate,useSearchParams} from 'react-router-dom'
 
 
 
-export default function authCallback(){
+export default function AuthCallback(){
     const [searchParams]=useSearchParams();
     const navigate=useNavigate();
 

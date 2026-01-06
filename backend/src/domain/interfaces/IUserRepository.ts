@@ -24,8 +24,11 @@ export interface IUserRepository {
     /**
      * Update user's OTP and expiry
      */
-    updateOTP(userId: string, otp: string, expiry: Date): Promise<void>;
+    updateOTP(userId: string, otp: string|null, expiry: Date|null): Promise<void>;
 
+    
     // for Google id using Auth
     findByGoogleId(googleId: string): Promise<User | null>;
+    updateUnVerifiedUser(userId:string,userData:CreateUserDTO):Promise<User>;
+    updateVerifyStatus(userId:string,isVerified:boolean):Promise<void>
 }

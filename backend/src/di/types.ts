@@ -9,5 +9,5 @@ export const TYPES={
     GoogleAuthUseCase:Symbol.for("GoogleAuthUseCase"),
     RefreshTokenUseCase:Symbol.for("RefreshTokenUseCase"),
     CacheService:Symbol.for("RedisCacheService"),
-        
+    EmailService:Symbol.for("EmailService")
 }

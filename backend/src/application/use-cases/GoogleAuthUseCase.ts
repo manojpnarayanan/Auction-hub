@@ -27,7 +27,8 @@ export class GoogleAuthUseCase{
                     email:data.email,
                     googleId:data.googleId,
                     role:"user",
-                    password:""
+                    password:"",
+                    isVerified:true
                 });
                 isNewUser=true;
             }

@@ -14,7 +14,8 @@ export class User {
         public readonly updatedAt: Date,
         public readonly otp?: string,
         public readonly otpExpiry?: Date,
-        public readonly googleId?:string
+        public readonly googleId?:string,
+        public readonly isVerified:boolean=false,
     ) { }
 
     /**

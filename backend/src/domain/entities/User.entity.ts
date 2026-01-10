@@ -1,4 +1,4 @@
-/**
+    /**
  * Domain Entity: User
  * Framework-agnostic representation of a User
  * Contains only business logic, no infrastructure concerns

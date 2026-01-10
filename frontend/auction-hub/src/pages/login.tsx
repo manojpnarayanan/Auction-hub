@@ -31,7 +31,7 @@ export default function Login() {
                     refreshToken: res.data.refreshToken,
                 })
             );
-            navigate("/"); // Dashboard
+            navigate("/user/dashboard"); // Dashboard
         } catch (err:any) {
             console.error("login failed", err);
             setMsg(err.response?.data?.error || "Login Failed >Please check Credentials")
@@ -90,7 +90,7 @@ export default function Login() {
                                 <div className="relative">
                                     <div className="flex justify-between items-center mb-1 ml-1">
                                         <label className="text-xs font-bold text-gray-700">Password</label>
-                                        <a href="#" className="text-xs text-[#1da1f2] hover:underline">Forgot password?</a>
+                                        <a href="/forgot-password" className="text-xs text-[#1da1f2] hover:underline">Forgot password?</a>
                                     </div>
                                     <div className="relative">
                                         <input

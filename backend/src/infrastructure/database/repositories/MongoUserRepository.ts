@@ -34,6 +34,9 @@ export class MongoUserRepository implements IUserRepository{
     async updateVerifyStatus(userId: string, isVerified: boolean): Promise<void> {
         await UserModel.updateOne({_id:userId},{isVerified})
     }
+    async updatePassword(userId: string, password: string): Promise<void> {
+        const userdoc=await UserModel.findByIdAndUpdate(userId,{password});
+    }
     private mapToEntity(doc:IUserDocument):User{
         return new User(
             (doc._id as any).toString(),

@@ -16,21 +16,21 @@ const authController = container.get<AuthController>(TYPES.AuthController);
 
 // Rate Limiter configuration
 
-const authLimiter=rateLimit(5,15*60);
+const authLimiter = rateLimit(5, 15 * 60);
 
 
 
 //   POST /user/signup - Register new user
 //   Validates request body against signupSchema
- 
-router.post("/signup", authLimiter,validate(signupSchema), authController.signup);
+
+router.post("/signup", authLimiter, validate(signupSchema), authController.signup);
 
 
 //   POST /user/login - Authenticate user
 //   Validates request body against loginSchema
 
 
-router.post("/login",authLimiter, validate(loginSchema), authController.login);
+router.post("/login", authLimiter, validate(loginSchema), authController.login);
 
 // Google OAuth routes
 router.get(
@@ -50,6 +50,8 @@ export default router;
 
 // RefresToken route
 
-router.post("/refresh-token",authController.refreshToken);
+router.post("/refresh-token", authController.refreshToken);
 // router.post('/send-otp',authController.sendOtp);
-router.post('/verify-otp',authController.verifyOTP);
+router.post('/verify-otp', authController.verifyOTP);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);

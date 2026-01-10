@@ -12,7 +12,7 @@ export default function AuthCallback(){
         const isNewUser= searchParams.get('isNewUser');
         if(token){
             localStorage.setItem('token',token);
-            navigate(isNewUser==='true' ? '/welcome': '/dashboard')
+            navigate(isNewUser==='true' ? '/user/dashboard': '/user/dashboard')
         }else {
             navigate('/login?error=auth_failed')
         }

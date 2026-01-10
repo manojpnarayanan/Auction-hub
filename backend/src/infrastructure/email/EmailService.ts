@@ -1,10 +1,11 @@
+import { IEmailService } from '../../domain/interfaces/IEmailService';
 import nodemailer from 'nodemailer';
 import { injectable } from 'inversify';
 import { config } from '../config/environment';
 
 @injectable()
 
-export class EmailService{
+export class EmailService implements IEmailService{
     private transporter;
     constructor(){
         this.transporter=nodemailer.createTransport({

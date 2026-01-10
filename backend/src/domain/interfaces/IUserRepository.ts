@@ -31,4 +31,5 @@ export interface IUserRepository {
     findByGoogleId(googleId: string): Promise<User | null>;
     updateUnVerifiedUser(userId:string,userData:CreateUserDTO):Promise<User>;
     updateVerifyStatus(userId:string,isVerified:boolean):Promise<void>
+    updatePassword(userId:string,password:string):Promise<void>
 }

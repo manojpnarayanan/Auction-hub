@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import {TYPES} from "../../di/types";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { ICacheService } from "../../domain/interfaces/ICacheService";
-import { EmailService } from "../../infrastructure/email/EmailService";
+import { IEmailService } from "../../domain/interfaces/IEmailService";
 import { CreateUserDTO , LoginResponseDTO  } from "../dtos/user.dto";
 import { ConflictError } from "../../domain/errors/errors";
 import bcrypt from "bcrypt";
@@ -16,7 +16,7 @@ export class SignupUseCase{
     constructor(
         @inject(TYPES.UserRepository) private userRepository:IUserRepository,
         @inject(TYPES.CacheService)private cacheService:ICacheService,
-        @inject(TYPES.EmailService) private emailService:EmailService,
+        @inject(TYPES.EmailService) private emailService:IEmailService,
     ) {};
 
     async execute(userData:CreateUserDTO):Promise<LoginResponseDTO >{

@@ -5,10 +5,12 @@ import { ICacheService } from "../../domain/interfaces/ICacheService";
 import { GoogleAuthDTO,OAuthResponseDTO } from "../dtos/user.dto";
 import jwt from "jsonwebtoken";
 import { config } from "../../infrastructure/config/environment";
+import { IGoogleAuthUseCase } from "./Usecase Interfaces/IGoogleAuthUseCase";
+
 
 @injectable()
 
-export class GoogleAuthUseCase{
+export class GoogleAuthUseCase implements IGoogleAuthUseCase{
     constructor(
         @inject(TYPES.UserRepository)private UserRepository:IUserRepository,
         @inject(TYPES.CacheService) private cacheService:ICacheService

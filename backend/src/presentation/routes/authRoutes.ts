@@ -55,3 +55,5 @@ router.post("/refresh-token", authController.refreshToken);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
+router.post('/resend-otp',authController.resendOtp);
+router.post("/logout",authController.logout);

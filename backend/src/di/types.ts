@@ -1,3 +1,4 @@
+import { ResendOtpUseCase } from "../application/use-cases/auth/ResendOtpUseCase";
 import { RefreshTokenUseCase } from "../application/use-cases/RefreshTokenUseCase";
 
 
@@ -13,5 +14,8 @@ export const TYPES = {
     verifyOtpUseCase:Symbol.for("verifyOtpUseCase"),
     ForgotPasswordUseCase:Symbol.for("ForgotPasswordUseCase"),
     ResetPasswordUseCase:Symbol.for("ResetPasswordUseCase"),
+    ResendOtpUseCase:Symbol.for("ResendOtpUseCase"),
+    LogoutUseCase:Symbol.for("LogoutUseCase"),
     
+
 }

@@ -14,7 +14,7 @@ export class RedisCacheService implements ICacheService {
         return await redisClient.get(key)
     }
 
-    async del(key:string):Promise<void>{
+    async delete(key:string):Promise<void>{
         await redisClient.del(key)
     }
 }

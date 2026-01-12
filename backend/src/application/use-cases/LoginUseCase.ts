@@ -7,10 +7,12 @@ import { UnauthorizedError } from "../../domain/errors/errors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../../infrastructure/config/environment";
+import { ILoginUseCase } from "./Usecase Interfaces/ILoginUseCase";
+ 
+
 
 @injectable()
-
-export class LoginUseCase {
+export class LoginUseCase implements ILoginUseCase{
     constructor(
         @inject(TYPES.UserRepository) private userRepository: IUserRepository,
         @inject(TYPES.CacheService) private cacheService: ICacheService,

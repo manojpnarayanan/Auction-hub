@@ -8,11 +8,11 @@ import { ConflictError } from "../../domain/errors/errors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../../infrastructure/config/environment";
-
+import { ISignupUseCase } from "./Usecase Interfaces/ISignupUseCase";
 
 @injectable()
 
-export class SignupUseCase{
+export class SignupUseCase implements ISignupUseCase{
     constructor(
         @inject(TYPES.UserRepository) private userRepository:IUserRepository,
         @inject(TYPES.CacheService)private cacheService:ICacheService,

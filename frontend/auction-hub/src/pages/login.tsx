@@ -28,7 +28,6 @@ export default function Login() {
                 setCredentials({
                     user: res.data.user,
                     token: res.data.token,
-                    refreshToken: res.data.refreshToken,
                 })
             );
             navigate("/user/dashboard"); // Dashboard

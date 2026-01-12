@@ -4,7 +4,7 @@ import { logout, updateAccessToken } from "../redux/slices/authSlices";
 
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-const API = axios.create({ baseURL: API_URL });
+const API = axios.create({ baseURL: API_URL, withCredentials:true });
 
 // Request Interceptor: Attach Token from Redux
 API.interceptors.request.use((req) => {
@@ -22,10 +22,7 @@ API.interceptors.response.use((response) => response, async (error) => {
     if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         try {
-            const refreshToken = localStorage.getItem('refreshToken');
-            if (!refreshToken) throw new Error("No refresh token");
-            // Call Backend to get new Access Token
-            const res = await axios.post(`${API_URL}/user/refresh-token`, { refreshToken });
+            const res=await axios.post(`${API_URL}/user/refresh-token`,{},{withCredentials:true});
 
             const newAccessToken = res.data.accessToken;
             // Dispatch action to update Redux Store

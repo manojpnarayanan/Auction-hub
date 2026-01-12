@@ -1,5 +1,6 @@
 import { useState } from "react";
 // import { Link } from "react-router-dom";
+import LogoutButton from "../components/LogoutButton";
 
 export default function Dashboard(){
     const [activeTab,setActiveTab]=useState("Home");
@@ -57,6 +58,7 @@ export default function Dashboard(){
             <div className="w-8 h-8 rounded-full bg-white/20 overflow-hidden border border-white/50 cursor-pointer">
                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2500" alt="Profile" className="w-full h-full object-cover" />
             </div>
+             <LogoutButton />
           </div>
         </div>
       </header>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { signup } from "../api/auth";
 import OTPModal from "../components/OTPModal";
 import { useNavigate } from "react-router-dom";
@@ -14,12 +14,28 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate=useNavigate();
 
+  useEffect(()=>{
+    const savedEmail=localStorage.getItem("otpEmail");
+    const savedExpiry=localStorage.getItem("otpExpiry");
+    if(savedEmail && savedExpiry){
+      const remaining=parseInt(savedExpiry)-Date.now();
+      if(remaining >0){
+        setEmailForOTP(savedEmail);
+        setShowOTP(true);
+      }else{
+        localStorage.removeItem("otpEmail");
+        localStorage.removeItem("otpExpiry");
+      }
+    }
+  },[]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg("");
     try {
       await signup(form);
+      localStorage.setItem("otpEmail",form.email);
       setEmailForOTP(form.email);
       setShowOTP(true);
     } catch (err: any) {
@@ -31,6 +47,8 @@ export default function Signup() {
 
   const handleOTPSuccess = () => {
     setMsg("✅ Verified! Redirecting to Login...");
+    localStorage.removeItem("otpEmail");
+    localStorage.removeItem("otpExpiry");
     setShowOTP(false);
     setTimeout(()=>{
       navigate('/login')

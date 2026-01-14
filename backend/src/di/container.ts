@@ -10,13 +10,13 @@ import { RedisCacheService } from "../infrastructure/redis/RedisCacheService";
 import { ICacheService } from "../domain/interfaces/ICacheService";
 // UseCases
 import { ISignupUseCase } from "../application/use-cases/Usecase Interfaces/ISignupUseCase";
-import { SignupUseCase } from "../application/use-cases/SignupUseCase";
+import { SignupUseCase } from "../application/use-cases/auth/SignupUseCase";
 import { IRefreshTokenUseCase } from "../application/use-cases/Usecase Interfaces/IRefreshTokenUseCase";
-import { RefreshTokenUseCase } from "../application/use-cases/RefreshTokenUseCase";
+import { RefreshTokenUseCase } from "../application/use-cases/auth/RefreshTokenUseCase";
 import { ILoginUseCase } from "../application/use-cases/Usecase Interfaces/ILoginUseCase";
-import { LoginUseCase } from "../application/use-cases/LoginUseCase";
+import { LoginUseCase } from "../application/use-cases/auth/LoginUseCase";
 import { IGoogleAuthUseCase } from "../application/use-cases/Usecase Interfaces/IGoogleAuthUseCase";
-import { GoogleAuthUseCase } from "../application/use-cases/GoogleAuthUseCase";
+import { GoogleAuthUseCase } from "../application/use-cases/auth/GoogleAuthUseCase";
 import { VerifyOtpUseCase } from "../application/use-cases/auth/VerifyOtpUseCase";
 import { ForgotPasswordUseCase } from "../application/use-cases/auth/ForgotPasswordUseCase";
 import { IEmailService } from "../domain/interfaces/IEmailService";

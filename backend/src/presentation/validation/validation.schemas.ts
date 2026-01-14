@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
-/**
- * Validation schema for user signup
- */
+
 export const signupSchema = z.object({
     name: z.string()
         .min(2, 'Name must be at least 2 characters')
@@ -18,9 +16,7 @@ export const signupSchema = z.object({
         .regex(/[0-9]/, 'Password must contain at least one number')
 });
 
-/**
- * Validation schema for user login
- */
+
 export const loginSchema = z.object({
     email: z.string()
         .email('Invalid email format'),

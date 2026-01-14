@@ -9,14 +9,14 @@ import bcrypt from "bcrypt";
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
     constructor(
         @inject(TYPES.UserRepository) private userRepository: IUserRepository
-    ) {}
+    ) { }
 
     async execute(email: string, otp: string, newPassword: string): Promise<void> {
         const user = await this.userRepository.findByEmail(email);
         if (!user) throw new NotFoundError("User not found");
-        
+
         if (user.otp !== otp) throw new ValidationError("OTP Invalid");
-        
+
         if (new Date() > new Date(user.otpExpiry!)) {
             throw new ValidationError("OTP Expired");
         }

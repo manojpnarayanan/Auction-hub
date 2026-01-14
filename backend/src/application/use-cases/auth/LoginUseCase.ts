@@ -1,18 +1,18 @@
 import { injectable, inject } from "inversify";
-import { TYPES } from "../../di/types";
-import { IUserRepository } from "../../domain/interfaces/IUserRepository";
-import { ICacheService } from "../../domain/interfaces/ICacheService";
-import { LoginDTO, LoginResponseDTO } from "../dtos/user.dto";
-import { UnauthorizedError } from "../../domain/errors/errors";
+import { TYPES } from "../../../di/types";
+import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
+import { ICacheService } from "../../../domain/interfaces/ICacheService";
+import { LoginDTO, LoginResponseDTO } from "../../dtos/user.dto";
+import { UnauthorizedError } from "../../../domain/errors/errors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { config } from "../../infrastructure/config/environment";
-import { ILoginUseCase } from "./Usecase Interfaces/ILoginUseCase";
- 
+import { config } from "../../../infrastructure/config/environment";
+import { ILoginUseCase } from "../Usecase Interfaces/ILoginUseCase";
+
 
 
 @injectable()
-export class LoginUseCase implements ILoginUseCase{
+export class LoginUseCase implements ILoginUseCase {
     constructor(
         @inject(TYPES.UserRepository) private userRepository: IUserRepository,
         @inject(TYPES.CacheService) private cacheService: ICacheService,
@@ -23,7 +23,7 @@ export class LoginUseCase implements ILoginUseCase{
             throw new UnauthorizedError("Invalid Credentials");
         }
         const isValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isValid) throw new UnauthorizedError("Invalid credentials");
+        if (!isValid) throw new UnauthorizedError("Invalid Password");
 
         // Access Token
         const token = jwt.sign(

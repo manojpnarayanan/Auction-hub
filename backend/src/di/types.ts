@@ -1,5 +1,3 @@
-import { ResendOtpUseCase } from "../application/use-cases/auth/ResendOtpUseCase";
-import { RefreshTokenUseCase } from "../application/use-cases/RefreshTokenUseCase";
 
 
 export const TYPES = {
@@ -11,11 +9,11 @@ export const TYPES = {
     RefreshTokenUseCase: Symbol.for("RefreshTokenUseCase"),
     CacheService: Symbol.for("RedisCacheService"),
     EmailService: Symbol.for("EmailService"),
-    verifyOtpUseCase:Symbol.for("verifyOtpUseCase"),
-    ForgotPasswordUseCase:Symbol.for("ForgotPasswordUseCase"),
-    ResetPasswordUseCase:Symbol.for("ResetPasswordUseCase"),
-    ResendOtpUseCase:Symbol.for("ResendOtpUseCase"),
-    LogoutUseCase:Symbol.for("LogoutUseCase"),
-    
+    verifyOtpUseCase: Symbol.for("verifyOtpUseCase"),
+    ForgotPasswordUseCase: Symbol.for("ForgotPasswordUseCase"),
+    ResetPasswordUseCase: Symbol.for("ResetPasswordUseCase"),
+    ResendOtpUseCase: Symbol.for("ResendOtpUseCase"),
+    LogoutUseCase: Symbol.for("LogoutUseCase"),
+
 
 }

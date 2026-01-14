@@ -7,33 +7,6 @@ interface OTPModalProps {
   onSuccess: () => void;
 }
 
-// const OTPModal=({email,onClose,onSuccess}:OTPModalProps)=>{
-
-//     const [otp,setOtp]=useState("");
-//     const [timer,setTimer]=useState(60);
-//     const [loading,setloading] =useState(false);
-//     const [message,setMessage]=useState<{text:string;type:"success" | "error"}|null>(null);
-
-//     useEffect(()=>{
-//         let interval:any;
-//         if(timer>0){
-//             interval=setInterval(()=>setTimer((prev)=>prev-1),1000)
-//         }
-//         return(()=>clearInterval(interval));
-//     },[timer]);
-
-//     const handleVerify=async()=>{
-//         setloading(true);
-//         try{
-//             await axios.post('http://localhost:3000/user/verify-otp',{email,otp});
-//             onSuccess();
-//         }catch(error:any){
-//            setMessage({text:error.response?.data?.message||"Failed",type:"error"})
-//         }finally{
-//             setloading(false);
-//         }
-//     };
-
 const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);

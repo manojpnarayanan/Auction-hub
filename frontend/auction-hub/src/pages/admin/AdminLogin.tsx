@@ -36,6 +36,7 @@ export default function AdminLogin() {
                     token: res.data.token,
                 })
             );
+
             navigate("/admin/dashboard");
         } catch (err: any) {
             console.error("Admin login failed", err);
@@ -130,8 +131,8 @@ export default function AdminLogin() {
                                 type="submit"
                                 disabled={loading}
                                 className={`w-full py-3 rounded-lg font-bold text-white shadow-lg transition-all ${loading
-                                        ? "bg-slate-600 cursor-not-allowed"
-                                        : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50"
+                                    ? "bg-slate-600 cursor-not-allowed"
+                                    : "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 hover:shadow-cyan-500/50"
                                     }`}
                             >
                                 {loading ? (

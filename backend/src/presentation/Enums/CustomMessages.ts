@@ -10,7 +10,7 @@ export enum CustomMessages {
     INVALID_CREDENTIALS = "Invalid credentials",
     USER_NOT_FOUND = "User not found",
     EMAIL_ALREADY_EXISTS = "Email already exists",
-    NO_TOKEN_PROVIDED="No token provided",
-    LOG_OUT="Logged out successfully" 
+    NO_TOKEN_PROVIDED = "No token provided",
+    LOG_OUT = "Logged out successfully"
 
 }

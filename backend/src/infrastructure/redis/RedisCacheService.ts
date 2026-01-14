@@ -6,15 +6,15 @@ import redisClient from "./redisClient";
 
 export class RedisCacheService implements ICacheService {
 
-    async set(key:string, value:string,ttlSeconds:number=3600):Promise<void>{
-    await redisClient.set(key,value,{EX:ttlSeconds})
+    async set(key: string, value: string, ttlSeconds: number = 3600): Promise<void> {
+        await redisClient.set(key, value, { EX: ttlSeconds })
     }
 
-    async get(key:string):Promise<string | null>{
+    async get(key: string): Promise<string | null> {
         return await redisClient.get(key)
     }
 
-    async delete(key:string):Promise<void>{
+    async delete(key: string): Promise<void> {
         await redisClient.del(key)
     }
 }

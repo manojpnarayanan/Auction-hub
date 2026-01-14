@@ -1,23 +1,14 @@
-/**
- * Data Transfer Objects for User operations
- * Used to transfer data between layers without exposing internal structure
- */
 
-/**
- * DTO for creating a new user
- */
 export interface CreateUserDTO {
     name: string;
     email: string;
     password: string;
-    googleId?:string;
+    googleId?: string;
     role?: string;
-    isVerified?:boolean;
+    isVerified?: boolean;
 }
 
-/**
- * DTO for user response (excludes sensitive data like password)
- */
+
 export interface UserResponseDTO {
     id: string;
     name: string;
@@ -26,39 +17,30 @@ export interface UserResponseDTO {
     createdAt: Date;
 }
 
-/**
- * DTO for login request
- */
 export interface LoginDTO {
     email: string;
     password: string;
 }
 
-/**
- * DTO for login response
- */
 export interface LoginResponseDTO {
     message: string;
     token: string;
-    refreshToken:string;
+    refreshToken: string;
     user: UserResponseDTO;
 }
 
-// DTO for Google Authentification
-
-export interface GoogleAuthDTO{
-    googleId:string;
-    email:string;
-    name:string;
-    picture?:string;
+export interface GoogleAuthDTO {
+    googleId: string;
+    email: string;
+    name: string;
+    picture?: string;
 }
 
-// DTO for OAuth response 
 
-export interface OAuthResponseDTO{
-    message:string;
-    token:string;
-    refreshToken:string;
-    user:UserResponseDTO;
-    isNewUser:boolean;
+export interface OAuthResponseDTO {
+    message: string;
+    token: string;
+    refreshToken: string;
+    user: UserResponseDTO;
+    isNewUser: boolean;
 }

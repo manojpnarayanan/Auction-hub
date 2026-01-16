@@ -1,0 +1,17 @@
+import { injectable,inject } from "inversify";
+import {TYPES} from "../../../di/types";
+import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
+import { CreateAuctionDTO } from "../../dtos/AuctionDTO";
+import { IGetAllListedAuctionUseCase } from "../Usecase Interfaces/Auction-Interface/IGetAllListedAuctionUseCase";
+
+
+@injectable()
+
+export class GetAllListedAuctionUseCase implements IGetAllListedAuctionUseCase{
+    constructor(
+        @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository
+    ) { };
+    async execute(sellerId:string):Promise<CreateAuctionDTO[]>{
+        return await this.auctionRepository.findBySellerId(sellerId);
+    }
+}

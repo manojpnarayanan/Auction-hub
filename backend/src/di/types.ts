@@ -1,8 +1,9 @@
 
 
 export const TYPES = {
-    UserRepository: Symbol.for("UserRepository"),
+    //    Auth
     AuthController: Symbol.for("AuthController"),
+    UserRepository: Symbol.for("UserRepository"),
     SignupUseCase: Symbol.for("SignupUseCase"),
     LoginUseCase: Symbol.for("LoginUseCase"),
     GoogleAuthUseCase: Symbol.for("GoogleAuthUseCase"),
@@ -15,5 +16,11 @@ export const TYPES = {
     ResendOtpUseCase: Symbol.for("ResendOtpUseCase"),
     LogoutUseCase: Symbol.for("LogoutUseCase"),
 
-
+    // Auction 
+    AuctionController:Symbol.for("AuctionController"),
+    AuctionRepository:Symbol.for("AuctionRepository"),
+    CreateAuctionUseCase:Symbol.for("CreateAuctionUseCase"),
+    GetSellerAuctionUseCase:Symbol.for("GetSellerAuctionUseCase"),
+    GetAllAuctionsUseCase:Symbol.for("GetAllAuctionsUseCase"),
+    
 }

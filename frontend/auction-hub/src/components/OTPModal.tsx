@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { verifyOtp, resendOtp } from "../api/auth";
 
 interface OTPModalProps {
   email: string;
@@ -42,27 +42,36 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
     return () => clearInterval(interval);
   }, [timer]);
   const handleVerify = async () => {
+    if (loading) return;
     setLoading(true);
     try {
-      await axios.post('http://localhost:3000/user/verify-otp', { email, otp });
+      await verifyOtp({ email, otp });
+
       // Clear storage on success
       localStorage.removeItem("otpExpiry");
-      localStorage.removeItem("otpEmail"); // We will use this in Part 2
+      localStorage.removeItem("otpEmail");
       onSuccess();
     } catch (error: any) {
-      setMessage({ text: error.response?.data?.message || "Failed", type: "error" });
+      const errorMsg = error.response?.data?.message || "Verification Failed";
+      // If OTP is already verified (race condition), just proceed!
+      if (errorMsg === "OTP Invalid" || errorMsg.includes("Invalid")) {
+        // Optional: You could choose to treat this as success if you trust the user flow, 
+        // but safer to just show the error. 
+        // However, if it's a double-click issue, the UI might have already transitioned.
+      }
+      setMessage({ text: errorMsg, type: "error" });
     } finally {
       setLoading(false);
     }
   };
+
   const handleResend = async () => {
     try {
-      await axios.post('http://localhost:3000/user/resend-otp', { email });
+      await resendOtp(email);
       const expiry = Date.now() + 60 * 1000;
       localStorage.setItem('otpExpiry', expiry.toString());
       setTimer(60);
       setcanResend(false);
-      // setMessage({text:"New otp send", type:"Success"})
       setMessage({ text: "New OTP sent!", type: "success" });
     } catch (error: any) {
       setMessage({ text: error.response?.data?.message || "Failed to resend", type: "error" });

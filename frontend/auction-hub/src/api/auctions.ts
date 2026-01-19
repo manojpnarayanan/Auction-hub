@@ -1,25 +1,24 @@
-import axios from "axios";
+import API from "./axiosInstances";
 
 
 
-const API_URL=import.meta.env.VITE_API_URL
 
-
-const api=axios.create({baseURL:API_URL})
-
-api.interceptors.request.use((config)=>{
-    const token=localStorage.getItem('token');
-    if(token){
-        config.headers.Authorization=`Bearer ${token}`;
-    }
-    return config;
-})
 export const getMyAuctions=async ()=>{
-    return api.get('/auctions/all-auctions');
+    return API.get('/auctions/all-auctions');
 }
-export const getAllAuctions=async ()=>{
-    return api.get('/auctions');
+export const getAllAuctions=async (category?:string)=>{
+    const url=category && category !=="All" 
+    ? `/auctions?category=${category}` : '/auctions';
+    return API.get(url);
 }
 export const createAuction=async (auctionData:any)=>{
-    return api.post('/auctions',auctionData);
+    return API.post('/auctions',auctionData);
+}
+
+export const getAuctionProductDetails=async(id:string)=>{
+    return API.get(`/auctions/${id}`);
+}
+
+export const updateAuction=async(id:string,data:any)=>{
+    return await API.put(`/auctions/${id}`,data);
 }

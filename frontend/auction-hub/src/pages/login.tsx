@@ -3,11 +3,12 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../redux/slices/authSlices";
 import { login } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import  type { LoginCredentials } from "../types/auth";
 
 export default function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [form, setForm] = useState({ email: "", password: "" });
+    const [form, setForm] = useState<LoginCredentials>({ email: "", password: "" });
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);

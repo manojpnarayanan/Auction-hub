@@ -13,7 +13,10 @@ export class GetAllAuctionsUseCase implements IGetAllAuctionUseCase{
         @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository,
 
     ) { }
-    async execute(): Promise<Auction[]> {
+    async execute(category:string): Promise<Auction[]> {
+        if(category && category!=="All"){
+            return await this.auctionRepository.findByCategory(category)
+        }
         return await this.auctionRepository.findAll();
     }
 }

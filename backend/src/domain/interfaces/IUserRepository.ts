@@ -15,6 +15,9 @@ export interface IUserRepository {
 
     findByGoogleId(googleId: string): Promise<User | null>;
     updateUnVerifiedUser(userId:string,userData:CreateUserDTO):Promise<User>;
-    updateVerifyStatus(userId:string,isVerified:boolean):Promise<void>
-    updatePassword(userId:string,password:string):Promise<void>
+    updateVerifyStatus(userId:string,isVerified:boolean):Promise<void>;
+    updatePassword(userId:string,password:string):Promise<void>;
+
+    adminUserManage(page:number,limit:number,search:string):Promise<{users:User[],total:number}>;
+    updateBlockStatus(userId:string,isBlocked:boolean):Promise<void>;
 }

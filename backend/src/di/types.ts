@@ -17,10 +17,19 @@ export const TYPES = {
     LogoutUseCase: Symbol.for("LogoutUseCase"),
 
     // Auction 
-    AuctionController:Symbol.for("AuctionController"),
-    AuctionRepository:Symbol.for("AuctionRepository"),
-    CreateAuctionUseCase:Symbol.for("CreateAuctionUseCase"),
-    GetSellerAuctionUseCase:Symbol.for("GetSellerAuctionUseCase"),
-    GetAllAuctionsUseCase:Symbol.for("GetAllAuctionsUseCase"),
-    
+    AuctionController: Symbol.for("AuctionController"),
+    AuctionRepository: Symbol.for("AuctionRepository"),
+    CreateAuctionUseCase: Symbol.for("CreateAuctionUseCase"),
+    GetSellerAuctionUseCase: Symbol.for("GetSellerAuctionUseCase"),
+    GetAllAuctionsUseCase: Symbol.for("GetAllAuctionsUseCase"),
+    GetAuctionDetailsUseCase: Symbol.for("GetAuctionDetailsUseCase"),
+    UpdateAuctionUseCase: Symbol.for("UpdateAuctionUseCase"),
+
+
+    // Admin 
+    AdminUserManagementUseCase:Symbol.for("AdminUserManagementUseCase"),
+    AdminController:Symbol.for("AdminController"),
+    BlockUserUseCase:Symbol.for("BlockUserUseCase")
+
+
 }

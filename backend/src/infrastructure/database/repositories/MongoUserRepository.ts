@@ -37,6 +37,26 @@ export class MongoUserRepository implements IUserRepository {
     async updatePassword(userId: string, password: string): Promise<void> {
         const userdoc = await UserModel.findByIdAndUpdate(userId, { password });
     }
+    async adminUserManage(page: number, limit: number, search: string): Promise<{ users: User[]; total: number }> {
+        const query:any={role:"user"};
+        if(search){
+            query.$or=[
+                {name:{$regex:search,$options:"i"}},
+                {email:{$regex:search,$options:"i"}}
+            ]
+        }
+        const skip=(page-1)*limit;
+        const [userDoc,total]= await Promise.all([
+            UserModel.find(query).sort({createdAt:-1}).skip(skip).limit(limit),
+            UserModel.countDocuments(query)
+        ]);
+        return {
+            users:userDoc.map(doc=>this.mapToEntity(doc)),total
+        }
+    }
+    async updateBlockStatus(userId: string, isBlocked: boolean): Promise<void> {
+        await UserModel.findByIdAndUpdate(userId,{isBlocked});
+    }
     private mapToEntity(doc: IUserDocument): User {
         return new User(
             (doc._id as any).toString(),
@@ -49,7 +69,8 @@ export class MongoUserRepository implements IUserRepository {
             doc.otp,
             doc.otpExpiry,
             doc.googleId,
-            doc.isVerified
+            doc.isVerified,
+            doc.isBlocked
         )
     }
 }

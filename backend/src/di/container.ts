@@ -14,9 +14,10 @@ import { ICacheService } from "../domain/interfaces/ICacheService";
 // Controllers
 import { AuthController } from "../presentation/controllers/Authcontroller";
 import { AuctionController } from "../presentation/controllers/AuctionController";
+import { AdminController } from "../presentation/controllers/admin/AdminDashboardController";
 
 
-// UseCases
+// Auth-UseCases
 import { ISignupUseCase } from "../application/use-cases/Usecase Interfaces/ISignupUseCase";
 import { SignupUseCase } from "../application/use-cases/auth/SignupUseCase";
 import { IRefreshTokenUseCase } from "../application/use-cases/Usecase Interfaces/IRefreshTokenUseCase";
@@ -37,13 +38,27 @@ import { IResendOtpUseCase } from "../application/use-cases/Usecase Interfaces/I
 import { ResendOtpUseCase } from "../application/use-cases/auth/ResendOtpUseCase";
 import { ILogoutUseCase } from "../application/use-cases/Usecase Interfaces/ILogoutUseCase";
 import { LogoutUseCase } from "../application/use-cases/auth/LogoutUseCase";
-
+//  Auction-useCases
 import { ICreateAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IAuctionUseCase";
 import { CreateAuctionUseCase } from "../application/use-cases/auction/CreateAuctionUseCase";
 import { IGetAllListedAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IGetAllListedAuctionUseCase";
 import { GetAllListedAuctionUseCase } from "../application/use-cases/auction/GetAllListedAuctionUseCase";
 import { IGetAllAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IGetAllAuctionsUSeCase";
 import { GetAllAuctionsUseCase } from "../application/use-cases/auction/GetAllAuctionsUseCase";
+import { IGetAuctionDetailsUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IGetAuctionDetailsUseCase";
+import { GetAuctionDetailsUSeCase } from "../application/use-cases/auction/GetAuctionDetailsUseCase";
+import { IUpdateAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IUpdateAuctionUseCase";
+import { UpdateAuctionUseCase } from "../application/use-cases/auction/UpdateAuctionUseCase";
+
+
+// Admin-useCases
+
+import { IAdminUserManagementUseCase } from "../application/use-cases/Usecase Interfaces/Admin/IAdminUserManagementUseCase";
+import { AdminUserManagementUseCase } from "../application/use-cases/Admin/AdminUserManagementUseCase";
+import { IBlockUserUseCase } from "../application/use-cases/Usecase Interfaces/Admin/IBlockUserUseCase";
+import { BlockUserUseCase } from "../application/use-cases/Admin/BlockUserUseCase";
+
+
 
 const container = new Container();
 // Repositories
@@ -65,12 +80,18 @@ container.bind<ILogoutUseCase>(TYPES.LogoutUseCase).to(LogoutUseCase);
 // Auction useCases
 container.bind<ICreateAuctionUseCase>(TYPES.CreateAuctionUseCase).to(CreateAuctionUseCase);
 container.bind<IGetAllListedAuctionUseCase>(TYPES.GetSellerAuctionUseCase).to(GetAllListedAuctionUseCase);
-container.bind<IGetAllAuctionUseCase>(TYPES.GetAllAuctionsUseCase).to(GetAllAuctionsUseCase)
+container.bind<IGetAllAuctionUseCase>(TYPES.GetAllAuctionsUseCase).to(GetAllAuctionsUseCase);
+container.bind<IGetAuctionDetailsUseCase>(TYPES.GetAuctionDetailsUseCase).to(GetAuctionDetailsUSeCase);
+container.bind<IUpdateAuctionUseCase>(TYPES.UpdateAuctionUseCase).to(UpdateAuctionUseCase);
 
+// Admin-UseCases
+container.bind<IAdminUserManagementUseCase>(TYPES.AdminUserManagementUseCase).to(AdminUserManagementUseCase); 
+container.bind<IBlockUserUseCase> (TYPES.BlockUserUseCase).to(BlockUserUseCase);
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
 container.bind<AuctionController>(TYPES.AuctionController).to(AuctionController);
+container.bind<AdminController>(TYPES.AdminController).to(AdminController);
 
 
 // Bind Redis

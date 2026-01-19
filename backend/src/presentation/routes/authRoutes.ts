@@ -11,7 +11,7 @@ import { rateLimit } from "../middleware/rateLimit.middleware";
 const router = Router();
 const authController = container.get<AuthController>(TYPES.AuthController);
 
-const authLimiter = rateLimit(5, 15 * 60);
+const authLimiter = rateLimit(100, 15 * 60);
 
 
 
@@ -38,5 +38,5 @@ router.post("/refresh-token", authController.refreshToken);
 router.post('/verify-otp', authController.verifyOTP);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
-router.post('/resend-otp',authController.resendOtp);
-router.post("/logout",authController.logout);
+router.post('/resend-otp', authController.resendOtp);
+router.post("/logout", authController.logout);

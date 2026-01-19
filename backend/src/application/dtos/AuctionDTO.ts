@@ -10,3 +10,12 @@ export interface CreateAuctionDTO{
     sellerId:string,
     images?:string[]
 }
+
+export interface UpdateAuctionDTO{
+    title?:string,
+    description?:string,
+    category?:string,
+    startingPrice?:number,
+    endDate?:Date| string,
+    images?:string[]
+}

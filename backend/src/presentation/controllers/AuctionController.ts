@@ -5,6 +5,9 @@ import { ICreateAuctionUseCase } from "../../application/use-cases/Usecase Inter
 import { HttpStatus } from "../Enums/StatusCodes";
 import { IGetAllListedAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IGetAllListedAuctionUseCase";
 import { IGetAllAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IGetAllAuctionsUSeCase";
+import { IGetAuctionDetailsUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IGetAuctionDetailsUseCase";
+import { IUpdateAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IUpdateAuctionUseCase";
+
 
 @injectable()
 
@@ -13,6 +16,9 @@ export class AuctionController{
         @inject(TYPES.CreateAuctionUseCase) private createAuctionUseCase:ICreateAuctionUseCase,
         @inject(TYPES.GetSellerAuctionUseCase) private getAllListedAuctionUseCase:IGetAllListedAuctionUseCase,
         @inject(TYPES.GetAllAuctionsUseCase)private getAllAuctionsUseCase:IGetAllAuctionUseCase,
+        @inject(TYPES.GetAuctionDetailsUseCase) private getAuctionDetails:IGetAuctionDetailsUseCase,
+        @inject(TYPES.UpdateAuctionUseCase) private updateAuctionUseCase:IUpdateAuctionUseCase,
+
 
     ){ }
     create=async (req:Request,res:Response,next:NextFunction)=>{
@@ -29,7 +35,8 @@ export class AuctionController{
     }
     getAll=async (req:Request,res:Response, next:NextFunction)=>{
         try{
-            const auctions=await this.getAllAuctionsUseCase.execute();
+            const {category} = req.query;
+            const auctions=await this.getAllAuctionsUseCase.execute(category as string);
             res.status(HttpStatus.OK).json({success:true,data:auctions});
         }catch(error){
             next(error);
@@ -44,4 +51,31 @@ export class AuctionController{
             next(error);
         }
     }
+    getAuctionProductDetails=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            const {id} = req.params;
+            const auction=await this.getAuctionDetails.execute(id);
+            if(!auction){
+                res.status(HttpStatus.NOT_FOUND).json({success:false,message:"Auction not found"});
+                return;
+            }
+            res.status(HttpStatus.OK).json({success:true,data:auction});
+        }catch(error){
+            next(error);
+        }
+    }
+    update=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            const {id} =req.params;
+            const updatedAuction=await this.updateAuctionUseCase.execute(id,req.body);
+            if(!updatedAuction){
+                res.status(HttpStatus.NOT_FOUND).json({success:false,message:"Auction not found"});
+                return;
+            }
+            res.status(HttpStatus.OK).json({success:true,data:updatedAuction});
+        }catch(error){
+            next(error);
+        }
+    }
+
 }

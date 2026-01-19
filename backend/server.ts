@@ -10,6 +10,8 @@ import { connectRedis } from './src/infrastructure/redis/redisClient.js'
 import cookieParser from "cookie-parser";
 import authRoutes from "./src/presentation/routes/authRoutes.js"
 import auctionRoutes from "./src/presentation/routes/auctionRoutes.js";
+import UploadRoutes from "./src/presentation/routes/user/UploadRoutes.js";
+import adminRoutes from "./src/presentation/routes/admin/adminRoutes.js";
 
 const app = express();
 configurePassport();
@@ -25,8 +27,9 @@ app.use(passport.initialize());
 
 
 app.use("/user", authRoutes);
-app.use('/auctions',auctionRoutes)
-
+app.use('/auctions', auctionRoutes)
+app.use('/upload', UploadRoutes);
+app.use("/admin",adminRoutes);
 
 app.use(errorHandler);
 

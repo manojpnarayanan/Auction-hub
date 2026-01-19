@@ -2,9 +2,16 @@ import { useState, useEffect } from "react";
 import { signup } from "../api/auth";
 import OTPModal from "../components/OTPModal";
 import { useNavigate } from "react-router-dom";
+import  type { SignupCredentials } from "../types/auth";
 
 export default function Signup() {
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  // const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [form,setForm]=useState<SignupCredentials &{confirmPassword:string} >({
+    name:"",
+    email:"",
+    password:"",
+    confirmPassword:"",
+  });
   const [msg, setMsg] = useState("");
   const [showOTP, setShowOTP] = useState(false);
   const [emailForOTP, setEmailForOTP] = useState("");

@@ -23,6 +23,26 @@ export class MongoAuctionRepository implements IAuctionRepository{
         const auction=await AuctionModel.findById(id);
         return auction? this.mapToEntity(auction):null
     }
+    async update(id:string,data:Partial<Auction>):Promise<Auction | null>{
+        const updatedAuction=await AuctionModel.findByIdAndUpdate(id,data,{new:true})
+        if(!updatedAuction) return null;
+        return new Auction(
+            updatedAuction.title,
+        updatedAuction.description,
+        updatedAuction.category,
+        updatedAuction.startingPrice,
+        updatedAuction.currentPrice,
+        updatedAuction.endDate,
+        updatedAuction.sellerId.toString(),
+        updatedAuction.images,
+        updatedAuction.status as "active" | "sold" | "expired",
+        // updatedAuction._id.toString();
+        )
+    }
+    async findByCategory(category:string):Promise<Auction[]>{
+        const auctions=await AuctionModel.find({category:category});
+        return auctions.map(this.mapToEntity);
+    }
 
 
     private mapToEntity(doc:any):Auction{

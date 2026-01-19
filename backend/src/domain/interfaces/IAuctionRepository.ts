@@ -6,4 +6,6 @@ export interface IAuctionRepository{
     findAll():Promise<Auction[]>;
     findBySellerId(sellerId:string):Promise<Auction[]>;
     findById(id:string):Promise<Auction | null>;
+    update(id:string,data:Partial<Auction>):Promise< Auction | null>;
+    findByCategory(category:string):Promise<Auction[]>;
 }

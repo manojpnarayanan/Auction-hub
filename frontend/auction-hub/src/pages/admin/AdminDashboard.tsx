@@ -1,11 +1,11 @@
-import LogoutButton from "../../components/LogoutButton";
+
 
 export default function AdminDashboard() {
     return (
         <div className="min-h-screen bg-slate-900 text-white p-8">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                <LogoutButton />
+                {/* <LogoutButton /> */}
             </div>
             <p className="text-slate-400 mt-2">Welcome to the admin panel!</p>
         </div>

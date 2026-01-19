@@ -12,6 +12,7 @@ export class User {
         public readonly otpExpiry?: Date,
         public readonly googleId?: string,
         public readonly isVerified: boolean = false,
+        public readonly isBlocked:boolean= false,
     ) { }
 
     

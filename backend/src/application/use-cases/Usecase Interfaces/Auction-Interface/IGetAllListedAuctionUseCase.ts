@@ -1,7 +1,7 @@
-import { CreateAuctionDTO } from "../../../dtos/AuctionDTO";
+import { AuctionResponseDTO, CreateAuctionDTO } from "../../../dtos/AuctionDTO";
 
   
 
 export interface IGetAllListedAuctionUseCase{
-    execute(sellerId:string):Promise<CreateAuctionDTO []>
+    execute(sellerId:string):Promise<AuctionResponseDTO []>
 }

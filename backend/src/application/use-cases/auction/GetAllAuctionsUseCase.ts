@@ -4,6 +4,8 @@ import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepositor
 import { CreateAuctionDTO } from "../../dtos/AuctionDTO";
 import { IGetAllAuctionUseCase } from "../Usecase Interfaces/Auction-Interface/IGetAllAuctionsUSeCase";
 import { Auction } from "../../../domain/entities/Auction.entity";
+import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
+import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
 
 
 @injectable()
@@ -13,10 +15,14 @@ export class GetAllAuctionsUseCase implements IGetAllAuctionUseCase{
         @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository,
 
     ) { }
-    async execute(category:string): Promise<Auction[]> {
+    async execute(category:string): Promise<AuctionResponseDTO[]> {
+        let auctions;
         if(category && category!=="All"){
-            return await this.auctionRepository.findByCategory(category)
+            auctions= await this.auctionRepository.findByCategory(category)
+        }else {
+            auctions= await this.auctionRepository.findAll();
+
         }
-        return await this.auctionRepository.findAll();
+        return AuctionDTOMapper.toResponseDTOs(auctions);
     }
 }

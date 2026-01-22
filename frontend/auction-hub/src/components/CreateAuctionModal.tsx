@@ -1,6 +1,6 @@
 import { useState,useEffect } from "react";
 import { createAuction ,updateAuction} from "../api/auctions";
-import axios from "axios";
+import API from "../api/axiosInstances";
 
 interface Props {
   onClose: () => void;
@@ -53,7 +53,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
 
     try {
       const API_URL = import.meta.env.VITE_API_URL;
-      const res = await axios.post(`${API_URL}/upload`, formData, {
+      const res = await API.post(`${API_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 

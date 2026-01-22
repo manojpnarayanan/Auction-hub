@@ -4,6 +4,10 @@ import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepositor
 import { ICreateAuctionUseCase } from "../Usecase Interfaces/Auction-Interface/IAuctionUseCase";
 import { Auction } from "../../../domain/entities/Auction.entity";
 import { CreateAuctionDTO } from "../../dtos/AuctionDTO";
+import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
+import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
+
+
 
 @injectable()
 
@@ -11,7 +15,7 @@ export class CreateAuctionUseCase implements ICreateAuctionUseCase{
     constructor(
         @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository
     ) { }
-    async execute(data:CreateAuctionDTO):Promise<Auction>{
+    async execute(data:CreateAuctionDTO):Promise<AuctionResponseDTO>{
         const newAuction=new Auction(
             data.title,
             data.description,
@@ -22,6 +26,9 @@ export class CreateAuctionUseCase implements ICreateAuctionUseCase{
             data.sellerId,
             data.images || []
         );
-        return await this.auctionRepository.create(newAuction);
+        const createdAuction= await this.auctionRepository.create(newAuction);
+        return AuctionDTOMapper.toResponseDTO(createdAuction);
+    
+    
     }
 }

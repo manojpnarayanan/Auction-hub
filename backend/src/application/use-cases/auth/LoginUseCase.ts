@@ -8,7 +8,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../../../infrastructure/config/environment";
 import { ILoginUseCase } from "../Usecase Interfaces/ILoginUseCase";
-
+import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
 
 
 @injectable()
@@ -21,6 +21,10 @@ export class LoginUseCase implements ILoginUseCase {
         const user = await this.userRepository.findByEmail(credentials.email);
         if (!user || !user.password) {
             throw new UnauthorizedError("Invalid Credentials");
+        }
+
+        if(user.isBlocked){
+            throw new UnauthorizedError("User is blocked")
         }
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) throw new UnauthorizedError("Invalid Password");
@@ -44,13 +48,14 @@ export class LoginUseCase implements ILoginUseCase {
             message: "Login successful",
             token,
             refreshToken,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                createdAt: user.createdAt
-            }
+            user: UserDTOMapper.toResponseDTO(user)
+            //  {
+            //     id: user.id,
+            //     name: user.name,
+            //     email: user.email,
+            //     role: user.role,
+            //     createdAt: user.createdAt
+            // }
         }
     }
 }

@@ -6,7 +6,8 @@ import { GoogleAuthDTO, OAuthResponseDTO } from "../../dtos/user.dto";
 import jwt from "jsonwebtoken";
 import { config } from "../../../infrastructure/config/environment";
 import { IGoogleAuthUseCase } from "../Usecase Interfaces/IGoogleAuthUseCase";
-
+import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
+import { User } from "../../../domain/entities/User.entity";
 
 @injectable()
 
@@ -51,13 +52,14 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
             token,
             refreshToken,
             isNewUser,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                createdAt: user.createdAt
-            }
+            user: UserDTOMapper.toResponseDTO(user)
+            //  {
+            //     id: user.id,
+            //     name: user.name,
+            //     email: user.email,
+            //     role: user.role,
+            //     createdAt: user.createdAt
+            // }
 
         }
     }

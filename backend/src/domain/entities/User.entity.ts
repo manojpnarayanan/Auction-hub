@@ -16,6 +16,19 @@ export class User {
     ) { }
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+    
     isOTPValid(providedOTP: string): boolean {
         if (!this.otp || !this.otpExpiry) {
             return false;

@@ -21,7 +21,7 @@ export class AdminController{
             
             res.status(200).json({
                 users:result.users,
-                totalPage:Math.ceil(result.total/limit),
+                totalPages:Math.ceil(result.total/limit),
                 currentPage:page,
                 totalUsers:result.total
             });

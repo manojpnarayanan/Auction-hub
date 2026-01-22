@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "../../../infrastructure/config/environment";
 import { ISignupUseCase } from "../Usecase Interfaces/ISignupUseCase";
+import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
 
 @injectable()
 
@@ -56,13 +57,14 @@ export class SignupUseCase implements ISignupUseCase {
             message: "OTP sent to mail",
             token,
             refreshToken,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                createdAt: user.createdAt
-            }
+            user: UserDTOMapper.toResponseDTO(user)
+            //  {
+            //     id: user.id,
+            //     name: user.name,
+            //     email: user.email,
+            //     role: user.role,
+            //     createdAt: user.createdAt
+            // }
         }
     }
 

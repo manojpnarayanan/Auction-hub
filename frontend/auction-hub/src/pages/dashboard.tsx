@@ -1,4 +1,4 @@
-import { useSelector ,useDispatch, } from "react-redux";
+import { useSelector, useDispatch, } from "react-redux";
 import { useState, useEffect } from "react";
 // import { Link } from "react-router-dom";
 import type { RootState } from "../redux/store";
@@ -11,23 +11,23 @@ import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("Home");
   // const [myAuctions, setMyAuctions] = useState<any[]>([]);
   // const [allAuctions, setAllAuctions] = useState<any[]>([]);
-  const {allAuctions,myAuctions} =useSelector((state:RootState)=>state.auctions)
+  const { allAuctions, myAuctions } = useSelector((state: RootState) => state.auctions)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedAuction, setSelectedAuction] = useState<any>(null);
-  const [selectedCategory,setSelectedCategory]= useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
 
-  const fetchAll = async (category:string="All") => {
+  const fetchAll = async (category: string = "All") => {
     try {
       const res = await getAllAuctions(category);
       dispatch(setAllAuctions(res.data.data));
-      if(category==="All"){
-      const myRes = await getMyAuctions();
-      dispatch(setMyAuctions(myRes.data.data));
+      if (category === "All") {
+        const myRes = await getMyAuctions();
+        dispatch(setMyAuctions(myRes.data.data));
       }
     } catch (error) {
       console.error("Failed to load auctions", error);
@@ -50,10 +50,10 @@ export default function Dashboard() {
   // },[]);
 
   const categories = [
-    { name: "All", icon: "🏠"  },
+    { name: "All", icon: "🏠" },
     { name: "Vehicles", icon: "🚗" },
-    { name: "Electronics", icon: "💻"  },
-    { name: "Others", icon:  "📦" },
+    { name: "Electronics", icon: "💻" },
+    { name: "Others", icon: "📦" },
   ];
 
   // const liveAuctions = [
@@ -75,9 +75,9 @@ export default function Dashboard() {
     {
       title: "Vintage Camera", desc: "Classic Film Camera",
       img: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2528"
-    }, { title: "Gaming Laptop", desc: "High performance laptop for gaming", img: "https://images.unsplash.com/photo-1603302576837-59f9ddd15367?q=80&w=2528" },
+    }, { title: "Gaming Laptop", desc: "High performance laptop for gaming", img: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=2500" },
     { title: "Designer Handbag", desc: "Limited edition designer handbag", img: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?q=80&w=2535" },
-    { title: "Art Deco Lamp", desc: "Elegant lamp from the Art Deco era", img: "https://images.unsplash.com/photo-1507473888900-52a11b2d8ce2?q=80&w=2500" },
+    // { title: "Art Deco Lamp", desc: "Elegant lamp from the Art Deco era", img: "https://images.unsplash.com/photo-1513506003011-3b062f73710c?q=80&w=2500" },
   ]
 
   return (
@@ -117,7 +117,7 @@ export default function Dashboard() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[21/9]">
           <img
-            src="https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?q=80&w=2670"
+            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2600"
             alt="Hero"
             className="w-full h-full object-cover"
           />
@@ -144,19 +144,19 @@ export default function Dashboard() {
               </div>
             ))} */}
             {categories.map((cat) => (
-    <div 
-        key={cat.name} 
-        onClick={() => setSelectedCategory(cat.name)} // Update State
-        className={`flex flex-col items-center gap-2 cursor-pointer group ${selectedCategory === cat.name ? "opacity-100" : "opacity-60 hover:opacity-100"}`} // Active styling
-    >
-        <div className={`w-16 h-16 rounded-2xl shadow-sm border flex items-center justify-center text-3xl transition-all ${selectedCategory === cat.name ? "bg-blue-50 border-blue-500 scale-110" : "bg-white border-gray-100"}`}>
-            {cat.icon}
-        </div>
-        <span className={`text-xs font-semibold ${selectedCategory === cat.name ? "text-blue-600" : "text-gray-600"}`}>
-            {cat.name}
-        </span>
-    </div>
-))}
+              <div
+                key={cat.name}
+                onClick={() => setSelectedCategory(cat.name)} // Update State
+                className={`flex flex-col items-center gap-2 cursor-pointer group ${selectedCategory === cat.name ? "opacity-100" : "opacity-60 hover:opacity-100"}`} // Active styling
+              >
+                <div className={`w-16 h-16 rounded-2xl shadow-sm border flex items-center justify-center text-3xl transition-all ${selectedCategory === cat.name ? "bg-blue-50 border-blue-500 scale-110" : "bg-white border-gray-100"}`}>
+                  {cat.icon}
+                </div>
+                <span className={`text-xs font-semibold ${selectedCategory === cat.name ? "text-blue-600" : "text-gray-600"}`}>
+                  {cat.name}
+                </span>
+              </div>
+            ))}
           </div>
         </section>
         {/* 4. Live Auctions */}
@@ -174,7 +174,7 @@ export default function Dashboard() {
               </div>
             ) : (
               // 2. SHOW THIS IF ITEMS EXIST
-              allAuctions.map((auction:any) => (
+              allAuctions.map((auction: any) => (
                 <div key={auction.id}
                   onClick={() => navigate(`/auction/${auction.id}`)}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
@@ -261,7 +261,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {myAuctions.map((auction:any) => (
+              {myAuctions.map((auction: any) => (
                 <div key={auction.id}
                   onClick={() => navigate(`/auction/${auction.id}`)}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer">
@@ -335,9 +335,9 @@ export default function Dashboard() {
         </div>
       </footer>
       {isModalOpen && (
-        <CreateAuctionModal onClose={() => setIsModalOpen(false)} 
-        onSuccess={fetchAll} 
-        initialData={selectedAuction}
+        <CreateAuctionModal onClose={() => setIsModalOpen(false)}
+          onSuccess={fetchAll}
+          initialData={selectedAuction}
         />
       )}
     </div>

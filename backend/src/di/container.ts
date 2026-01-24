@@ -59,6 +59,21 @@ import { IBlockUserUseCase } from "../application/use-cases/Usecase Interfaces/A
 import { BlockUserUseCase } from "../application/use-cases/Admin/BlockUserUseCase";
 
 
+// Category Section
+import { MongoCategoryRepository } from "../infrastructure/database/repositories/MongoCategoryRepository";
+import { ICategoryRepository } from "../domain/interfaces/ICategoryRepository";
+import { CreateCategoryUseCase } from "../application/use-cases/Admin/Category UseCase/CreateCategoryUseCase";
+import { ICreatecategoryUseCase } from "../application/use-cases/Usecase Interfaces/Admin/Category Interface/ICreatecategoryUseCase";
+import { CategoryController } from "../presentation/controllers/admin/CategoryController";
+import { IGetAllCategoriesUseCase } from "../application/use-cases/Usecase Interfaces/Admin/Category Interface/IGetAllCategoriesUseCase";
+import { GetAllCategoriesUseCase } from "../application/use-cases/Admin/Category UseCase/GetAllCategoriesUseCase";
+import { IUpdateCategoryUseCase } from "../application/use-cases/Usecase Interfaces/Admin/Category Interface/IUpdateCategoryUseCase";
+import { UpdateCategoryUseCase } from "../application/use-cases/Admin/Category UseCase/UpdateCategoryUseCase";
+import { IDeleteCategoryUseCase } from "../application/use-cases/Usecase Interfaces/Admin/Category Interface/IDeleteCategoryUseCase";
+import { DeleteCategoryUseCase } from "../application/use-cases/Admin/Category UseCase/DeleteCategoryUseCase";
+
+
+
 
 const container = new Container();
 // Repositories
@@ -85,8 +100,20 @@ container.bind<IGetAuctionDetailsUseCase>(TYPES.GetAuctionDetailsUseCase).to(Get
 container.bind<IUpdateAuctionUseCase>(TYPES.UpdateAuctionUseCase).to(UpdateAuctionUseCase);
 
 // Admin-UseCases
-container.bind<IAdminUserManagementUseCase>(TYPES.AdminUserManagementUseCase).to(AdminUserManagementUseCase); 
-container.bind<IBlockUserUseCase> (TYPES.BlockUserUseCase).to(BlockUserUseCase);
+container.bind<IAdminUserManagementUseCase>(TYPES.AdminUserManagementUseCase).to(AdminUserManagementUseCase);
+container.bind<IBlockUserUseCase>(TYPES.BlockUserUseCase).to(BlockUserUseCase);
+
+
+// Category section
+container.bind<ICreatecategoryUseCase>(TYPES.CreateCategoryUseCase).to(CreateCategoryUseCase);
+container.bind<CategoryController>(TYPES.CategoryController).to(CategoryController);
+container.bind<ICategoryRepository>(TYPES.CategoryRepository).to(MongoCategoryRepository);
+container.bind<IGetAllCategoriesUseCase>(TYPES.GetAllCategoriesUseCase).to(GetAllCategoriesUseCase);
+container.bind<IUpdateCategoryUseCase>(TYPES.UpdateCategoryUSeCase).to(UpdateCategoryUseCase);
+container.bind<IDeleteCategoryUseCase>(TYPES.DeleteCategoryUseCase).to(DeleteCategoryUseCase)
+
+
+
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);

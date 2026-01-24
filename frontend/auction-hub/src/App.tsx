@@ -13,6 +13,7 @@ import { PublicRoute, PrivateRoute, AdminRoute } from './components/RouteGuards'
 import AuctionProductDetails from './pages/user/AuctionProductDetails';
 import UserManagement from './pages/admin/UserManagement';
 import { AdminLayout } from './pages/admin/AdminLayout';
+import AdminCategories from './pages/admin/AdminCategories';
 
 
 
@@ -58,7 +59,12 @@ function App() {
             <Route path="users" element={
               <AdminRoute><UserManagement /></AdminRoute>
             } />
+            <Route path="categories" element={
+              <AdminRoute><AdminCategories/></AdminRoute>
+              } >
+          </Route>
             <Route index element={<Navigate to="dashboard" replace />} />
+
           </Route>
         </Routes>
 

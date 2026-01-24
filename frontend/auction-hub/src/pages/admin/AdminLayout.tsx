@@ -12,6 +12,7 @@ export function AdminLayout() {
     { name: "Dashboard", path: "/admin/dashboard", },
     // {name:"Auctions" ,path:""},
     { name: "Users", path: "/admin/users" },
+    {name:"Categories",path:"/admin/categories"}
     // {name:"Wallet" ,path:""},
     // {name:"Reports" ,path:""}
   ]

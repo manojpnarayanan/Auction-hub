@@ -12,6 +12,7 @@ import authRoutes from "./src/presentation/routes/authRoutes.js"
 import auctionRoutes from "./src/presentation/routes/auctionRoutes.js";
 import UploadRoutes from "./src/presentation/routes/user/UploadRoutes.js";
 import adminRoutes from "./src/presentation/routes/admin/adminRoutes.js";
+import CategoryRoutes from "./src/presentation/routes/admin/CategoryRoutes.js";
 
 const app = express();
 configurePassport();
@@ -30,6 +31,7 @@ app.use("/user", authRoutes);
 app.use('/auctions', auctionRoutes)
 app.use('/upload', UploadRoutes);
 app.use("/admin",adminRoutes);
+app.use('/admin/categories',CategoryRoutes);
 
 app.use(errorHandler);
 

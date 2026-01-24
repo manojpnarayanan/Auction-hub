@@ -1,5 +1,6 @@
 import { useState,useEffect } from "react";
 import { createAuction ,updateAuction} from "../api/auctions";
+import { getCategories } from "../api/Admin/Category";
 import API from "../api/axiosInstances";
 
 interface Props {
@@ -18,9 +19,22 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
     endDate: "",
     images: [] as string[]
   });
+  const [categories,setCategories]=useState<{id:string,name:string}[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(()=>{
+    const fetchCat=async()=>{
+      try{
+        const data=await getCategories();
+        setCategories(data);
+      }catch(err){
+        console.error("Failed to load categories");
+      }
+    }
+    fetchCat();
+  },[])
 
   useEffect(()=>{
     if(initialData){
@@ -123,6 +137,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
           <h2 className="text-xl font-bold text-gray-800">{initialData? "Edit Listing" :"Create new Listing"}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">✕</button>
         </div>
+        
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg">{error}</div>}
           <div>
@@ -132,13 +147,27 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">Category</label>
-              <select name="category" value={form.category} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg bg-white outline-none">
+              {/* <select name="category" value={form.category} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg bg-white outline-none">
                 <option value="Vehicles">Vehicles</option>
                 <option value="Electronics">Electronics</option>
                 <option value="Real Estate">Real Estate</option>
                 <option value="Art">Art</option>
                 <option value="Others">Others</option>
-              </select>
+              </select> */}
+              <select 
+    name="category" 
+    value={form.category} 
+    onChange={handleChange} 
+    className="w-full px-3 py-2 border rounded-lg bg-white outline-none"
+>
+    <option value="Others">Select Category</option>
+    {categories.map((cat) => (
+        <option key={cat.id} value={cat.name}>
+            {cat.name}
+        </option>
+    ))}
+    <option value="Others">Others</option>
+</select>
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">Starting Price ($)</label>

@@ -29,7 +29,15 @@ export const TYPES = {
     // Admin 
     AdminUserManagementUseCase:Symbol.for("AdminUserManagementUseCase"),
     AdminController:Symbol.for("AdminController"),
-    BlockUserUseCase:Symbol.for("BlockUserUseCase")
+    BlockUserUseCase:Symbol.for("BlockUserUseCase"),
+    
+    //  Category
+    CategoryRepository:Symbol.for("CategoryRepository"),
+    CategoryController:Symbol.for("CategoryController"),
+    CreateCategoryUseCase:Symbol.for("CreateCategoryUseCase"),
+    GetAllCategoriesUseCase:Symbol.for("GetAllCategoriesUseCase"),
+    UpdateCategoryUSeCase:Symbol.for("UpdateCategoryUseCase"),
+    DeleteCategoryUseCase:Symbol.for("DeleteCategoryUseCase"),
 
 
 }

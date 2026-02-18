@@ -15,6 +15,8 @@ export interface UserResponseDTO {
     email: string;
     role: string;
     createdAt: Date;
+    isBlocked:boolean;
+    isVerified:boolean;
 }
 
 export interface LoginDTO {

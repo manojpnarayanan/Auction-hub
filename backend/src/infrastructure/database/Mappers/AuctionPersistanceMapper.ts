@@ -14,7 +14,16 @@ export class AuctionPersistanceMapper{
             doc.sellerId,
             doc.images,
             doc.status,
-            doc._id.toString()
+            doc._id.toString(),
+            doc.type,
+            doc.startTime,
+            doc.winnerId,
+            doc.bids? doc.bids.map((b:any)=>({
+                bidderId:b.bidderId,
+                amount:b.amount,
+                time:b.time
+            })):[],
+            doc.createdAt,
         )
     }
 }

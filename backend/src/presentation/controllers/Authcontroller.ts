@@ -30,6 +30,7 @@ export class AuthController {
 
     signup = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            // console.log(req.body);
             const result = await this.signupUseCase.execute(req.body);
             res.status(HttpStatus.CREATED).json({ success: true, data: result });
         } catch (error) {

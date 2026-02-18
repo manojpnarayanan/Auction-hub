@@ -13,8 +13,15 @@ import auctionRoutes from "./src/presentation/routes/auctionRoutes.js";
 import UploadRoutes from "./src/presentation/routes/user/UploadRoutes.js";
 import adminRoutes from "./src/presentation/routes/admin/adminRoutes.js";
 import CategoryRoutes from "./src/presentation/routes/admin/CategoryRoutes.js";
+import bidRoutes from "./src/presentation/routes/user/BidRoutes.js";
+import { ISocketService } from "./src/domain/interfaces/ISocketService.js";
+import { createServer } from "http";
+import container from "./src/di/container.js";
+import {TYPES} from "./src/di/types.js"
+import {startCronJobs} from "./src/infrastructure/Cron/Cron.js";
 
 const app = express();
+const httpServer=createServer(app);
 configurePassport();
 
 
@@ -32,15 +39,22 @@ app.use('/auctions', auctionRoutes)
 app.use('/upload', UploadRoutes);
 app.use("/admin",adminRoutes);
 app.use('/admin/categories',CategoryRoutes);
+app.use('/bids',bidRoutes)
 
 app.use(errorHandler);
 
 
 connectDB();
 connectRedis();
+startCronJobs();
 
+const socketService=container.get<ISocketService>(TYPES.SocketService);
+socketService.init(httpServer)
 
 const PORT = config.port;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+
+

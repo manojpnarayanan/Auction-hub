@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { createCategory, getCategories ,updateCategory,deleteCategory} from "../../api/Admin/Category";
-import Swal from "sweetalert2";
+import Pagination from "../../components/Pagination";
+import toast from "react-hot-toast";
+import ConfirmModal from "../../components/ConfirmationModal";
 
 
 
@@ -17,49 +19,51 @@ export default function AdminCategories(){
     const [editingId,setEditingId]=useState<string | null>(null);
     const [form,setForm]=useState({name:"",description:""});
     const [msg,setMsg]=useState("");
+    const [isDeleteModalOpen,setIsDeleteModalOpen]=useState(false);
+    const [categoryToDelete,setCategoryToDelete]=useState<string | null>(null);
+    const [searchTerm,setSearchTerm]=useState('');
+    const [debounceTerm,setDebounceTerm]=useState("")
+    const [page,SetPage]=useState(1);
+    const [totalPages,setTotalPages]=useState(1);
+    const limit=2
+
+    useEffect(()=>{
+      const timerId=setTimeout(()=>{
+        setDebounceTerm(searchTerm);
+      },500)
+      return()=> clearTimeout(timerId);
+    },[searchTerm])
 
     useEffect(()=>{
         fetchCategories();
-    },[])
+    },[page,debounceTerm])
 
     const fetchCategories=async ()=>{
         try{
-            const data=await getCategories();
-            setCategories(data)
+            const data=await getCategories(page,limit,debounceTerm);
+            console.log(data);
+            setCategories(data.categories);
+            setTotalPages(Math.ceil(data.total/limit));
         }catch(error){
             console.error("Failed to fetch Categories",error);
         }
     }
-    const handleDelete=async (id:string)=>{
-        
-            const result=await Swal.fire({
-                title:"Are you sure?",
-                text:"You wont be able to revert this?",
-                icon:"warning",
-                showCancelButton:true,
-                confirmButtonColor:"#d33",
-                cancelButtonColor:"#3085d6",
-                confirmButtonText:"Delete"
-            });
-            if(result.isConfirmed){
-                try{
-                    await deleteCategory(id);
-                    Swal.fire({
-                        title:"Deleted",
-                        text:"Category has been deleted",
-                        icon:"success",
-                    });
-                    fetchCategories();
-                }catch(error){
-                  console.error(error);
-                  Swal.fire({
-                    title:"Error",
-                    text:"Failed to delete Category",
-                    icon:"error"
-                  });
-                }
-            }
-        
+    
+    const handleDelete=async(id:string)=>{
+      setCategoryToDelete(id);
+      setIsDeleteModalOpen(true);
+    }
+    const confirmDelete=async ()=>{
+      if(!categoryToDelete) return;
+      try{
+        await deleteCategory(categoryToDelete);
+        toast.success("Category deleted successfully");
+        fetchCategories();
+        setIsDeleteModalOpen(false);
+      }catch(error){
+        console.error(error);
+        toast.error("Failed to delete category");
+      }
     }
     const handleEdit=async (category:Category)=>{
         setEditingId(category.id)
@@ -73,10 +77,10 @@ export default function AdminCategories(){
         try{
             if(editingId){
                 await updateCategory(editingId,form);
-                setMsg("Category updated successfully")
+                toast.success("Category updated successfully")
             }else{
                 await createCategory(form);
-                setMsg("Category created Successfully");
+                toast.success("Category created Successfully");
 
             }
             setForm({name:"",description:""});
@@ -85,13 +89,14 @@ export default function AdminCategories(){
             fetchCategories()
         }catch(error){
             console.error(error);
-            setMsg("Failed to create category");
+            toast.error("Failed to create category");
         }
     }
      return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Manage Categories</h1>
+        <input type="text" value={searchTerm} onChange={(e)=>{setSearchTerm(e.target.value)}} placeholder="Search here......" className="border px-3 py-2 rounded-lg"  />
         <button 
           onClick={() =>{ 
             setIsCreating(!isCreating);
@@ -173,6 +178,20 @@ export default function AdminCategories(){
           </tbody>
         </table>
       </div>
+      <Pagination 
+       currentPage={page}
+       totalPages={totalPages}
+       onPageChange={SetPage}
+      />
+      <ConfirmModal 
+      isOpen={isDeleteModalOpen}
+      onClose={()=>setIsDeleteModalOpen(false)}
+      onConfirm={confirmDelete}
+      title="Delete Category"
+      message="Are you sure to delete this category? "
+      confirmText="Yes, Delete"
+      isDanger={true}
+      />
     </div>
   );
 }

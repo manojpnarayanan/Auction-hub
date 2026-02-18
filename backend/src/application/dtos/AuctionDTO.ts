@@ -8,7 +8,10 @@ export interface CreateAuctionDTO {
     currentPrice: number,
     endDate: Date | string,
     sellerId: string,
-    images?: string[]
+    images?: string[],
+    type:'live'|"timed",
+    startTime?:Date | string;
+    createdAt?:Date
 }
 
 export interface UpdateAuctionDTO {
@@ -29,5 +32,9 @@ export interface AuctionResponseDTO {
     endDate: Date | string,
     sellerId: string,
     images: string[],
-    status: string
+    status: string,
+    type:string,
+    startTime?:Date,
+    winnerId?:string;
+    bids:{bidderId:string,amount:number,time:Date}[];
 }

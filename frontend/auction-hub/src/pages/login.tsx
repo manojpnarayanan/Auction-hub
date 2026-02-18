@@ -30,23 +30,16 @@ export default function Login() {
 
         try {
             const res = await login(form);
-            // ADD THESE LINES:
-            // console.log(' Response:', res.data);
-            // console.log(' Token:', res.data.token);
-            // console.log(' User:', res.data.user);
-
+            // console.log(res);
             dispatch(
                 setCredentials({
                     user: res.data.user,
                     token: res.data.token,
                 })
             );
-            // ADD THESE LINES:
-            // console.log(' Response:', res.data);
-            // console.log(' Token:', res.data.token);
-            // console.log(' User:', res.data.user);
+            
             await new Promise(resolve => setTimeout(resolve, 100));
-            navigate("/user/dashboard"); // Dashboard
+            navigate("/user/dashboard");
         } catch (err: any) {
             console.error("login failed", err);
             setMsg(err.response?.data?.message || "Login Failed -Please check Credentials")

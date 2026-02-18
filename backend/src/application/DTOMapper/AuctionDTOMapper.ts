@@ -16,7 +16,11 @@ export class AuctionDTOMapper {
             endDate: auction.endDate,
             sellerId: auction.sellerId,
             images: auction.images,
-            status: auction.status
+            status: auction.status,
+            type:auction.type,
+            startTime:auction.startTime,
+            winnerId:auction.winnerId,
+            bids:auction.bids
         }
     }
     static toResponseDTOs(auctions: Auction[]): AuctionResponseDTO[] {

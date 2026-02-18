@@ -10,7 +10,7 @@ export function AdminLayout() {
   const { user } = useSelector((state: RootState) => state.auth);
   const navItems = [
     { name: "Dashboard", path: "/admin/dashboard", },
-    // {name:"Auctions" ,path:""},
+    {name:"Auctions" ,path:"/admin/auctions"},
     { name: "Users", path: "/admin/users" },
     {name:"Categories",path:"/admin/categories"}
     // {name:"Wallet" ,path:""},

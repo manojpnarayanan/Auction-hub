@@ -15,9 +15,16 @@ export class MongoCategoryRepository implements ICategoryRepository {
         if(!category) return null;
         return CategoryPersistanceMapper.toEntity(category);
     }
-    async findAll(): Promise<Category[]> {
-        const categories=await CategoryModel.find();
-        return categories.map((c)=>CategoryPersistanceMapper.toEntity(c)) 
+    async findAll(page:number,limit:number,searchTerm:string): Promise<{categories:Category[],total:number}> {
+        // const categories=await CategoryModel.find();
+        const skip=(page-1)*limit;
+        const query:any={};
+        if(searchTerm){
+            query.name={$regex:searchTerm,$options:'i'}
+        };
+        const [category,total]=await Promise.all([ CategoryModel.find(query).skip(skip).limit(limit),
+        CategoryModel.countDocuments(query)]);
+        return {categories:category.map((c)=>CategoryPersistanceMapper.toEntity(c)),total}; 
     }
     async update(id: string, data: Partial<Category>): Promise<Category | null> {
         const updated=await CategoryModel.findByIdAndUpdate(id,data,{new:true});

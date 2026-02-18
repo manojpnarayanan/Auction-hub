@@ -10,7 +10,11 @@ export interface IAuctionDocument extends Document{
     endDate:Date;
     sellerId:string;
     images:string[];
-    status:'active'| 'sold' | 'expired'
+    status:'active'| 'sold' | 'expired',
+    type:'live' |'timed',
+    startTime?:Date,
+    winnerId?:string,
+    bids:{bidderId:string;amount:number;time:Date}[]
 }
 
 const AuctionSchema:Schema=new Schema({
@@ -22,7 +26,17 @@ const AuctionSchema:Schema=new Schema({
     endDate:{type:Date ,required:true},
     sellerId:{type:String ,required:true},
     images:{type:[String], default:[]},
-    status:{type:String,enum:['active','sold','expired'],default:'active'}
+    status:{type:String,enum:['active','sold','expired' ,'pending','rejected'],default:'pending'},
+    type:{type:String,enum:['live','timed'],default:'timed'},
+    startTime:{type:Date},
+    winnerId:{type:String,default:null},
+    bids:[
+        {
+            bidderId:{type:String, required:true},
+            amount:{type:Number,required:true},
+            time:{type:Date,default:Date.now}
+        }
+    ]
 },{timestamps:true});
 
 export const AuctionModel=mongoose.model<IAuctionDocument>("Auction",AuctionSchema);

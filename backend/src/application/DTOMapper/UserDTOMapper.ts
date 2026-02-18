@@ -9,7 +9,9 @@ export class UserDTOMapper {
             name:user.name,
             email:user.email,
             role:user.role,
-            createdAt:user.createdAt
+            createdAt:user.createdAt,
+            isBlocked:user.isBlocked,
+            isVerified:user.isVerified
         }
     }
 }

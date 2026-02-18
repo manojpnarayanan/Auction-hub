@@ -3,6 +3,6 @@ import { CategoryDTO } from "../../../../dtos/CategoryDTO";
 
 
 
-export interface IGetAllCategoriesUseCase{
-    execute():Promise<CategoryDTO[]>;
+export interface IGetAllCategoriesUseCase {
+    execute(page?: number, limit?: number,searchTerm?:string): Promise<{ categories: CategoryDTO[], total: number }>;
 }

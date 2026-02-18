@@ -15,14 +15,18 @@ export class GetAllAuctionsUseCase implements IGetAllAuctionUseCase{
         @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository,
 
     ) { }
-    async execute(category:string): Promise<AuctionResponseDTO[]> {
-        let auctions;
-        if(category && category!=="All"){
-            auctions= await this.auctionRepository.findByCategory(category)
-        }else {
-            auctions= await this.auctionRepository.findAll();
+    async execute(
+        category?:string,
+        search?:string,
+        type?:string,
+        status:string='active',
+        page:number=1,
+        limit:number=10
+    ): Promise<{data:AuctionResponseDTO[],total:number,page:number,totalPages:number}> {
+        const {auction,total}=await this.auctionRepository.findAll({category,search,type,status,page,limit})
 
-        }
-        return AuctionDTOMapper.toResponseDTOs(auctions);
+
+
+        return {data:AuctionDTOMapper.toResponseDTOs(auction),total,page,totalPages:Math.ceil(total/limit)};
     }
 }

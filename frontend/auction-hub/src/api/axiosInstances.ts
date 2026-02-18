@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Store } from "../redux/store";
 import { logout, updateAccessToken } from "../redux/slices/authSlices";
-import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -27,27 +27,40 @@ API.interceptors.response.use(
             const msg = error.response.data.message;
             if ((msg === "user is blocked" || msg === "USer is blocked")
             && !originalRequest.url?.includes('/block')) {
-        if(isBlockedAlertShown){
-            return Promise.reject(error);
-        }
-         isBlockedAlertShown=true;
+        // if(isBlockedAlertShown){
+        //     return Promise.reject(error);
+        // }
+        //  isBlockedAlertShown=true;
 
-                await Swal.fire({
-                    icon: "error",
-                    title: "Account Blocked",
-                    text: "Your Account has been suspended by Administrator",
-                    confirmButtonText: "Logout",
-                    confirmButtonColor: "#d33",
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                });
-                Store.dispatch(logout());
-                localStorage.clear();
-                window.location.href = '/login';
-                isBlockedAlertShown=false;
-                return Promise.reject(error);
-            }
+        //         await Swal.fire({
+        //             icon: "error",
+        //             title: "Account Blocked",
+        //             text: "Your Account has been suspended by Administrator",
+        //             confirmButtonText: "Logout",
+        //             confirmButtonColor: "#d33",
+        //             allowOutsideClick: false,
+        //             allowEscapeKey: false,
+        //         });
+        //         Store.dispatch(logout());
+        //         localStorage.clear();
+        //         window.location.href = '/login';
+        //         isBlockedAlertShown=false;
+        //         return Promise.reject(error);
+        //     }
+        if(!isBlockedAlertShown){
+            isBlockedAlertShown=true;
+            toast.error("Your account was suspended by the administrator",{duration:4000});
+            
+            Store.dispatch(logout());
+            localStorage.clear();
+            setTimeout(()=>{
+                window.location.href='/login';
+                isBlockedAlertShown=false
+            },2000);
         }
+        return Promise.reject(error);
+        }
+    }
         if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes("login")) {
             originalRequest._retry = true;
             try {

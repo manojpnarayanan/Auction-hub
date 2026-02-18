@@ -49,7 +49,8 @@ import { IGetAuctionDetailsUseCase } from "../application/use-cases/Usecase Inte
 import { GetAuctionDetailsUSeCase } from "../application/use-cases/auction/GetAuctionDetailsUseCase";
 import { IUpdateAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IUpdateAuctionUseCase";
 import { UpdateAuctionUseCase } from "../application/use-cases/auction/UpdateAuctionUseCase";
-
+import { IDeleteAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IDeleteAuctionUseCase";
+import { DeleteAuctionUseCase } from "../application/use-cases/auction/DeleteAuctionUseCase";
 
 // Admin-useCases
 
@@ -57,6 +58,8 @@ import { IAdminUserManagementUseCase } from "../application/use-cases/Usecase In
 import { AdminUserManagementUseCase } from "../application/use-cases/Admin/AdminUserManagementUseCase";
 import { IBlockUserUseCase } from "../application/use-cases/Usecase Interfaces/Admin/IBlockUserUseCase";
 import { BlockUserUseCase } from "../application/use-cases/Admin/BlockUserUseCase";
+import { IAdminAuctionManagamentUseCase } from "../application/use-cases/Usecase Interfaces/Admin/IAdminAuctionManagement";
+import { ApproveAuctionUseCase } from "../application/use-cases/Admin/AdminAuctionManagement";
 
 
 // Category Section
@@ -72,8 +75,20 @@ import { UpdateCategoryUseCase } from "../application/use-cases/Admin/Category U
 import { IDeleteCategoryUseCase } from "../application/use-cases/Usecase Interfaces/Admin/Category Interface/IDeleteCategoryUseCase";
 import { DeleteCategoryUseCase } from "../application/use-cases/Admin/Category UseCase/DeleteCategoryUseCase";
 
-
-
+// Bid
+import { IBidRepository } from "../domain/interfaces/IBidRepository";
+import { MongoBidRepository } from "../infrastructure/database/repositories/MongoBidRepository";
+import { BidController } from "../presentation/controllers/user/BidController";
+import { PlaceBidUseCase } from "../application/use-cases/Bid/PlaceBidUseCase";
+import { IPlaceBidUseCase } from "../application/use-cases/Usecase Interfaces/Bid-interface/IPlaceBidUseCase";
+import { IGetAuctionBidsUseCase } from "../application/use-cases/Usecase Interfaces/Bid-interface/IGetAuctionBidsUseCase";
+import { GetAuctionBidsUseCase } from "../application/use-cases/Bid/GetAuctionBidsUseCase";
+import { ISocketService } from "../domain/interfaces/ISocketService";
+import { SocketService } from "../infrastructure/socket/SocketService";
+import { ICloseExpiredAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/ICloseExpiredAuctionUseCase";
+import { CloseExpiredAuctionUseCase } from "../application/use-cases/auction/CloseExpiredAuctionsUseCase";
+import { IGetUserBidsUseCase } from "../application/use-cases/Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
+import { GetUserBidUseCase } from "../application/use-cases/Bid/GetUserBidUseCase";
 
 const container = new Container();
 // Repositories
@@ -98,27 +113,37 @@ container.bind<IGetAllListedAuctionUseCase>(TYPES.GetSellerAuctionUseCase).to(Ge
 container.bind<IGetAllAuctionUseCase>(TYPES.GetAllAuctionsUseCase).to(GetAllAuctionsUseCase);
 container.bind<IGetAuctionDetailsUseCase>(TYPES.GetAuctionDetailsUseCase).to(GetAuctionDetailsUSeCase);
 container.bind<IUpdateAuctionUseCase>(TYPES.UpdateAuctionUseCase).to(UpdateAuctionUseCase);
+container.bind<IDeleteAuctionUseCase>(TYPES.DeleteAuctionUseCase).to(DeleteAuctionUseCase);
+container.bind<ICloseExpiredAuctionUseCase>(TYPES.CloseExpiredAuctionsUseCase).to(CloseExpiredAuctionUseCase)
 
 // Admin-UseCases
 container.bind<IAdminUserManagementUseCase>(TYPES.AdminUserManagementUseCase).to(AdminUserManagementUseCase);
 container.bind<IBlockUserUseCase>(TYPES.BlockUserUseCase).to(BlockUserUseCase);
+container.bind<IAdminAuctionManagamentUseCase>(TYPES.ApproveAuctionUseCase).to(ApproveAuctionUseCase);
 
 
 // Category section
 container.bind<ICreatecategoryUseCase>(TYPES.CreateCategoryUseCase).to(CreateCategoryUseCase);
-container.bind<CategoryController>(TYPES.CategoryController).to(CategoryController);
 container.bind<ICategoryRepository>(TYPES.CategoryRepository).to(MongoCategoryRepository);
 container.bind<IGetAllCategoriesUseCase>(TYPES.GetAllCategoriesUseCase).to(GetAllCategoriesUseCase);
 container.bind<IUpdateCategoryUseCase>(TYPES.UpdateCategoryUSeCase).to(UpdateCategoryUseCase);
 container.bind<IDeleteCategoryUseCase>(TYPES.DeleteCategoryUseCase).to(DeleteCategoryUseCase)
 
 
+// Bid Section
+container.bind<IBidRepository>(TYPES.BidRepository).to(MongoBidRepository);
+container.bind<IPlaceBidUseCase>(TYPES.PlaceBidUseCase).to(PlaceBidUseCase);
+container.bind<IGetAuctionBidsUseCase>(TYPES.GetAuctionBidsUseCase).to(GetAuctionBidsUseCase);
+container.bind<ISocketService>(TYPES.SocketService).to(SocketService).inSingletonScope();
+container.bind<IGetUserBidsUseCase>(TYPES.GetUserBidUseCase).to(GetUserBidUseCase)
 
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
 container.bind<AuctionController>(TYPES.AuctionController).to(AuctionController);
 container.bind<AdminController>(TYPES.AdminController).to(AdminController);
+container.bind<BidController>(TYPES.BidController).to(BidController);
+container.bind<CategoryController>(TYPES.CategoryController).to(CategoryController);
 
 
 // Bind Redis

@@ -42,7 +42,6 @@ export default function Signup() {
     setMsg("");
 
     // console.log("Validation form",form);
-    // --- NEW VALIDATION START ---
     if (!form.name || !form.email || !form.password || !form.confirmPassword){
       setMsg("Please fill all Fields");
       setLoading(false);
@@ -72,8 +71,6 @@ export default function Signup() {
       setLoading(false);
       return;
     }
-
-    // --- NEW VALIDATION END ---
 
     try {
       await signup(form);

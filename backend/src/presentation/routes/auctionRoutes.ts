@@ -19,6 +19,4 @@ auctionRouter.put('/:id',authenticate,checkBlockedStatus,auctionController.updat
 
 
 
-
-
 export default auctionRouter;

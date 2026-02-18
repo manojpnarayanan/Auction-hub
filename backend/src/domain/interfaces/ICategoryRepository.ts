@@ -4,7 +4,7 @@
  export interface ICategoryRepository{
     create(category:Category):Promise<Category>;
     findById(id:string):Promise<Category | null>;
-    findAll():Promise<Category[]>;
+    findAll(page:number,limit:number,searchTerm:string):Promise<{categories:Category[], total:number}>;
     update(id:string,category:Partial<Category>):Promise<Category | null>;
     delete(id:string):Promise<boolean>
  }

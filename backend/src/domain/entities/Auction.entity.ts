@@ -9,7 +9,13 @@ export class Auction{
         public endDate:Date,
         public sellerId:string,
         public images:string[],
-        public status:'active' | 'sold' |'expired'='active',
-        public id?:string
+        public status:'active' | 'sold' |'expired'| 'pending' | 'rejected'= 'pending',
+        public id?:string,
+        public type:"live" | "timed"="timed",
+        public startTime?:Date,
+        public winnerId?:string,
+        public bids:{bidderId:string,amount:number,time:Date}[]=[],
+        public createdAt?:Date,
+
     ){ }
 }

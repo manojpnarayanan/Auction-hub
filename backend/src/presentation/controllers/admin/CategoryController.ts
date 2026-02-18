@@ -27,7 +27,10 @@ export class CategoryController{
     }
     getAllCategories=async (req:Request,res:Response,next:NextFunction)=>{
         try{
-            const categories=await this.getAllCategoryUseCase.execute();
+            const page=parseInt(req.query.page as string) || 1;
+            const limit=parseInt(req.query.limit as string) || 5
+            const searchTerm=req.query.searchTerm as string
+            const categories=await this.getAllCategoryUseCase.execute(page,limit,searchTerm);
             const response=ApiResponse.success(categories,'Categories Fetched Successfully')
             return res.status(response.statusCode).json(response);
         }catch(error){

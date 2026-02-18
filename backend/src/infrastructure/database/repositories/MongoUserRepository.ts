@@ -51,27 +51,14 @@ export class MongoUserRepository implements IUserRepository {
             UserModel.find(query).sort({createdAt:-1}).skip(skip).limit(limit),
             UserModel.countDocuments(query)
         ]);
+        // console.log("DB fetch ",JSON.stringify(userDoc,null,2))
         return {
             users:userDoc.map(doc=>UserPersistanceMapper.toEntity(doc)),total
         }
     }
     async updateBlockStatus(userId: string, isBlocked: boolean): Promise<void> {
+        console.log("Blocking user", userId,isBlocked)
         await UserModel.findByIdAndUpdate(userId,{isBlocked});
     }
-    // private mapToEntity(doc: IUserDocument): User {
-    //     return new User(
-    //         (doc._id as any).toString(),
-    //         doc.name,
-    //         doc.email,
-    //         doc.password || "",
-    //         doc.role,
-    //         doc.createdAt,
-    //         doc.updatedAt,
-    //         doc.otp,
-    //         doc.otpExpiry,
-    //         doc.googleId,
-    //         doc.isVerified,
-    //         doc.isBlocked
-    //     )
-    // }
+    
 }

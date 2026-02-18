@@ -13,8 +13,8 @@ export class GetAllCategoriesUseCase implements IGetAllCategoriesUseCase {
     constructor(
         @inject(TYPES.CategoryRepository) private categoryRepository: ICategoryRepository
     ) { }
-    async execute(): Promise<CategoryDTO[]> {
-        const categories = await this.categoryRepository.findAll();
-        return categories.map((category) => categoryDTOMapper.toDTO(category));
+    async execute(page:number,limit:number,searchTerm:string): Promise<{categories:CategoryDTO[],total:number}> {
+        const {categories,total} = await this.categoryRepository.findAll(page,limit,searchTerm);
+        return {categories:categories.map((category) => categoryDTOMapper.toDTO(category)),total};
     }
 }

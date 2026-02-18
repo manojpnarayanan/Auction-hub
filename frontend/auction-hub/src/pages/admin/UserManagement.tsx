@@ -3,8 +3,8 @@ import { useSelector, } from "react-redux";
 import { getUsers, toggleUserBlock } from "../../api/Admin/adminUser";
 import type { User } from '../../types/admin';
 import type { RootState } from "../../redux/store";
-import Swal from "sweetalert2";
 import toast from "react-hot-toast";
+import ConfirmModal from "../../components/ConfirmationModal";
 
 
 
@@ -15,12 +15,15 @@ export default function UserManagement() {
     const [searchTerm, setSearchTerm] = useState("");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
     const fetchUserData = async () => {
         if (!token) return;
         setLoading(true);
         try {
             const res = await getUsers(page, searchTerm, token);
+            console.log("userManagement",res.data.users);
             setUsers(res.data.users);
             setTotalPages(res.data.totalPages);
 
@@ -35,28 +38,50 @@ export default function UserManagement() {
         return () => clearTimeout(handler)
     }, [page, searchTerm, token]);
 
-    const handleBlockToggle = async (_userId: string, currentStatus: boolean) => {
-        if (!token) return;
-        const result = await Swal.fire({
-            title: currentStatus ? "Unblock User" : "Block user",
-            text: currentStatus ? "This user will regain access to the platform." : "This user will be logged out and banned immediately.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: currentStatus ? '#10b981' : '#d33',
-            confirmButtonText: currentStatus ? "Yes Unblock" : "Yes Block",
-        });
-        if (!result.isConfirmed) return;
-        try {
-            const newStatus = !currentStatus;
-            await toggleUserBlock(_userId, newStatus, token);
+    // const handleBlockToggle = async (_userId: string, currentStatus: boolean) => {
+    //     if (!token) return;
+    //     const result = await Swal.fire({
+    //         title: currentStatus ? "Unblock User" : "Block user",
+    //         text: currentStatus ? "This user will regain access to the platform." : "This user will be logged out and banned immediately.",
+    //         icon: "warning",
+    //         showCancelButton: true,
+    //         confirmButtonColor: currentStatus ? '#10b981' : '#d33',
+    //         confirmButtonText: currentStatus ? "Yes Unblock" : "Yes Block",
+    //     });
+    //     if (!result.isConfirmed) return;
+    //     try {
+    //         const newStatus = !currentStatus;
+    //         await toggleUserBlock(_userId, newStatus, token);
 
-            setUsers(prev => prev.map(user => user.id === _userId ? { ...user, isBlocked: newStatus } : user));
-            toast.success(currentStatus ? "USer unblocked Successfully" : "user blocked successfully")
+    //         setUsers(prev => prev.map(user => user.id === _userId ? { ...user, isBlocked: newStatus } : user));
+    //         toast.success(currentStatus ? "USer unblocked Successfully" : "user blocked successfully")
 
-        } catch (error) {
-            console.error("Failed to update status")
+    //     } catch (error) {
+    //         console.error("Failed to update status")
+    //     }
+    // };
+    const handleBlockToggle=(_userId:string,_currentStatus:boolean)=>{
+        const user=users.find(u=>u.id ===_userId);
+        if(user){
+            setSelectedUser(user);
+            setIsModalOpen(true);
         }
-    };
+    }
+    
+    const confirmBlockUser=async()=>{
+        if(!selectedUser || !token) return;
+        try{
+            const newStatus=!selectedUser.isBlocked;
+            console.log("Fromtend",selectedUser.id,newStatus);
+            await toggleUserBlock(selectedUser.id,newStatus);
+            setUsers(prev=>prev.map(user=>user.id ===selectedUser.id ? {...user,isBlocked:newStatus}:user));
+            toast.success(selectedUser.isBlocked? "User Unblocked successfully":"User blocked successfully");
+            setIsModalOpen(false);
+        }catch(error){
+            console.error("Failed to update status");
+            toast.error("Failed to update status")
+        }
+    }
 
     return (
         <div>
@@ -133,6 +158,15 @@ export default function UserManagement() {
                 <span className="text-gray-300">Page {page} of {totalPages}</span>
                 <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="text-gray-400 disabled:opacity-50">Next</button>
             </div>
+            <ConfirmModal 
+            isOpen={isModalOpen}
+            onClose={()=>setIsModalOpen(false)} 
+            onConfirm={confirmBlockUser}
+            title={selectedUser?.isBlocked? "Unblock User":"Block User"}
+            message={selectedUser?.isBlocked? "This user get access to platForm":"This user will be logged out and banned"}
+            confirmText={selectedUser?.isBlocked ? "Yes , UnBlock": "Yes Block"}
+            isDanger={!selectedUser?.isBlocked}
+            />
         </div>
     );
 }

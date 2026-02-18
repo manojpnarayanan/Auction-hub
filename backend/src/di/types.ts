@@ -24,12 +24,15 @@ export const TYPES = {
     GetAllAuctionsUseCase: Symbol.for("GetAllAuctionsUseCase"),
     GetAuctionDetailsUseCase: Symbol.for("GetAuctionDetailsUseCase"),
     UpdateAuctionUseCase: Symbol.for("UpdateAuctionUseCase"),
+    DeleteAuctionUseCase:Symbol.for("DeleteAuctionUseCase"),
 
 
     // Admin 
     AdminUserManagementUseCase:Symbol.for("AdminUserManagementUseCase"),
     AdminController:Symbol.for("AdminController"),
     BlockUserUseCase:Symbol.for("BlockUserUseCase"),
+    ApproveAuctionUseCase:Symbol.for("ApproveAuctionUseCase"),
+
     
     //  Category
     CategoryRepository:Symbol.for("CategoryRepository"),
@@ -38,6 +41,16 @@ export const TYPES = {
     GetAllCategoriesUseCase:Symbol.for("GetAllCategoriesUseCase"),
     UpdateCategoryUSeCase:Symbol.for("UpdateCategoryUseCase"),
     DeleteCategoryUseCase:Symbol.for("DeleteCategoryUseCase"),
+
+    // Bid
+    BidRepository:Symbol.for("BidRepository"),
+    BidController:Symbol.for("BidController"),
+    PlaceBidUseCase:Symbol.for("PlacebidUseCase"),
+    GetAuctionBidsUseCase:Symbol.for("GetAuctionBidsUseCase"),
+    SocketService:Symbol.for("SocketService"),
+    CloseExpiredAuctionsUseCase:Symbol.for("CloseExpiredAuctionsUseCase"),
+    GetUserBidUseCase:Symbol.for("GetUSerBidUseCase"),
+
 
 
 }

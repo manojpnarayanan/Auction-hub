@@ -21,7 +21,9 @@ export class PlaceBidUseCase implements IPlaceBidUseCase{
     async execute(data:PlaceBidDTO):Promise<BidResponseDTO | null>{
         
         const auction=await this.auctionRepository.findById(data.auctionId);
-       
+       console.log(auction)
+
+        if(auction?.sellerId === data.bidderId) throw new Error("Auctioner should not bid in this auction")
         
         if(!auction) throw new Error("Auction not found");
         if(auction.status !== 'active') throw new Error("Auction is closed");

@@ -134,7 +134,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
       setLoading(false);
       return;
     }
-    if (form.type = 'live') {
+    if (form.type === 'live') {
       if (!form.startTime) {
         setError("Start time is required ");
         setLoading(false);
@@ -142,7 +142,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
       }
       const startTime = new Date(form.startTime);
       if (startTime <= now) {
-        setError("Stert time must be a future date");
+        setError("Start time must be a future date");
         setLoading(false);
         return;
       }

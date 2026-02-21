@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createCategory, getCategories ,updateCategory,deleteCategory} from "../../api/Admin/Category";
 import Pagination from "../../components/Pagination";
 import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmationModal";
 
 
@@ -23,9 +24,10 @@ export default function AdminCategories(){
     const [categoryToDelete,setCategoryToDelete]=useState<string | null>(null);
     const [searchTerm,setSearchTerm]=useState('');
     const [debounceTerm,setDebounceTerm]=useState("")
-    const [page,SetPage]=useState(1);
     const [totalPages,setTotalPages]=useState(1);
     const limit=2
+    const [searchParams,setSearchParams]=useSearchParams();
+    const page=parseInt(searchParams.get('page')||"1");
 
     useEffect(()=>{
       const timerId=setTimeout(()=>{
@@ -74,6 +76,10 @@ export default function AdminCategories(){
 
     const handleSubmit=async (e:React.FormEvent)=>{
         e.preventDefault();
+        if(!form.name.trim()){
+          throw new Error("Category name cannot be empty or spaces only");
+          return;
+        }
         try{
             if(editingId){
                 await updateCategory(editingId,form);
@@ -87,9 +93,10 @@ export default function AdminCategories(){
             setIsCreating(false);
             setEditingId(null);
             fetchCategories()
-        }catch(error){
+        }catch(error:any){
             console.error(error);
-            toast.error("Failed to create category");
+            const errorMessage=error.response?.data?.message|| "Failed to create category"
+            toast.error(errorMessage);
         }
     }
      return (
@@ -181,7 +188,7 @@ export default function AdminCategories(){
       <Pagination 
        currentPage={page}
        totalPages={totalPages}
-       onPageChange={SetPage}
+       onPageChange={(n)=>setSearchParams({page:String(n)})}
       />
       <ConfirmModal 
       isOpen={isDeleteModalOpen}

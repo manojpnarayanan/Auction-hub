@@ -1,16 +1,21 @@
 import { injectable } from "inversify";
 import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
 import { Auction } from "../../../domain/entities/Auction.entity";
-import { AuctionModel } from "../models/AuctionModel";
+import { AuctionModel, IAuctionDocument } from "../models/AuctionModel";
 import { AuctionPersistanceMapper } from "../Mappers/AuctionPersistanceMapper";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
 
-export class MongoAuctionRepository implements IAuctionRepository {
-    async create(auction: Auction): Promise<Auction> {
-        const newAuction = await AuctionModel.create(auction);
-        return AuctionPersistanceMapper.toEntity(newAuction)
+export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocument> implements IAuctionRepository {
+    constructor(){
+        super(AuctionModel,AuctionPersistanceMapper.toEntity)
     }
+    
+    // async create(auction: Auction): Promise<Auction> {
+    //     const newAuction = await AuctionModel.create(auction);
+    //     return AuctionPersistanceMapper.toEntity(newAuction)
+    // }
     async findAll(filters?: { 
         category?: string, 
         search?: string; 
@@ -50,16 +55,16 @@ export class MongoAuctionRepository implements IAuctionRepository {
         const auctions = await AuctionModel.find({ sellerId });
         return auctions.map(AuctionPersistanceMapper.toEntity);
     }
-    async findById(id: string): Promise<Auction | null> {
-        const auction = await AuctionModel.findById(id);
-        return auction ? AuctionPersistanceMapper.toEntity(auction) : null
-    }
-    async update(id: string, data: Partial<Auction>): Promise<Auction | null> {
-        const updatedAuction = await AuctionModel.findByIdAndUpdate(id, data, { new: true })
-        if (!updatedAuction) return null;
-        return AuctionPersistanceMapper.toEntity(updatedAuction);
+    // async findById(id: string): Promise<Auction | null> {
+    //     const auction = await AuctionModel.findById(id);
+    //     return auction ? AuctionPersistanceMapper.toEntity(auction) : null
+    // }
+    // async update(id: string, data: Partial<Auction>): Promise<Auction | null> {
+    //     const updatedAuction = await AuctionModel.findByIdAndUpdate(id, data, { new: true })
+    //     if (!updatedAuction) return null;
+    //     return AuctionPersistanceMapper.toEntity(updatedAuction);
         
-    }
+    // }
     async findByCategory(category: string): Promise<Auction[]> {
         const auctions = await AuctionModel.find({ category: category });
         return auctions.map(AuctionPersistanceMapper.toEntity);
@@ -76,10 +81,10 @@ export class MongoAuctionRepository implements IAuctionRepository {
         return result.modifiedCount > 0;
     }
 
-    async delete(id: string): Promise<boolean> {
-        const result = await AuctionModel.deleteOne({ _id: id });
-        return result.deletedCount > 0;
-    }
+    // async delete(id: string): Promise<boolean> {
+    //     const result = await AuctionModel.deleteOne({ _id: id });
+    //     return result.deletedCount > 0;
+    // }
 
     async findExpiredActiveAuctions(): Promise<Auction[]> {
         const now = new Date();

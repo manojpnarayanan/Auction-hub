@@ -15,20 +15,6 @@ export class User {
         public readonly isBlocked:boolean= false,
     ) { }
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-    
     isOTPValid(providedOTP: string): boolean {
         if (!this.otp || !this.otpExpiry) {
             return false;

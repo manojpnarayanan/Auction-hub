@@ -18,4 +18,22 @@ export class Auction{
         public createdAt?:Date,
 
     ){ }
+
+    isLive():boolean{
+        const now=new Date();
+        return  this.status==='active' && now< this.endDate && (!this.startTime || now>=this.startTime);
+    }
+
+    placeBid(bidderId:string,amount:number){
+        if(!this.isLive) throw new Error("Auction is not Currently Live");
+        if(bidderId === this.sellerId) throw new Error("Seller cannot bid on their own Auction");
+        if(amount < this.currentPrice) throw new Error("Bid must be higher than curretn Price");
+        this.bids.push({
+            bidderId,
+            amount,
+            time:new Date()
+        });
+        this.currentPrice=amount;
+        this.winnerId=bidderId;
+    }
 }

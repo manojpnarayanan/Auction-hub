@@ -13,9 +13,13 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     async execute(email: string, otp: string): Promise<void> {
         const user = await this.userRepository.findByEmail(email);
         if (!user) throw new NotFoundError("User not found");
-        if (user.otp !== otp) throw new Error("OTP Invalid");
-        if (new Date() > new Date(user.otpExpiry!)) {
-            throw new ValidationError("OTP Expired");
+
+        // if (user.otp !== otp) throw new Error("OTP Invalid");
+        // if (new Date() > new Date(user.otpExpiry!)) {
+        //     throw new ValidationError("OTP Expired");
+        // }
+        if(!user.isOTPValid(otp)){
+            throw new ValidationError('Invalid or Expired OTP')
         }
         await this.userRepository.updateVerifyStatus(user.id, true)
         await this.userRepository.updateOTP(user.id, null, null);

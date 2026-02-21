@@ -5,6 +5,10 @@ import { injectable,inject } from "inversify";
 import { CategoryDTO, CategoryRequestDTO} from "../../../dtos/CategoryDTO";
 import { categoryDTOMapper } from "../../../DTOMapper/CategoryDTOMapper";
 import {TYPES} from "../../../../di/types";
+import { ConflictError } from "../../../../domain/errors/errors";
+
+
+
 @injectable()
 export class CreateCategoryUseCase implements ICreatecategoryUseCase {
     constructor(
@@ -12,6 +16,13 @@ export class CreateCategoryUseCase implements ICreatecategoryUseCase {
     ) {}
     
     async execute(data: CategoryRequestDTO): Promise<CategoryDTO> {
+
+        const {categories}=await this.categoryRepository.findAll(1,2,data.name)
+        // console.log("Cat",categories);
+
+        const checkExists=categories.find((c)=>c.name.toLowerCase()===data.name.trim().toLowerCase());
+        if(checkExists) throw new ConflictError("Category already exists");
+
         const newCategory=new Category (
             "",
             data.name,

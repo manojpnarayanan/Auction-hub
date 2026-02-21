@@ -3,22 +3,27 @@ import { User } from "../../../domain/entities/User.entity";
 import { CreateUserDTO } from "../../../application/dtos/user.dto";
 import { UserModel, IUserDocument } from "../models/UserModel";
 import { injectable } from "inversify";
+import { BaseRepository } from "./BaseRepository";
 import { UserPersistanceMapper } from "../Mappers/UserPersistanceMapper";
 
 @injectable()
-export class MongoUserRepository implements IUserRepository {
-    async create(userData: CreateUserDTO): Promise<User> {
-        const userDoc = await UserModel.create(userData);
-        return UserPersistanceMapper.toEntity(userDoc);
+export class MongoUserRepository extends BaseRepository<User,IUserDocument> implements IUserRepository {
+    constructor(){
+        super(UserModel,UserPersistanceMapper.toEntity)
     }
+    
+    // async create(userData: CreateUserDTO): Promise<User> {
+    //     const userDoc = await UserModel.create(userData);
+    //     return UserPersistanceMapper.toEntity(userDoc);
+    // }
     async findByEmail(email: string): Promise<User | null> {
         const userDoc = await UserModel.findOne({ email });
         return userDoc ? UserPersistanceMapper.toEntity(userDoc) : null;
     }
-    async findById(id: string): Promise<User | null> {
-        const userDoc = await UserModel.findById(id);
-        return userDoc ? UserPersistanceMapper.toEntity(userDoc) : null
-    }
+    // async findById(id: string): Promise<User | null> {
+    //     const userDoc = await UserModel.findById(id);
+    //     return userDoc ? UserPersistanceMapper.toEntity(userDoc) : null
+    // }
 
     async updateOTP(userId: string, otp: string, expiry: Date): Promise<void> {
         await UserModel.updateOne({ _id: userId }, { otp, otpExpiry: expiry })

@@ -1,10 +1,11 @@
 import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { User } from "../../../domain/entities/User.entity";
-import { CreateUserDTO } from "../../../application/dtos/user.dto";
+import { CreateUserDTO, updateUserProfileDTO } from "../../../application/dtos/user.dto";
 import { UserModel, IUserDocument } from "../models/UserModel";
 import { injectable } from "inversify";
 import { BaseRepository } from "./BaseRepository";
 import { UserPersistanceMapper } from "../Mappers/UserPersistanceMapper";
+import { NotFoundError } from "../../../domain/errors/errors";
 
 @injectable()
 export class MongoUserRepository extends BaseRepository<User,IUserDocument> implements IUserRepository {
@@ -64,6 +65,11 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     async updateBlockStatus(userId: string, isBlocked: boolean): Promise<void> {
         console.log("Blocking user", userId,isBlocked)
         await UserModel.findByIdAndUpdate(userId,{isBlocked});
+    }
+    async updateProfile(userId: string, data: updateUserProfileDTO): Promise<User> {
+        const doc=await UserModel.findByIdAndUpdate(userId,data,{new :true});
+        if(!doc) throw new NotFoundError("User not found");
+        return UserPersistanceMapper.toEntity(doc)
     }
     
 }

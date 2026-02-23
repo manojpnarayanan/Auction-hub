@@ -58,7 +58,13 @@ export class AuthController {
                 sameSite: 'strict',
                 maxAge: 7 * 24 * 60 * 60 * 1000
             });
-            const frontendUrl = `${process.env.CORS_ORIGIN}/auth/callback?token=${result.token}&isNewUser=${result.isNewUser}`;
+            const userEncoded=encodeURIComponent(JSON.stringify({
+                id: result.user.id,
+                name: result.user.name,
+                email: result.user.email,
+                role: result.user.role
+            }))
+            const frontendUrl = `${process.env.CORS_ORIGIN}/auth/callback?token=${result.token}&isNewUser=${result.isNewUser}&user=${userEncoded}`;
             res.redirect(frontendUrl);
         } catch (error) {
             next(error);

@@ -16,7 +16,9 @@ export class UserPersistanceMapper{
         doc.otpExpiry,
         doc.googleId,
         doc.isVerified,
-        doc.isBlocked
+        doc.isBlocked,
+        doc.phone,
+        doc.profileImage
         )
     }
 }

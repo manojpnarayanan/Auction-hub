@@ -10,7 +10,7 @@ import AuthCallback from './pages/authCallback';
 import AdminLogin from "./pages/admin/AdminLogin"
 import AdminAuctions from './pages/admin/AdminAuctionManagement';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import { Suspense, lazy,useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { socket } from './utils/socket';
 import Dashboard from './pages/dashboard';
 import { PublicRoute, PrivateRoute, AdminRoute } from './components/RouteGuards';
@@ -20,21 +20,22 @@ import { AdminLayout } from './pages/admin/AdminLayout';
 import AdminCategories from './pages/admin/AdminCategories';
 import MyBids from './pages/user/MyBids';
 import MyListings from './pages/user/MyListings';
+import Profile from './pages/user/Profile';
 
 
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
 
 function App() {
 
-  useEffect(()=>{
+  useEffect(() => {
     socket.connect();
-    socket.on("connect",()=>{
-      console.log("Connected to Socket.io :Server",socket.id)
+    socket.on("connect", () => {
+      console.log("Connected to Socket.io :Server", socket.id)
     });
-    return ()=>{
+    return () => {
       socket.disconnect();
     }
-  },[]);
+  }, []);
 
   return (
     <>
@@ -43,11 +44,11 @@ function App() {
       </div>} >
         <Routes>
           {/* <Route path='/' element={<Navigate to='login' replace />} /> */}
-          <Route path='/' element={<Home/>} />
+          <Route path='/' element={<Home />} />
           <Route path='/signup' element={
             <PublicRoute><Signup /></PublicRoute>
           } />
-          <Route path='auctions' element={<Auctions/>} />
+          <Route path='auctions' element={<Auctions />} />
           <Route path='login' element={
             <PublicRoute><Login /></PublicRoute>
           } />
@@ -60,10 +61,13 @@ function App() {
             <PrivateRoute><Dashboard /></PrivateRoute>
           } />
           <Route path='/user/my-bids' element={
-            <PrivateRoute><MyBids/></PrivateRoute>
-          }/>
-          <Route path="/user/my-listings" element ={
-            <PrivateRoute><MyListings/></PrivateRoute>
+            <PrivateRoute><MyBids /></PrivateRoute>
+          } />
+          <Route path="/user/my-listings" element={
+            <PrivateRoute><MyListings /></PrivateRoute>
+          } />
+          <Route path="/user/profile" element={
+            <PrivateRoute><Profile /></PrivateRoute>
           } />
 
           <Route path="auction/:id" element={
@@ -83,12 +87,12 @@ function App() {
               <AdminRoute><UserManagement /></AdminRoute>
             } />
             <Route path="categories" element={
-              <AdminRoute><AdminCategories/></AdminRoute>
-              } >
-          </Route>
+              <AdminRoute><AdminCategories /></AdminRoute>
+            } >
+            </Route>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path='auctions' element={
-              <AdminRoute><AdminAuctions/></AdminRoute>
+              <AdminRoute><AdminAuctions /></AdminRoute>
             } />
 
           </Route>

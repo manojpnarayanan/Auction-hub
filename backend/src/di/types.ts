@@ -52,5 +52,10 @@ export const TYPES = {
     GetUserBidUseCase:Symbol.for("GetUSerBidUseCase"),
 
 
+    // user Profile
+    GetProfileUseCase:Symbol.for("GetProfileUseCase"),
+    updateProfileUseCase:Symbol.for("updateProfileUseCase"),
+    changePasswordUseCase:Symbol.for("changePasswordUseCase"),
+    profileController:Symbol.for("profileController")
 
 }

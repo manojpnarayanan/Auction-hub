@@ -17,6 +17,8 @@ export interface UserResponseDTO {
     createdAt: Date;
     isBlocked:boolean;
     isVerified:boolean;
+    phone?:string;
+    profileImage?:string
 }
 
 export interface LoginDTO {
@@ -45,4 +47,10 @@ export interface OAuthResponseDTO {
     refreshToken: string;
     user: UserResponseDTO;
     isNewUser: boolean;
+}
+
+export interface updateUserProfileDTO{
+    name?:string;
+    phone?:string;
+    profileImage?:string
 }

@@ -11,7 +11,9 @@ export class UserDTOMapper {
             role:user.role,
             createdAt:user.createdAt,
             isBlocked:user.isBlocked,
-            isVerified:user.isVerified
+            isVerified:user.isVerified,
+            phone:user.phone,
+            profileImage:user.profileImage,
         }
     }
 }

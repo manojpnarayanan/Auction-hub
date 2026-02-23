@@ -90,6 +90,19 @@ import { CloseExpiredAuctionUseCase } from "../application/use-cases/auction/Clo
 import { IGetUserBidsUseCase } from "../application/use-cases/Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
 import { GetUserBidUseCase } from "../application/use-cases/Bid/GetUserBidUseCase";
 
+// user-Profile UseCases
+
+import { IGetprofileUseCase } from "../application/use-cases/Usecase Interfaces/profile-interface/IGetprofileUseCase";
+import { GetprofileUseCase } from "../application/use-cases/profile/GetprofileUseCase";
+import { IUpdateProfileUseCase } from "../application/use-cases/Usecase Interfaces/profile-interface/IUpdateProfileUseCase";
+import { UpdateProfileUseCase } from "../application/use-cases/profile/UpdateProfileUseCase";
+import { IChangePasswordUseCase } from "../application/use-cases/Usecase Interfaces/profile-interface/IChangePasswordUseCase";
+import { ChangePasswordUseCase } from "../application/use-cases/profile/ChangePasswordUseCase";
+import { profileController } from "../presentation/controllers/user/ProfileController";
+
+
+
+
 const container = new Container();
 // Repositories
 container.bind<IUserRepository>(TYPES.UserRepository).to(MongoUserRepository);
@@ -137,6 +150,12 @@ container.bind<IGetAuctionBidsUseCase>(TYPES.GetAuctionBidsUseCase).to(GetAuctio
 container.bind<ISocketService>(TYPES.SocketService).to(SocketService).inSingletonScope();
 container.bind<IGetUserBidsUseCase>(TYPES.GetUserBidUseCase).to(GetUserBidUseCase)
 
+// user-ProfileSection
+container.bind<IGetprofileUseCase>(TYPES.GetProfileUseCase).to(GetprofileUseCase);
+container.bind<IUpdateProfileUseCase>(TYPES.updateProfileUseCase).to(UpdateProfileUseCase);
+container.bind<IChangePasswordUseCase>(TYPES.changePasswordUseCase).to(ChangePasswordUseCase);
+
+
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -144,6 +163,7 @@ container.bind<AuctionController>(TYPES.AuctionController).to(AuctionController)
 container.bind<AdminController>(TYPES.AdminController).to(AdminController);
 container.bind<BidController>(TYPES.BidController).to(BidController);
 container.bind<CategoryController>(TYPES.CategoryController).to(CategoryController);
+container.bind<profileController>(TYPES.profileController).to(profileController);
 
 
 // Bind Redis

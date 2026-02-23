@@ -1,5 +1,5 @@
 import { User } from "../entities/User.entity";
-import { CreateUserDTO } from "../../application/dtos/user.dto";
+import { CreateUserDTO ,updateUserProfileDTO} from "../../application/dtos/user.dto";
 
 
 export interface IUserRepository {
@@ -20,4 +20,6 @@ export interface IUserRepository {
 
     adminUserManage(page:number,limit:number,search:string):Promise<{users:User[],total:number}>;
     updateBlockStatus(userId:string,isBlocked:boolean):Promise<void>;
+
+    updateProfile(userId:string,data:updateUserProfileDTO):Promise<User>;
 }

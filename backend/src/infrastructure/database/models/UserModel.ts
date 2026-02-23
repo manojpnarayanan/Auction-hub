@@ -13,6 +13,8 @@ export interface IUserDocument extends Document {
     isBlocked:boolean;
     createdAt: Date;
     updatedAt: Date;
+    phone?:string;
+    profileImage?:string;
 }
 
 const UserSchema = new Schema<IUserDocument>({
@@ -24,7 +26,9 @@ const UserSchema = new Schema<IUserDocument>({
     otpExpiry: { type: Date },
     googleId: { type: String, unique: true, sparse: true },
     isVerified: { type: Boolean, default: false },
-    isBlocked:{type:Boolean, default:false}
+    isBlocked:{type:Boolean, default:false},
+    phone:{type:String},
+    profileImage:{type:String}
 }, { timestamps: true });
 
 export const UserModel = model<IUserDocument>("User", UserSchema)

@@ -13,6 +13,8 @@ export class User {
         public readonly googleId?: string,
         public readonly isVerified: boolean = false,
         public readonly isBlocked:boolean= false,
+        public readonly phone?:string,
+        public readonly profileImage?:string,
     ) { }
 
     isOTPValid(providedOTP: string): boolean {

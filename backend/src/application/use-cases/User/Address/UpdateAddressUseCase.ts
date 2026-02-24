@@ -1,0 +1,20 @@
+import { injectable,inject } from "inversify";
+import {TYPES} from '../../../../di/types';
+import { IUpdateAddressUseCase } from "../../Usecase Interfaces/Address-Interface/IUpdateAddressUseCase";
+import { IAddressRepository } from "../../../../domain/interfaces/IAddressRepository";
+import { AddressResponseDTO,updateAddressDTO } from "../../../dtos/AddressDTO";
+import { AddressDTOMapper } from "../../../DTOMapper/AddressDTOMapper";
+
+
+
+
+@injectable()
+export class UpdateAddressUseCase implements IUpdateAddressUseCase{
+    constructor(
+        @inject(TYPES.AddressRepository)private addressRepository:IAddressRepository
+    ){}
+    async execute(addressId: string, data: updateAddressDTO): Promise<AddressResponseDTO> {
+        const addresses=await this.addressRepository.update(addressId,data);
+        return AddressDTOMapper.toResponseDTO(addresses);
+    }
+}

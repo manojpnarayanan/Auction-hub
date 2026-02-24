@@ -100,6 +100,21 @@ import { IChangePasswordUseCase } from "../application/use-cases/Usecase Interfa
 import { ChangePasswordUseCase } from "../application/use-cases/profile/ChangePasswordUseCase";
 import { profileController } from "../presentation/controllers/user/ProfileController";
 
+// Address Section
+import { IAddressRepository } from "../domain/interfaces/IAddressRepository";
+import { MongoAddressRepository } from "../infrastructure/database/repositories/MongoAddressRepository";
+import { IGetAddressUseCase } from "../application/use-cases/Usecase Interfaces/Address-Interface/IGetAddressUseCase";
+import { GetAddressUseCase } from "../application/use-cases/User/Address/GetAddressUseCase";
+import { IAddAddressUseCase } from "../application/use-cases/Usecase Interfaces/Address-Interface/IAddAddressUseCase";
+import { AddAddressUseCase } from "../application/use-cases/User/Address/AddAddressUseCase";
+import { IUpdateAddressUseCase } from "../application/use-cases/Usecase Interfaces/Address-Interface/IUpdateAddressUseCase";
+import { UpdateAddressUseCase } from "../application/use-cases/User/Address/UpdateAddressUseCase";
+import { IDeleteAddressUseCase } from "../application/use-cases/Usecase Interfaces/Address-Interface/IDeleteAddressUseCase";
+import { DeleteAddressUseCase } from "../application/use-cases/User/Address/DeleteAddressUseCase";
+import { AddressController } from "../presentation/controllers/user/AddressController";
+import { ISetDefaultUseCase } from "../application/use-cases/Usecase Interfaces/Address-Interface/ISetDefaultUseCase";
+import { SetDefaultAddressUseCase } from "../application/use-cases/User/Address/SetDefaultAddressUseCase";
+
 
 
 
@@ -156,6 +171,14 @@ container.bind<IUpdateProfileUseCase>(TYPES.updateProfileUseCase).to(UpdateProfi
 container.bind<IChangePasswordUseCase>(TYPES.changePasswordUseCase).to(ChangePasswordUseCase);
 
 
+// Address Section
+container.bind<IAddressRepository>(TYPES.AddressRepository).to(MongoAddressRepository);
+container.bind<IGetAddressUseCase>(TYPES.GetAddressUseCase).to(GetAddressUseCase);
+container.bind<IAddAddressUseCase>(TYPES.AddAddressUseCase).to(AddAddressUseCase);
+container.bind<IUpdateAddressUseCase>(TYPES.UpdateAddressUseCase).to(UpdateAddressUseCase);
+container.bind<IDeleteAddressUseCase>(TYPES.DeleteAddressUseCase).to(DeleteAddressUseCase);
+container.bind<ISetDefaultUseCase>(TYPES.SetDefaultAddressUseCase).to(SetDefaultAddressUseCase);
+
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -164,7 +187,7 @@ container.bind<AdminController>(TYPES.AdminController).to(AdminController);
 container.bind<BidController>(TYPES.BidController).to(BidController);
 container.bind<CategoryController>(TYPES.CategoryController).to(CategoryController);
 container.bind<profileController>(TYPES.profileController).to(profileController);
-
+container.bind<AddressController>(TYPES.AddressController).to(AddressController);
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

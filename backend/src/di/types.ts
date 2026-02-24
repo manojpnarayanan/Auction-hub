@@ -56,6 +56,16 @@ export const TYPES = {
     GetProfileUseCase:Symbol.for("GetProfileUseCase"),
     updateProfileUseCase:Symbol.for("updateProfileUseCase"),
     changePasswordUseCase:Symbol.for("changePasswordUseCase"),
-    profileController:Symbol.for("profileController")
+    profileController:Symbol.for("profileController"),
 
+
+
+    // Address
+    AddressRepository:Symbol.for("AddressRepository"),
+    GetAddressUseCase:Symbol.for("GetAddressUseCase"),
+    AddAddressUseCase:Symbol.for("AddAddressUseCase"),
+    UpdateAddressUseCase:Symbol.for("UpdateAddressUseCase"),
+    DeleteAddressUseCase:Symbol.for("DeleteAddressUseCase"),
+    SetDefaultAddressUseCase:Symbol.for("SetDefaultAddressUseCase"),
+    AddressController:Symbol.for("AddressController")
 }

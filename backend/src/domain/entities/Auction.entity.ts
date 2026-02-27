@@ -16,6 +16,7 @@ export class Auction{
         public winnerId?:string,
         public bids:{bidderId:string,amount:number,time:Date}[]=[],
         public createdAt?:Date,
+        public paymentStatus:'pending'|'completed'='pending'
 
     ){ }
 

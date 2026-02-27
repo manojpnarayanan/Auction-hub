@@ -19,4 +19,5 @@ export interface IAuctionRepository {
     delete(id: string): Promise<boolean>;
     findExpiredActiveAuctions(): Promise<Auction[]>;
     updateAuctionStatus(id: string, status: string, winnerId?: string): Promise<void>;
+    updatePaymentStatus(id:string,status:string):Promise<void>
 }

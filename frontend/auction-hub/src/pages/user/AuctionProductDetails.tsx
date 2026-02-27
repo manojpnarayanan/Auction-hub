@@ -3,6 +3,9 @@ import { useParams } from "react-router-dom";
 import { getAuctionProductDetails } from "../../api/auctions";
 import { placeBid } from "../../api/User/Bidding";
 import { socket } from "../../utils/socket";
+import { usePayment } from "../../hooks/UsePayment";
+import PaymentModal from "../../components/paymentModal";
+import { useSelector } from "react-redux";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
@@ -25,6 +28,7 @@ interface Auction{
   amount:number,
   time:Date;
 }>
+paymentStatus:string;
 }
 
 export default function AuctionProductDetails() {
@@ -35,6 +39,9 @@ export default function AuctionProductDetails() {
   const [bidAmount, setBidAmount] = useState("");
   const [biddingLoading, setBiddingLoading] = useState(false);
   const [timeLeft,setTimeLeft]=useState('');
+  const currentUser=useSelector((state:any)=>state.auth.user);
+  const {paymentSession,initiating,initiatePayment,closePayment}=usePayment();
+
 
   const calculateTimeLeft=()=>{
     if(!auction?.endDate) return "";
@@ -171,8 +178,7 @@ export default function AuctionProductDetails() {
             {/* Price */}
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Highest Bid</label>
-              <p className="text-3xl font-bold text-blue-600">${auction.currentPrice || auction.startingPrice}</p>
-            </div>
+<p className="text-3xl font-bold text-blue-600">₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}</p>            </div>
 
             {/* Status */}
             <div>
@@ -203,11 +209,33 @@ export default function AuctionProductDetails() {
           <div className="w-full md:w-1/2">
             <h3 className="text-xl font-bold text-[#1a202c] mb-4">Place a Bid</h3>
             
-            {auction.status === 'sold' && auction.winnerId ? (
+            {/* {auction.status === 'sold' && auction.winnerId ? (
     // Show Sold Status
     <div className="bg-green-100 text-green-800 p-4 rounded-lg font-bold border border-green-200">
         🏆 This auction has been sold to User: <span className="underline">{auction.winnerId}</span>
+    </div> */}
+    {auction.status === 'sold' && auction.winnerId ? (
+    <div className="space-y-3">
+        <div className="bg-green-100 text-green-800 p-4 rounded-lg font-bold border border-green-200">
+            🏆 This auction has been sold to User: <span className="underline">{auction.winnerId}</span>
+        </div>
+        {/* Pay button — only visible to the winner */}
+        {currentUser?.id === auction.winnerId &&auction.paymentStatus !== 'completed' && (
+            <button
+                onClick={() => initiatePayment(auction.id, (auction.currentPrice || auction.startingPrice) * 100)}
+                disabled={initiating}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50"
+            >
+                {initiating ? 'Preparing payment...' : 'Pay Now'}
+            </button>
+        )}
+        {auction.paymentStatus === 'completed' && (
+          <div className="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-center">
+        ✅ Payment Completed" 
+          </div>
+        )}
     </div>
+
 ) : auction.status !== 'active' ? (
     <div className="bg-red-100 text-red-800 p-4 rounded-lg font-bold">
         ⛔ This auction has ended.
@@ -245,11 +273,10 @@ export default function AuctionProductDetails() {
                                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
                                     BID
                                 </div>
-                                <span className="font-medium text-gray-700">User {bid.bidderName}</span>
+                                <span className="font-medium text-gray-700"> {bid.bidderName || 'Anonymous'}</span>
                             </div>
                             <div className="text-right">
-                                <span className="block font-bold text-gray-900">${bid.amount}</span>
-                                <span className="text-xs text-gray-500">{new Date(bid.time).toLocaleTimeString()}</span>
+<span className="block font-bold text-gray-900">₹{bid.amount.toLocaleString('en-IN')}</span>                                <span className="text-xs text-gray-500">{new Date(bid.time).toLocaleTimeString()}</span>
                             </div>
                         </div>
                     ))
@@ -263,6 +290,17 @@ export default function AuctionProductDetails() {
       </div>
       </main>
       <Footer/>
+      {paymentSession && (
+        <PaymentModal
+          isOpen={true}
+          clientSecret={paymentSession.clientSecret}
+          paymentIntentId={paymentSession.paymentIntentId}
+          auctionId={auction.id}
+          amount={(auction.currentPrice || auction.startingPrice) * 100}
+          onSuccess={() => { closePayment(); fetchAuction(); }}
+          onClose={closePayment}
+        />
+      )}
     </div>
   );
 }

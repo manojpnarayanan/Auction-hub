@@ -138,7 +138,7 @@ export default function Dashboard() {
                   <div className="p-4">
                     <h4 className="font-bold text-gray-900 truncate">{auction.title}</h4>
                     <p className="text-sm text-blue-600 font-bold mt-1">
-                      Current Bid: ${auction.currentPrice || auction.startingPrice}
+                     Current Bid: ₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}
                     </p>
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -184,7 +184,7 @@ export default function Dashboard() {
                   <div className="p-4">
                     <h4 className="font-bold text-gray-900 truncate">{auction.title}</h4>
                     <p className="text-sm text-blue-600 font-bold mt-1">
-                      Current Bid: ${auction.currentPrice || auction.startingPrice}
+                     Current Bid: ₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}
                     </p>
                     <div className="flex justify-between items-center mt-2">
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">

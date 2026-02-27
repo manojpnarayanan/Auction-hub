@@ -24,6 +24,7 @@ export class AuctionPersistanceMapper{
                 time:b.time
             })):[],
             doc.createdAt,
+            doc.paymentStatus || 'pending'
         )
     }
 }

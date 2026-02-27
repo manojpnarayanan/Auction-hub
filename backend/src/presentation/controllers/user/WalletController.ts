@@ -1,0 +1,53 @@
+import { Request,Response,NextFunction } from "express";
+import { injectable,inject } from "inversify";
+import { TYPES } from "../../../di/types";
+import { IGetWalletUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/IGetWalletUseCase";
+import { ICreatePaymentIntentUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/ICreatePaymentIntentUseCase";
+import { IconfirmPaymentUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/IConfirmPaymentUseCase";
+import { HttpStatus } from "../../Enums/StatusCodes";
+
+
+@injectable()
+export class WalletController{
+    constructor(
+        @inject(TYPES.GetWalletUseCase) private getWalletUseCase:IGetWalletUseCase,
+        @inject(TYPES.CreatePaymentIntentUseCase) private createPaymentIntentUseCase:ICreatePaymentIntentUseCase,
+        @inject(TYPES.ConfirmPaymentUseCase) private confirmPaymentUseCase:IconfirmPaymentUseCase
+    ){}
+    getWallet=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
+        try{
+            const userId=req.user?.id;
+            if(!userId) {res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"}); return}
+            const result=await this.getWalletUseCase.execute(userId);
+            res.status(HttpStatus.OK).json(result);
+        }catch(error){
+            next(error);
+        }
+    }
+    createPaymentIntent=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
+        try{
+            const userId=req.user?.id;
+            if(!userId){
+                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                return;
+            }
+            const result=await this.createPaymentIntentUseCase.execute(userId,req.body);
+            res.status(HttpStatus.OK).json(result)
+        }catch(error){
+            next(error);
+        }
+    };
+    confirmPayment=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
+        try{
+            const userId=req.user?.id;
+            if(!userId){
+                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                return;
+            }
+            await this.confirmPaymentUseCase.execute(userId,req.body);
+            res.status(HttpStatus.OK).json({message:"Payment confirmed"});
+        }catch(error){
+            next(error);
+        }
+    }
+}

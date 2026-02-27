@@ -3,15 +3,22 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getMyAuctions } from "../../api/auctions";
 import CreateAuctionModal from "../../components/CreateAuctionModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
+
 
 
 export default function MyListings(){
     const navigate=useNavigate();
+    const location=useLocation();
     const [myAuctions,setMyAuctions]=useState<any[]>([]);
     const [loading,setLoading]=useState(true);
     const [isModalOpen,setIsModalOpen]=useState(false);
     const [selectedAuction,setSelectedAuction]=useState<any>(null);
+
+    useEffect(()=>{
+        setIsModalOpen(false);
+        setSelectedAuction(null);
+    },[location]);
 
     const fetchMyListings=async()=>{
         try{

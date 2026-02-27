@@ -19,8 +19,14 @@ import { createServer } from "http";
 import container from "./src/di/container.js";
 import {TYPES} from "./src/di/types.js"
 import {startCronJobs} from "./src/infrastructure/Cron/Cron.js";
+import {startPaymentTimeoutJob} from './src/infrastructure/Cron/PaymentTimeoutCron.js'
 import ProfileRoutes from './src/presentation/routes/user/ProfileRoutes.js';
 import AddressRoutes from "./src/presentation/routes/user/AddressRoutes.js";
+import WalletRoutes from "./src/presentation/routes/user/WalletRoutes.js";
+import WebhookRoutes from './src/presentation/routes/WebhookRoutes.js';
+import AdminPaymentRoutes from "./src/presentation/routes/admin/AdminPaymentRoutes.js";
+ 
+
 
 const app = express();
 const httpServer=createServer(app);
@@ -31,6 +37,7 @@ app.use(cors({
     origin: config.corsOrigin,
     credentials: true
 }));
+app.use('/user',WebhookRoutes);
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
@@ -44,6 +51,8 @@ app.use('/admin/categories',CategoryRoutes);
 app.use('/bids',bidRoutes);
 app.use('/profile',ProfileRoutes);
 app.use('/user',AddressRoutes);
+app.use('/user',WalletRoutes);
+app.use('/admin',AdminPaymentRoutes);
 
 app.use(errorHandler);
 
@@ -51,7 +60,7 @@ app.use(errorHandler);
 connectDB();
 connectRedis();
 startCronJobs();
-
+startPaymentTimeoutJob();
 const socketService=container.get<ISocketService>(TYPES.SocketService);
 socketService.init(httpServer)
 

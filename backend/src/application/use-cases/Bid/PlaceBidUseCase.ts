@@ -21,22 +21,8 @@ export class PlaceBidUseCase implements IPlaceBidUseCase{
     async execute(data:PlaceBidDTO):Promise<BidResponseDTO | null>{
         
         const auction=await this.auctionRepository.findById(data.auctionId);
-
-        // if(auction?.sellerId === data.bidderId) throw new Error("Auctioner should not bid in this auction")
-        
+ 
         if(!auction) throw new Error("Auction not found");
-        // if(auction.status !== 'active') throw new Error("Auction is closed");
-        // if(auction.type==='timed' && new Date()>new Date(auction.endDate)){
-        //     throw new Error("Auction has ended");
-        // }
-        // if(auction.type ==='live' && auction.startTime && new Date()<new Date(auction.startTime)) {
-        //     throw new Error("Auction has not started yet");
-        // }
-        
-        // const currentHighest=auction.currentPrice || auction.startingPrice;
-        // if(data.amount <= currentHighest){
-        //         throw new Error(`Bid must be higher than current price ${currentHighest}`);
-        // } 
         auction.placeBid(data.bidderId,data.amount)
 
         const newBid=new Bid(data.auctionId,data.bidderId,data.amount,new Date());

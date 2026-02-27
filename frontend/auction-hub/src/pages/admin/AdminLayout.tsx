@@ -12,7 +12,8 @@ export function AdminLayout() {
     { name: "Dashboard", path: "/admin/dashboard", },
     {name:"Auctions" ,path:"/admin/auctions"},
     { name: "Users", path: "/admin/users" },
-    {name:"Categories",path:"/admin/categories"}
+    {name:"Categories",path:"/admin/categories"},
+    {name:"Wallet",path:"/admin/wallet"}
     // {name:"Wallet" ,path:""},
     // {name:"Reports" ,path:""}
   ]

@@ -36,7 +36,8 @@ const AuctionSchema:Schema=new Schema({
             amount:{type:Number,required:true},
             time:{type:Date,default:Date.now}
         }
-    ]
+    ],
+    paymentStatus:{type:String, enum:['pending','completed'],default:'pending'}
 },{timestamps:true});
 
 export const AuctionModel=mongoose.model<IAuctionDocument>("Auction",AuctionSchema);

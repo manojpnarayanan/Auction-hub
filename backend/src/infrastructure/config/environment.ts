@@ -18,6 +18,9 @@ interface Config {
         callbackUrl: string;
     };
     redisUrl: string;
+    stripeSecretKey:string;
+    stripePublishKey:string;
+    stripeWebhook:string;
 }
 
 
@@ -51,5 +54,8 @@ export const config: Config = {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         callbackUrl: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/user/auth/google/callback'
     },
-    redisUrl: process.env.REDIS_URL!
+    redisUrl: process.env.REDIS_URL!,
+    stripeSecretKey:process.env.STRIPE_SECRET_KEY!,
+    stripePublishKey:process.env.STRIPE_PUBLISH_KEY!,
+    stripeWebhook:process.env.STRIPE_WEBHOOK_SECRET!
 };

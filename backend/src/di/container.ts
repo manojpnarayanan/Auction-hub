@@ -115,6 +115,26 @@ import { AddressController } from "../presentation/controllers/user/AddressContr
 import { ISetDefaultUseCase } from "../application/use-cases/Usecase Interfaces/Address-Interface/ISetDefaultUseCase";
 import { SetDefaultAddressUseCase } from "../application/use-cases/User/Address/SetDefaultAddressUseCase";
 
+// payment-Selection
+
+import { IPaymentService } from "../domain/interfaces/IPaymentService";
+import { StripeService } from "../infrastructure/Service/stripeService";
+import { IWalletRepository } from "../domain/interfaces/IWalletRepository";
+import { MongoWalletRepository } from "../infrastructure/database/repositories/MongoWalletRepository";
+import { IGetWalletUseCase } from "../application/use-cases/Usecase Interfaces/Wallet-interfaces/IGetWalletUseCase";
+import { GetWalletUseCase } from "../application/use-cases/User/Wallet/GetWalletUseCase";
+import { ICreatePaymentIntentUseCase } from "../application/use-cases/Usecase Interfaces/Wallet-interfaces/ICreatePaymentIntentUseCase";
+import { CreatePaymentIntentUseCase } from "../application/use-cases/User/Wallet/createPaymentIntentUseCase";
+import { IconfirmPaymentUseCase } from "../application/use-cases/Usecase Interfaces/Wallet-interfaces/IConfirmPaymentUseCase";
+import { ConfirmPayment } from "../application/use-cases/User/Wallet/confirmPaymentUseCase";
+import { IReleasePaymentUseCase } from "../application/use-cases/Usecase Interfaces/Wallet-interfaces/IReleasePaymentUseCase";
+import { ReleasePaymentUseCase } from "../application/use-cases/User/Wallet/releasePaymentUseCase";
+import { IHandleWebhookUseCase } from "../application/use-cases/Usecase Interfaces/Wallet-interfaces/IHandleWebhookUseCase";
+import { HandleWebhookUseCase } from "../application/use-cases/User/Wallet/handleWebhookUseCase";
+import { WalletController } from "../presentation/controllers/user/WalletController";
+import { AdminPaymentController } from "../presentation/controllers/admin/AdminWalletController";
+import { WebhookController } from "../presentation/controllers/WebhookController";
+
 
 
 
@@ -179,6 +199,15 @@ container.bind<IUpdateAddressUseCase>(TYPES.UpdateAddressUseCase).to(UpdateAddre
 container.bind<IDeleteAddressUseCase>(TYPES.DeleteAddressUseCase).to(DeleteAddressUseCase);
 container.bind<ISetDefaultUseCase>(TYPES.SetDefaultAddressUseCase).to(SetDefaultAddressUseCase);
 
+// Payment-Section
+container.bind<IPaymentService>(TYPES.PaymentService).to(StripeService).inSingletonScope();
+container.bind<IWalletRepository>(TYPES.WalletRepository).to(MongoWalletRepository);
+container.bind<IGetWalletUseCase>(TYPES.GetWalletUseCase).to(GetWalletUseCase);
+container.bind<ICreatePaymentIntentUseCase>(TYPES.CreatePaymentIntentUseCase).to(CreatePaymentIntentUseCase);
+container.bind<IconfirmPaymentUseCase>(TYPES.ConfirmPaymentUseCase).to(ConfirmPayment);
+container.bind<IReleasePaymentUseCase>(TYPES.ReleasePaymentUseCase).to(ReleasePaymentUseCase);
+container.bind<IHandleWebhookUseCase>(TYPES.HandleWebhookUseCase).to(HandleWebhookUseCase);
+
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -188,6 +217,9 @@ container.bind<BidController>(TYPES.BidController).to(BidController);
 container.bind<CategoryController>(TYPES.CategoryController).to(CategoryController);
 container.bind<profileController>(TYPES.profileController).to(profileController);
 container.bind<AddressController>(TYPES.AddressController).to(AddressController);
+container.bind<WalletController>(TYPES.WalletController).to(WalletController);
+container.bind<AdminPaymentController>(TYPES.AdminPaymentController).to(AdminPaymentController);
+container.bind<WebhookController>(TYPES.WebhookController).to(WebhookController);
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

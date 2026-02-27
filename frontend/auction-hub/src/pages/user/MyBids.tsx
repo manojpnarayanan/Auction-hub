@@ -65,12 +65,10 @@ export default function MyBids() {
                                     <div className="flex justify-between items-end mt-4">
                                         <div>
                                             <p className="text-xs text-gray-500 uppercase font-semibold">Your Bid</p>
-                                            <p className="font-bold text-xl text-gray-900">${item.myHighestBid}</p>
-                                        </div>
+<p className="font-bold text-xl text-gray-900">₹{item.myHighestBid?.toLocaleString('en-IN')}</p>                                        </div>
                                         <div className="text-right">
                                             <p className="text-xs text-gray-500 uppercase font-semibold">Current Price</p>
-                                            <p className="font-bold text-xl text-blue-600">${item.auction.currentPrice}</p>
-                                        </div>
+<p className="font-bold text-xl text-blue-600">₹{item.auction.currentPrice?.toLocaleString('en-IN')}</p>                                        </div>
                                     </div>
                                 </div>
                             </div>

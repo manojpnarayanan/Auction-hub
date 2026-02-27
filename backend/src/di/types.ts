@@ -67,5 +67,18 @@ export const TYPES = {
     UpdateAddressUseCase:Symbol.for("UpdateAddressUseCase"),
     DeleteAddressUseCase:Symbol.for("DeleteAddressUseCase"),
     SetDefaultAddressUseCase:Symbol.for("SetDefaultAddressUseCase"),
-    AddressController:Symbol.for("AddressController")
+    AddressController:Symbol.for("AddressController"),
+
+    // Payment
+    PaymentService:Symbol.for("PaymentService"),
+    WalletRepository:Symbol.for('WalletRepository'),
+    GetWalletUseCase:Symbol.for("GetWalletUseCase"),
+    CreatePaymentIntentUseCase:Symbol.for('CreatePaymentIntentUseCase'),
+    ConfirmPaymentUseCase:Symbol.for('ConfirmPaymentUseCase'),
+    ReleasePaymentUseCase:Symbol.for('ReleasePaymentUseCase'),
+    HandleWebhookUseCase:Symbol.for('HandleWebhookUseCase'),
+    WalletController:Symbol.for('WalletController'),
+    AdminPaymentController:Symbol.for('AdminPaymentController'),
+    WebhookController:Symbol.for('WebhookController')
+
 }

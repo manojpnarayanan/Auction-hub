@@ -100,6 +100,9 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         await AuctionModel.findByIdAndUpdate(id, updateData);
     }
 
+    async updatePaymentStatus(auctionId:string,status:string):Promise<void>{
+        await AuctionModel.findByIdAndUpdate(auctionId,{paymentStatus:status})
+    }
 
 
 }

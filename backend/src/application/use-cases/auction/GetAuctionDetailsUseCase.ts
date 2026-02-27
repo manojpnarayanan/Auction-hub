@@ -2,16 +2,18 @@ import { injectable ,inject } from "inversify";
 import {TYPES} from "../../../di/types";
 import { IGetAuctionDetailsUseCase } from "../Usecase Interfaces/Auction-Interface/IGetAuctionDetailsUseCase";
 import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
-import { Auction } from "../../../domain/entities/Auction.entity";
+import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
 import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
+
 
 
 @injectable()
 
 export class GetAuctionDetailsUSeCase implements IGetAuctionDetailsUseCase{
     constructor(
-        @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository
+        @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository,
+        @inject(TYPES.UserRepository) private userRepository:IUserRepository
     ) { };
     async execute(id: string): Promise<AuctionResponseDTO | null> {
         const auction=await  this.auctionRepository.findById(id);
@@ -34,6 +36,14 @@ export class GetAuctionDetailsUSeCase implements IGetAuctionDetailsUseCase{
                 currentPrice:auction.currentPrice
             })
         }
+        const enrichedBids=await Promise.all((auction.bids || []).map(async (bid)=>{
+            const bidder=await this.userRepository.findById(bid.bidderId);
+            return {
+                ...bid,
+                bidderName:bidder?.name ||"Anonymous" 
+            }
+        }));
+        auction.bids=enrichedBids;
         return AuctionDTOMapper.toResponseDTO(auction)
     }
 }

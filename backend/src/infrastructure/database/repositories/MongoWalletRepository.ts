@@ -12,43 +12,49 @@ import { TransactionPersistanceMapper } from "../Mappers/TransactionPersistanceM
 
 
 @injectable()
-export class MongoWalletRepository implements IWalletRepository{
-    
+export class MongoWalletRepository implements IWalletRepository {
+
     async findByUserId(userId: string): Promise<Wallet | null> {
-        const doc=await WalletModel.findOne({userId});
-        return doc? WalletPersistanceMapper.toEntity(doc) : null;
+        const doc = await WalletModel.findOne({ userId });
+        return doc ? WalletPersistanceMapper.toEntity(doc) : null;
     }
     async create(userId: string): Promise<Wallet> {
-        const doc=await WalletModel.create({userId:userId,
-            balance:0
+        const doc = await WalletModel.create({
+            userId: userId,
+            balance: 0
         });
-        return  WalletPersistanceMapper.toEntity(doc);
+        return WalletPersistanceMapper.toEntity(doc);
     }
 
     async credit(userId: string, amount: number): Promise<Wallet> {
-        const doc=await WalletModel.findOneAndUpdate({userId},{$inc:{balance:amount}},{new :true,upsert:true});
+        const doc = await WalletModel.findOneAndUpdate({ userId }, { $inc: { balance: amount } }, { new: true, upsert: true });
         return WalletPersistanceMapper.toEntity(doc);
     }
 
     async debit(userId: string, amount: number): Promise<Wallet> {
-        const wallet=await WalletModel.findOne({userId});
-        const doc=await WalletModel.findOneAndUpdate({userId},{$inc:{balance:-amount}},{new:true});
+        const wallet = await WalletModel.findOne({ userId });
+        const doc = await WalletModel.findOneAndUpdate({ userId }, { $inc: { balance: -amount } }, { new: true });
         return WalletPersistanceMapper.toEntity(doc!);
     }
 
     async getTransactions(userId: string): Promise<Transactions[]> {
-        const wallet=await WalletModel.findOne({userId});
-        if(!wallet) return [];
-        const doc=await TransactionModel.find({walletId:wallet._id}).sort({createdAt:-1});
+        const wallet = await WalletModel.findOne({ userId });
+        if (!wallet) return [];
+        const doc = await TransactionModel.find({ walletId: wallet._id }).sort({ createdAt: -1 });
         return doc.map(TransactionPersistanceMapper.toEntity)
     }
 
     async createTransactions(data: Partial<Transactions>): Promise<Transactions> {
-        const doc=await TransactionModel.create(data);
+        const doc = await TransactionModel.create(data);
         return TransactionPersistanceMapper.toEntity(doc);
     }
 
     async updateTransactions(stripePaymentIntentId: string, status: string): Promise<void> {
-        await TransactionModel.findOneAndUpdate({stripePaymentIntentId},{status});
+        await TransactionModel.findOneAndUpdate({ stripePaymentIntentId }, { status });
+    }
+
+    async findTransactionByIntentId(stripePaymentIntentId: string): Promise<Transactions | null> {
+        const doc = await TransactionModel.findOne({ stripePaymentIntentId });
+        return doc ? TransactionPersistanceMapper.toEntity(doc) : null;
     }
 }

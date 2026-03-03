@@ -6,6 +6,7 @@ import { socket } from "../../utils/socket";
 import { usePayment } from "../../hooks/UsePayment";
 import PaymentModal from "../../components/paymentModal";
 import { useSelector } from "react-redux";
+import { confirmPayment } from "../../api/User/wallet";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
@@ -290,17 +291,24 @@ export default function AuctionProductDetails() {
       </div>
       </main>
       <Footer/>
-      {paymentSession && (
+            {paymentSession && (
         <PaymentModal
           isOpen={true}
           clientSecret={paymentSession.clientSecret}
-          paymentIntentId={paymentSession.paymentIntentId}
-          auctionId={auction.id}
+          // paymentIntentId={paymentSession.paymentIntentId}
           amount={(auction.currentPrice || auction.startingPrice) * 100}
-          onSuccess={() => { closePayment(); fetchAuction(); }}
-          onClose={closePayment}
+          title="Complete Auction Payment"
+          onSuccess={async () => { 
+            // We now confirm the auction payment here instead of inside the form
+            await confirmPayment({ 
+                paymentIntentId: paymentSession.paymentIntentId, 
+                auctionId: auction.id 
+            });
+          }}
+          onClose={() => { closePayment(); fetchAuction(); }}
         />
       )}
+
     </div>
   );
 }

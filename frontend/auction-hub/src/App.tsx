@@ -22,6 +22,8 @@ import MyBids from './pages/user/MyBids';
 import MyListings from './pages/user/MyListings';
 import Profile from './pages/user/Profile';
 import AdminWallet from './pages/admin/AdminWallet';
+import AdminSubscriptionPlan from './pages/admin/AdminSubscriptionPlan';
+import SubscriptionPlans from './pages/user/SubscriptionPlans';
 
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
 
@@ -69,6 +71,11 @@ function App() {
           <Route path="/user/profile" element={
             <PrivateRoute><Profile /></PrivateRoute>
           } />
+          <Route path='subscription-plans' element={
+            <PrivateRoute><SubscriptionPlans/></PrivateRoute>
+          } >
+
+          </Route>
 
           <Route path="auction/:id" element={
             <PrivateRoute><AuctionProductDetails /></PrivateRoute>
@@ -95,10 +102,11 @@ function App() {
               <AdminRoute><AdminAuctions /></AdminRoute>
             } />
             <Route path='wallet' element={
-              <AdminRoute><AdminWallet/></AdminRoute>
-            } >
-
-            </Route>
+              <AdminRoute><AdminWallet /></AdminRoute>
+            } />
+            <Route path='subscription-plans' element={
+              <AdminRoute><AdminSubscriptionPlan /></AdminRoute>
+            } />
 
           </Route>
         </Routes>

@@ -1,15 +1,11 @@
-export type PlanType= 'free'|'basic'|'premium';
+export type PlanType= string;
 
 
-export const PLAN_LIMITS={
-    free:{auctionsPerYear:1, maxDay:3,hasLive:false,commission:0.06},
-    basic:{auctionsPerYear:5,maxDays:15,hasLive:true,commission:0.04},
-    premium:{auctionsPerYear:Infinity,maxDays:30,hasLive:true,commission:0.02}
-}
 
 export class Subscription{
     constructor(
         public readonly userId:string,
+        public readonly planId:string,
         public readonly plan:PlanType,
         public readonly startDate:Date,
         public readonly endDate:Date,

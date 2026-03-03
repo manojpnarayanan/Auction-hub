@@ -79,6 +79,23 @@ export const TYPES = {
     HandleWebhookUseCase:Symbol.for('HandleWebhookUseCase'),
     WalletController:Symbol.for('WalletController'),
     AdminPaymentController:Symbol.for('AdminPaymentController'),
-    WebhookController:Symbol.for('WebhookController')
+    WebhookController:Symbol.for('WebhookController'),
 
+    // Subscription 
+    SubscriptionRepository:Symbol.for('SubscriptionRepository'),
+    SubscriptionController:Symbol.for('SubcriptionController'),
+    SubscribePlanUseCase:Symbol.for('SubscribePlanUseCase'),
+    GetSubscriptionUseCase:Symbol.for('GetSubscriptionUseCase'),
+    // CreateSubscriptionChe ckoutUseCase:Symbol.for("CreateSubscriptionCheckoutUseCase"),
+    CreateSubscriptionPaymentIntentUseCase:Symbol.for("CreateSubscriptionPaymentIntentUseCase"),
+    ConfirmSubscriptionPaymentUseCase:Symbol.for("ConfirmSubscriptionPaymentUseCase"),
+
+
+    // Subscription-Plan
+    SubscriptionPlanRepository:Symbol.for("SubscriptionPlanRepository"),
+    SubscriptionPlanController:Symbol.for("SubscriptionPlanController"),
+    CreateSubscriptionPlanUseCase:Symbol.for("CreateSubscriptionPlanUseCase"),
+    GetAllSubscriptionPlanUseCase:Symbol.for("GetAllSubscriptionPlanUseCase"),
+    UpdateSubscriptionPlanUseCase:Symbol.for("UpdateSubscriptionPlanUseCase"),
+    DeleteSubscriptionPlanUseCase:Symbol.for("DeleteSubscriptionPlanUseCase")
 }

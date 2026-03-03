@@ -10,12 +10,14 @@ export function AdminLayout() {
   const { user } = useSelector((state: RootState) => state.auth);
   const navItems = [
     { name: "Dashboard", path: "/admin/dashboard", },
-    {name:"Auctions" ,path:"/admin/auctions"},
+    { name: "Auctions", path: "/admin/auctions" },
     { name: "Users", path: "/admin/users" },
-    {name:"Categories",path:"/admin/categories"},
-    {name:"Wallet",path:"/admin/wallet"}
+    { name: "Categories", path: "/admin/categories" },
+    { name: "Wallet", path: "/admin/wallet" },
+    { name: "Subscriptions", path: "/admin/subscription-plans" },
     // {name:"Wallet" ,path:""},
     // {name:"Reports" ,path:""}
+
   ]
   return (
     <div className="min-h-screen bg-[#0d1117] text-gray-300 font-sans">
@@ -42,21 +44,20 @@ export function AdminLayout() {
           ))}
         </nav> */}
         <nav className="flex items-center gap-8">
-    {navItems.map(item => (
-        <button 
-          key={item.name}
-          onClick={() => navigate(item.path)}
-          // Update styling to be simple text links
-          className={`text-sm font-medium transition-colors ${
-              location.pathname === item.path
-              ? "text-white" 
-              : "text-gray-400 hover:text-gray-200"
-          }`}
-        >
-            {item.name}
-        </button>
-    ))}
-</nav>
+          {navItems.map(item => (
+            <button
+              key={item.name}
+              onClick={() => navigate(item.path)}
+              // Update styling to be simple text links
+              className={`text-sm font-medium transition-colors ${location.pathname === item.path
+                ? "text-white"
+                : "text-gray-400 hover:text-gray-200"
+                }`}
+            >
+              {item.name}
+            </button>
+          ))}
+        </nav>
         <div className="flex items-center gap-4">
           {user && <span className="text-sm text-gray-400 hidden md:block">Hi, {user.name}</span>}
           <div className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 text-xs font-bold py-2 px-4 rounded-md transition cursor-pointer">

@@ -6,17 +6,45 @@ import { Auction } from "../../../domain/entities/Auction.entity";
 import { CreateAuctionDTO } from "../../dtos/AuctionDTO";
 import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
 import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
-import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-
-
+import { ISubscriptionRepository } from "../../../domain/interfaces/ISubscriptionRepository";
+import { PLAN_LIMITS } from "../../../config/SubscriptionConfig";
+import { ValidationError } from "../../../domain/errors/errors";
+import { ISubscriptionPlanRepository } from "../../../domain/interfaces/ISubscriptionPlanRepository";
 
 @injectable()
 
 export class CreateAuctionUseCase implements ICreateAuctionUseCase {
     constructor(
-        @inject(TYPES.AuctionRepository) private auctionRepository: IAuctionRepository,
+        @inject(TYPES.AuctionRepository) private _auctionRepository: IAuctionRepository,
+        @inject(TYPES.SubscriptionRepository) private _subscriptionRepository:ISubscriptionRepository,
+        @inject (TYPES.SubscriptionPlanRepository)private _subscriptionPlanRepository:ISubscriptionPlanRepository
     ) { }
     async execute(data: CreateAuctionDTO): Promise<AuctionResponseDTO> {
+        const subscription=await this._subscriptionRepository.findActiveByUSerId(data.sellerId);
+        let activePlan;
+        if(subscription){
+            activePlan=await this._subscriptionPlanRepository.findById(subscription.planId);
+        }else{
+            const allPlans=await this._subscriptionPlanRepository.findAll();
+            activePlan=allPlans.find(plan=>plan.isDefault && plan.isActive);
+        }
+        if(!activePlan){
+            throw new Error("No available sunscription plans found.");
+        }
+        const planName=activePlan.name;
+        
+        
+        const auctionCount=await this._subscriptionRepository.countAuctionsThisYear(data.sellerId);
+        if(auctionCount>=activePlan.auctionsPerYear){
+            throw new ValidationError(`Your ${planName} plan allows only ${activePlan.auctionsPerYear} auctions per year`);
+        }
+        const durationDays=(new Date(data.endDate).getTime()-Date.now())/(1000*60*60*24)
+        if(durationDays > activePlan.maxDays){
+            throw new ValidationError(`your ${planName} plan allows a maximum auction duration of ${activePlan.maxDays} days`);
+        }
+        if(data.type==='live' && !activePlan.hasLive){ 
+            throw new ValidationError(`Live Auactions are available only on ${planName} plan`);
+        }
         // console.log("data", data);
         const newAuction = new Auction(
             data.title,
@@ -32,7 +60,7 @@ export class CreateAuctionUseCase implements ICreateAuctionUseCase {
             data.type,
             data.startTime ? new Date(data.startTime) : undefined,
         );
-        const createdAuction = await this.auctionRepository.create(newAuction);
+        const createdAuction = await this._auctionRepository.create(newAuction);
         return AuctionDTOMapper.toResponseDTO(createdAuction);
 
 

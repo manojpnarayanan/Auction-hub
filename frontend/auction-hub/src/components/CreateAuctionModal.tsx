@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { createAuction, updateAuction } from "../api/auctions";
+import { getSubscription } from "../api/User/subscription";
 import { getCategories } from "../api/Admin/Category";
 import API from "../api/axiosInstances";
+import type{ checkSubscription } from "../types/subscribe";
 
 interface Props {
   onClose: () => void;
@@ -25,6 +27,8 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [subscriptionLimit,setSubscriptionLimit]=useState<checkSubscription | null>(null)
+  const [planName,setPlanName]=useState('free');
 
   useEffect(() => {
     const fetchCat = async () => {
@@ -52,6 +56,16 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
       });
     }
   }, [initialData]);
+  
+  
+  useEffect(()=>{
+    getSubscription().then(res=>{
+      setSubscriptionLimit(res.data.limits);
+      setPlanName(res.data.plan);
+    }).catch(()=>{});
+  },[]);
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
@@ -133,6 +147,14 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
       setError("End date should be a future date");
       setLoading(false);
       return;
+    }
+    if(subscriptionLimit){
+      const durationDays=(new Date(form.endDate).getTime()-Date.now())/(1000*60*60*24);
+      if(durationDays>subscriptionLimit.maxDays){
+        setError(`Your ${planName} plan allows a max auction duration of ${subscriptionLimit.maxDays} days`);
+        setLoading(false);
+        return;
+      }
     }
     if (form.type === 'live') {
       if (!form.startTime) {
@@ -235,10 +257,26 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
                 <input type="radio" name="type" value="timed" checked={form.type === 'timed'} onChange={handleChange} />
                 <span className="text-sm">Timed Auction</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer">
+              {/* <label className="flex items-center gap-2 cursor-pointer">
                 <input type="radio" name="type" value="live" checked={form.type === 'live'} onChange={handleChange} />
                 <span className="text-sm">Live Auction</span>
-              </label>
+              </label> */}
+              <label className={`flex items-center gap-2 ${!subscriptionLimit?.hasLive ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
+  <input
+    type="radio"
+    name="type"
+    value="live"
+    checked={form.type === 'live'}
+    onChange={handleChange}
+    disabled={!subscriptionLimit?.hasLive}
+  />
+  <span className="text-sm">
+    Live Auction {!subscriptionLimit?.hasLive && (
+      <span className="text-xs text-orange-500">(Basic+ only)</span>
+    )}
+  </span>
+</label>
+
             </div>
           </div>
 

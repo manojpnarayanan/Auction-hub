@@ -3,6 +3,7 @@ export type TransactionStatus= 'pending' | 'completed' | 'failed' | 'refunded';
 
 export type TransactionPurpose=
 | 'auction_payment'
+| 'subscription_payment'
 | 'seller_credit'
 | 'commission'
 | 'refund';

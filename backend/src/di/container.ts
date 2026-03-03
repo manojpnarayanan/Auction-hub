@@ -135,6 +135,33 @@ import { WalletController } from "../presentation/controllers/user/WalletControl
 import { AdminPaymentController } from "../presentation/controllers/admin/AdminWalletController";
 import { WebhookController } from "../presentation/controllers/WebhookController";
 
+//Subscription-Section
+
+import { ISubscriptionRepository } from "../domain/interfaces/ISubscriptionRepository";
+import { MongoSubscriptionRepository } from "../infrastructure/database/repositories/MongoSubscriptionRepository";
+import { IGetSubscriptionUseCase } from "../application/use-cases/Usecase Interfaces/Subscription-Interface/IGetSubscriptionUseCase";
+import { GetSubscriptionUseCase } from "../application/use-cases/User/Subscriptions/GetSubscriptionUseCase";
+import { ISubscribePlanUseCase } from "../application/use-cases/Usecase Interfaces/Subscription-Interface/ISubcribePlanUseCase";
+import { SubscribePlanUseCase } from "../application/use-cases/User/Subscriptions/SubscribePlanUseCase";
+import { SubscriptionController } from "../presentation/controllers/user/SubscriptionController";
+import { ISubscriptionPlanRepository } from "../domain/interfaces/ISubscriptionPlanRepository";
+import { SubscriptionPlanRepository } from "../infrastructure/database/repositories/MongoSubscriptionPlanRepository";
+import { ICreateSubscriptionPlanUseCase } from "../application/use-cases/Usecase Interfaces/SubscriptionPlan-Interfaces/ICreateSubscriptionPlanUseCase";
+import { CreateSubscriptionPlanUseCase } from "../application/use-cases/User/SubscriptionPlan/CreateSubscriptionPlanUseCase";
+import { IGetAllSubscriptionPlanUseCase } from "../application/use-cases/Usecase Interfaces/SubscriptionPlan-Interfaces/IGetAllSubscriptionPlanUseCase";
+import { GetAllSubscriptionPlanUseCase } from "../application/use-cases/User/SubscriptionPlan/GetAllSubscriptionPlanUseCase";
+import { IDeleteSubscriptionPlanUseCase } from "../application/use-cases/Usecase Interfaces/SubscriptionPlan-Interfaces/IDeleteSubscriptionPlanUseCase";
+import { DeleteSubscriptionPlanUseCase } from "../application/use-cases/User/SubscriptionPlan/DeleteSubscriptionPlanUseCase";
+import { IUpdateSubscriptionPlanUseCase } from "../application/use-cases/Usecase Interfaces/SubscriptionPlan-Interfaces/IUpdateSubscriptionPlanUseCase";
+import { UpdataSubscriptionPlanUseCase } from "../application/use-cases/User/SubscriptionPlan/UpdateSubscriptionPlanUseCase";
+import { SubscriptionPlanController } from "../presentation/controllers/admin/SubscriptionPlanController";
+import { IcreateSubscriptionCheckoutUseCase } from "../application/use-cases/Usecase Interfaces/Subscription-Interface/ICreateSubscriptionCheckoutUseCase";
+import { createSubscriptionCheckoutUseCase } from "../application/use-cases/User/Subscriptions/CreateSubscriptionCheckoutUseCase";
+import { ICreateSubscriptionPaymentIntentUseCase } from "../application/use-cases/Usecase Interfaces/Subscription-Interface/ICreateSubscriptionPaymentIntentUseCase";
+import { createSubscriptionPaymentIntentUseCase } from "../application/use-cases/User/Subscriptions/CreateSubscriptionPaymentIntentUseCase";
+import { IConfirmSubscriptionPaymentUseCase } from "../application/use-cases/Usecase Interfaces/Subscription-Interface/IConfirmSubscriptionPaymentUseCase";
+import { confirmSubscriptionPaymentUseCase } from "../application/use-cases/User/Subscriptions/ConfirmSubscriptionPaymentUseCase";
+
 
 
 
@@ -208,6 +235,20 @@ container.bind<IconfirmPaymentUseCase>(TYPES.ConfirmPaymentUseCase).to(ConfirmPa
 container.bind<IReleasePaymentUseCase>(TYPES.ReleasePaymentUseCase).to(ReleasePaymentUseCase);
 container.bind<IHandleWebhookUseCase>(TYPES.HandleWebhookUseCase).to(HandleWebhookUseCase);
 
+// Subscription
+container.bind<ISubscriptionRepository>(TYPES.SubscriptionRepository).to(MongoSubscriptionRepository);
+container.bind<IGetSubscriptionUseCase>(TYPES.GetSubscriptionUseCase).to(GetSubscriptionUseCase);
+container.bind<ISubscribePlanUseCase>(TYPES.SubscribePlanUseCase).to(SubscribePlanUseCase);
+// container.bind<IcreateSubscriptionCheckoutUseCase>(TYPES.CreateSubscriptionCheckoutUseCase).to(createSubscriptionCheckoutUseCase);
+container.bind<ICreateSubscriptionPaymentIntentUseCase>(TYPES.CreateSubscriptionPaymentIntentUseCase).to(createSubscriptionPaymentIntentUseCase);
+container.bind<IConfirmSubscriptionPaymentUseCase>(TYPES.ConfirmSubscriptionPaymentUseCase).to(confirmSubscriptionPaymentUseCase)
+
+// SubscriptionPlanS
+container.bind<ISubscriptionPlanRepository>(TYPES.SubscriptionPlanRepository).to(SubscriptionPlanRepository);
+container.bind<ICreateSubscriptionPlanUseCase>(TYPES.CreateSubscriptionPlanUseCase).to(CreateSubscriptionPlanUseCase);
+container.bind<IGetAllSubscriptionPlanUseCase>(TYPES.GetAllSubscriptionPlanUseCase).to(GetAllSubscriptionPlanUseCase);
+container.bind<IDeleteSubscriptionPlanUseCase>(TYPES.DeleteSubscriptionPlanUseCase).to(DeleteSubscriptionPlanUseCase);
+container.bind<IUpdateSubscriptionPlanUseCase>(TYPES.UpdateSubscriptionPlanUseCase).to(UpdataSubscriptionPlanUseCase);
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -220,6 +261,8 @@ container.bind<AddressController>(TYPES.AddressController).to(AddressController)
 container.bind<WalletController>(TYPES.WalletController).to(WalletController);
 container.bind<AdminPaymentController>(TYPES.AdminPaymentController).to(AdminPaymentController);
 container.bind<WebhookController>(TYPES.WebhookController).to(WebhookController);
+container.bind<SubscriptionController>(TYPES.SubscriptionController).to(SubscriptionController);
+container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController)
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

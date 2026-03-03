@@ -19,7 +19,6 @@ export class PlaceBidUseCase implements IPlaceBidUseCase{
         @inject (TYPES.SocketService) private socketService:ISocketService,
     ) { }
     async execute(data:PlaceBidDTO):Promise<BidResponseDTO | null>{
-        
         const auction=await this.auctionRepository.findById(data.auctionId);
  
         if(!auction) throw new Error("Auction not found");

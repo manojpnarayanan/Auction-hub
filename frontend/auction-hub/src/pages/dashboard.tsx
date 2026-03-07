@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [searchText, setSearchText] = useState("");
   const [categories, setCategories] = useState<{ id: string, name: string, icon?: string }[]>([]);
   const { allAuctions } = useSelector((state: RootState) => state.auctions)
-  const liveAuction = allAuctions.filter((a: any) => a.type === 'live');
+  const liveAuction = allAuctions.filter((a: any) => a.type === 'live' || a.type==='approved');
   const timedAuctions = allAuctions.filter((a: any) => a.type === 'timed');
 
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -118,7 +118,7 @@ export default function Dashboard() {
               // 2. SHOW THIS IF ITEMS EXIST
               liveAuction.map((auction: any) => (
                 <div key={auction.id}
-                  onClick={() => navigate(`/auction/${auction.id}`)}
+                  onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
                   {/* Image */}
                   <div className="h-40 overflow-hidden bg-gray-200">
@@ -167,7 +167,7 @@ export default function Dashboard() {
                 // ... Copy the exact same Card code from Live Auctions ...
                 // ... just change key={auction.id} ...
                 <div key={auction.id}
-                  onClick={() => navigate(`/auction/${auction.id}`)}
+                  onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
                   {/* ... Same Image Logic ... */}
                   <div className="h-40 overflow-hidden bg-gray-200">

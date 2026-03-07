@@ -60,7 +60,7 @@ export default function MyListings(){
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {myAuctions.map((auction: any) => (
                             <div key={auction.id}
-                                onClick={() => navigate(`/auction/${auction.id}`)}
+                                onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition group">
                                 <div className="h-48 bg-gray-200 overflow-hidden relative">
                                     {auction.images?.[0] || auction.image ? (

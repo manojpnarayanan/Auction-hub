@@ -21,7 +21,22 @@ export class SocketService implements ISocketService{
             socket.on('join_auction',(auctionId)=>{
                 socket.join(auctionId);
                 console.log(`Socket ${socket.id} joined room ${auctionId}`);
-            })
+                // count viewers count
+                const room=this.io!.sockets.adapter.rooms.get(auctionId);
+                const viewerCount=room ? room.size :1;
+                this.io!.to(auctionId).emit('viewer_count',{
+                    auctionId,count:viewerCount
+                });
+            });
+            socket.on('disconnecting',()=>{
+                socket.rooms.forEach((room)=>{
+                    if(room !== socket.id){
+                        const roomSockets=this.io!.sockets.adapter.rooms.get(room);
+                        const count=roomSockets ? roomSockets.size-1 :0;
+                        this.io!.to(room).emit('viewer_count',{auctionId:room,count})
+                    }
+                });
+            });
             socket.on('disconnect',()=>{
                 console.log('Socket Disconnected',socket.id);
             })

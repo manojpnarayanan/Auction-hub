@@ -9,20 +9,26 @@ import { IGetAuctionDetailsUseCase } from "../../application/use-cases/Usecase I
 import { IUpdateAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IUpdateAuctionUseCase";
 import { IDeleteAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IDeleteAuctionUseCase";
 import { IAdminAuctionManagamentUseCase } from "../../application/use-cases/Usecase Interfaces/Admin/IAdminAuctionManagement";
+import { IStartLiveAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/IStartLiveAuctionUseCase";
+import { IEndLiveAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/IEndLiveAuctionUseCase";
+import { ICancelLiveAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/ICancelLiveAuctionUseCase";
+
 
 
 @injectable()
 
 export class AuctionController {
     constructor(
-        @inject(TYPES.CreateAuctionUseCase) private createAuctionUseCase: ICreateAuctionUseCase,
-        @inject(TYPES.GetSellerAuctionUseCase) private getAllListedAuctionUseCase: IGetAllListedAuctionUseCase,
-        @inject(TYPES.GetAllAuctionsUseCase) private getAllAuctionsUseCase: IGetAllAuctionUseCase,
-        @inject(TYPES.GetAuctionDetailsUseCase) private getAuctionDetails: IGetAuctionDetailsUseCase,
-        @inject(TYPES.UpdateAuctionUseCase) private updateAuctionUseCase: IUpdateAuctionUseCase,
-        @inject(TYPES.DeleteAuctionUseCase) private deleteAuctionUseCase: IDeleteAuctionUseCase,
-        @inject(TYPES.ApproveAuctionUseCase) private approveAuctionsUseCase: IAdminAuctionManagamentUseCase,
-
+        @inject(TYPES.CreateAuctionUseCase) private _createAuctionUseCase: ICreateAuctionUseCase,
+        @inject(TYPES.GetSellerAuctionUseCase) private _getAllListedAuctionUseCase: IGetAllListedAuctionUseCase,
+        @inject(TYPES.GetAllAuctionsUseCase) private _getAllAuctionsUseCase: IGetAllAuctionUseCase,
+        @inject(TYPES.GetAuctionDetailsUseCase) private _getAuctionDetails: IGetAuctionDetailsUseCase,
+        @inject(TYPES.UpdateAuctionUseCase) private _updateAuctionUseCase: IUpdateAuctionUseCase,
+        @inject(TYPES.DeleteAuctionUseCase) private _deleteAuctionUseCase: IDeleteAuctionUseCase,
+        @inject(TYPES.ApproveAuctionUseCase) private _approveAuctionsUseCase: IAdminAuctionManagamentUseCase,
+        @inject(TYPES.StartLiveAuctionUseCase)private _startLiveAuctionuseCase:IStartLiveAuctionUseCase,
+        @inject(TYPES.EndLiveAuctionUseCase) private _endLiveAuctionUseCase:IEndLiveAuctionUseCase,
+        @inject(TYPES.CancelLiveAuctionUseCase) private _cancelLiveAuctionUseCase:ICancelLiveAuctionUseCase,
 
     ) { }
     create = async (req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +37,7 @@ export class AuctionController {
                 ...req.body,
                 sellerId: (req as any).user.id
             };
-            const result = await this.createAuctionUseCase.execute(auctionData);
+            const result = await this._createAuctionUseCase.execute(auctionData);
             res.status(HttpStatus.CREATED).json({ success: true, data: result });
         } catch (error) {
             next(error);
@@ -40,7 +46,7 @@ export class AuctionController {
     getAll = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { category, search, type, status ,page,limit} = req.query;
-            const result = await this.getAllAuctionsUseCase.execute(
+            const result = await this._getAllAuctionsUseCase.execute(
                 category as string, 
                 search as string,
                  type as string, 
@@ -56,7 +62,7 @@ export class AuctionController {
     getMine = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = (req as any).user.id;
-            const auctions = await this.getAllListedAuctionUseCase.execute(userId);
+            const auctions = await this._getAllListedAuctionUseCase.execute(userId);
             res.status(HttpStatus.OK).json({ success: true, data: auctions })
         } catch (error) {
             next(error);
@@ -65,7 +71,7 @@ export class AuctionController {
     getAuctionProductDetails = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;
-            const auction = await this.getAuctionDetails.execute(id);
+            const auction = await this._getAuctionDetails.execute(id);
             if (!auction) {
                 res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Auction not found" });
                 return;
@@ -78,7 +84,7 @@ export class AuctionController {
     update = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;
-            const updatedAuction = await this.updateAuctionUseCase.execute(id, req.body);
+            const updatedAuction = await this._updateAuctionUseCase.execute(id, req.body);
             if (!updatedAuction) {
                 res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Auction not found" });
                 return;
@@ -91,7 +97,7 @@ export class AuctionController {
     delete = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;
-            const success = await this.deleteAuctionUseCase.execute(id);
+            const success = await this._deleteAuctionUseCase.execute(id);
             if (!success) {
                 res.status(HttpStatus.NOT_FOUND).json({ success: false, message: "Auction not found" });
                 return;
@@ -105,9 +111,41 @@ export class AuctionController {
         try {
             const { id } = req.params;
             const { status } = req.body;
-            await this.approveAuctionsUseCase.execute(id, status);
+            await this._approveAuctionsUseCase.execute(id, status);
             res.status(HttpStatus.OK).json({ success: true, message: `Auction marked as ${status}` })
         } catch (error) {
+            next(error);
+        }
+    }
+
+    startLiveAuction=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            const {id}=req.params;
+            const sellerId=req.user!.id;
+            await this._startLiveAuctionuseCase.execute(id,sellerId);
+            res.status(HttpStatus.OK).json({success:true,message:"Live auction Started"});
+        }catch(error){
+            next(error);
+        }
+    }
+    endLiveAuction=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            const {id} =req.params;
+            const sellerId=req.user!.id;
+            await this._endLiveAuctionUseCase.execute(id,sellerId);
+            res.status(HttpStatus.OK).json({success:true,message:"Auction Ended successfully"});
+        }catch(error){
+            next(error);
+        }
+    }
+    cancelLiveAuction=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            const {id} =req.params;
+            const requesterId=req.user!.id;
+            const isAdmin=req.user!.role==='admin';
+            await this._cancelLiveAuctionUseCase.execute(id,requesterId,isAdmin);
+            res.status(HttpStatus.OK).json({success:true,message:"Auction cancelled"});
+        }catch(error){
             next(error);
         }
     }

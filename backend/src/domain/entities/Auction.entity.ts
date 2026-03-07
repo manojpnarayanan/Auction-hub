@@ -1,3 +1,4 @@
+import { ValidationError } from "../errors/errors";
 
 export class Auction{
     constructor(
@@ -26,9 +27,10 @@ export class Auction{
     }
 
     placeBid(bidderId:string,amount:number){
-        if(!this.isLive) throw new Error("Auction is not Currently Live");
-        if(bidderId === this.sellerId) throw new Error("Seller cannot bid on their own Auction");
-        if(amount < this.currentPrice) throw new Error("Bid must be higher than curretn Price");
+        if(!this.isLive()) throw new ValidationError("Auction is not Currently Live");
+        if(bidderId === this.sellerId) throw new ValidationError("Seller cannot bid on their own Auction");
+        const minBid=this.currentPrice+1
+        if(amount <minBid) throw new ValidationError("Bid must be higher than current Price");
         this.bids.push({
             bidderId,
             amount,

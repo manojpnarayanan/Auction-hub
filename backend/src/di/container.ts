@@ -51,6 +51,14 @@ import { IUpdateAuctionUseCase } from "../application/use-cases/Usecase Interfac
 import { UpdateAuctionUseCase } from "../application/use-cases/auction/UpdateAuctionUseCase";
 import { IDeleteAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IDeleteAuctionUseCase";
 import { DeleteAuctionUseCase } from "../application/use-cases/auction/DeleteAuctionUseCase";
+import { IStartLiveAuctionUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/IStartLiveAuctionUseCase";
+import { StartLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/StartLiveAuctionUseCase";
+import { IEndLiveAuctionUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/IEndLiveAuctionUseCase";
+import { EndLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/EndLiveAuctionUseCase";
+import { ICancelLiveAuctionUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/ICancelLiveAuctionUseCase";
+import { CancelLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/CancelLiveAuctionUseCase";
+
+
 
 // Admin-useCases
 
@@ -189,7 +197,12 @@ container.bind<IGetAllAuctionUseCase>(TYPES.GetAllAuctionsUseCase).to(GetAllAuct
 container.bind<IGetAuctionDetailsUseCase>(TYPES.GetAuctionDetailsUseCase).to(GetAuctionDetailsUSeCase);
 container.bind<IUpdateAuctionUseCase>(TYPES.UpdateAuctionUseCase).to(UpdateAuctionUseCase);
 container.bind<IDeleteAuctionUseCase>(TYPES.DeleteAuctionUseCase).to(DeleteAuctionUseCase);
-container.bind<ICloseExpiredAuctionUseCase>(TYPES.CloseExpiredAuctionsUseCase).to(CloseExpiredAuctionUseCase)
+container.bind<ICloseExpiredAuctionUseCase>(TYPES.CloseExpiredAuctionsUseCase).to(CloseExpiredAuctionUseCase);
+container.bind<IStartLiveAuctionUseCase>(TYPES.StartLiveAuctionUseCase).to(StartLiveAuctionUseCase);
+container.bind<IEndLiveAuctionUseCase>(TYPES.EndLiveAuctionUseCase).to(EndLiveAuctionUseCase);
+container.bind<ICancelLiveAuctionUseCase>(TYPES.CancelLiveAuctionUseCase).to(CancelLiveAuctionUseCase);
+
+
 
 // Admin-UseCases
 container.bind<IAdminUserManagementUseCase>(TYPES.AdminUserManagementUseCase).to(AdminUserManagementUseCase);

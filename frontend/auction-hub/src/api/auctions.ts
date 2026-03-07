@@ -36,4 +36,16 @@ export const updateAuction=async(id:string,data:any)=>{
     return await API.put(`/auctions/${id}`,data);
 }
 
+export const startLiveAuction=(id:string)=>{
+     return API.post(`/auctions/${id}/start`);
+}
+
+export const endLiveAuction=(id:string)=>{
+    return API.post(`/auctions/${id}/end`);
+}
+
+export const cancelLiveAuction=(id:string)=>{
+    return API.post(`/auctions/${id}/cancel`);
+}
+
 

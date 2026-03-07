@@ -11,11 +11,6 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
     constructor(){
         super(AuctionModel,AuctionPersistanceMapper.toEntity)
     }
-    
-    // async create(auction: Auction): Promise<Auction> {
-    //     const newAuction = await AuctionModel.create(auction);
-    //     return AuctionPersistanceMapper.toEntity(newAuction)
-    // }
     async findAll(filters?: { 
         category?: string, 
         search?: string; 
@@ -26,7 +21,12 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
      }): Promise<{auction:Auction[],total:number}> {
         const query: any = {};
         if (filters?.status && filters.status !== 'all') {
-            query.status = filters.status
+            // query.status = filters.status
+            if(filters.status === 'active'){
+                query.status={$in:['active','approved']}
+            }else{
+                query.status=filters.status
+            }
         }
         if (filters?.category && filters.category !== "All") {
             query.category = filters.category
@@ -55,16 +55,7 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         const auctions = await AuctionModel.find({ sellerId });
         return auctions.map(AuctionPersistanceMapper.toEntity);
     }
-    // async findById(id: string): Promise<Auction | null> {
-    //     const auction = await AuctionModel.findById(id);
-    //     return auction ? AuctionPersistanceMapper.toEntity(auction) : null
-    // }
-    // async update(id: string, data: Partial<Auction>): Promise<Auction | null> {
-    //     const updatedAuction = await AuctionModel.findByIdAndUpdate(id, data, { new: true })
-    //     if (!updatedAuction) return null;
-    //     return AuctionPersistanceMapper.toEntity(updatedAuction);
-        
-    // }
+
     async findByCategory(category: string): Promise<Auction[]> {
         const auctions = await AuctionModel.find({ category: category });
         return auctions.map(AuctionPersistanceMapper.toEntity);
@@ -80,11 +71,6 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         );
         return result.modifiedCount > 0;
     }
-
-    // async delete(id: string): Promise<boolean> {
-    //     const result = await AuctionModel.deleteOne({ _id: id });
-    //     return result.deletedCount > 0;
-    // }
 
     async findExpiredActiveAuctions(): Promise<Auction[]> {
         const now = new Date();
@@ -104,5 +90,15 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         await AuctionModel.findByIdAndUpdate(auctionId,{paymentStatus:status})
     }
 
-
+    async recalculateCurrentPrice(auctionId:string):Promise<void>{
+        const auction=await AuctionModel.findById(auctionId);
+        if(!auction) return;
+        const highestBid=auction.bids.reduce((max,bid)=>bid.amount? bid.amount:max,auction.startingPrice);
+        await AuctionModel.findByIdAndUpdate(auctionId,{currentPrice:highestBid});
+    }
+    async findAuctionstoStart(): Promise<Auction[]> {
+        const now=new Date();
+        const auctions=await AuctionModel.find({status:'approved',startTime:{$lte:now}});
+        return auctions.map(AuctionPersistanceMapper.toEntity);
+    }
 }

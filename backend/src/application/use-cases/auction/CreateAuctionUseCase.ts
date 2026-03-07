@@ -43,7 +43,14 @@ export class CreateAuctionUseCase implements ICreateAuctionUseCase {
             throw new ValidationError(`your ${planName} plan allows a maximum auction duration of ${activePlan.maxDays} days`);
         }
         if(data.type==='live' && !activePlan.hasLive){ 
-            throw new ValidationError(`Live Auactions are available only on ${planName} plan`);
+            throw new ValidationError(`Live Auctions are available only on ${planName} plan`);
+        }
+        if(data.type==='live'){
+            const startTime=data.startTime?new Date(data.startTime):new Date();
+            const durationHours=(new Date(data.endDate).getTime()-startTime.getTime())/(1000*60*60);
+            if(durationHours>2){
+                throw new ValidationError("Live auction cannot exceeded 2 hours in duration");
+            }
         }
         // console.log("data", data);
         const newAuction = new Auction(

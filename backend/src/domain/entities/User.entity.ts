@@ -15,6 +15,7 @@ export class User {
         public readonly isBlocked:boolean= false,
         public readonly phone?:string,
         public readonly profileImage?:string,
+        public readonly watchlist:string[]=[]
     ) { }
 
     isOTPValid(providedOTP: string): boolean {
@@ -30,5 +31,8 @@ export class User {
     }
     isGoogleUser(): boolean {
         return !!this.googleId
+    }
+    isInWatchlist(auctionId:string):boolean{
+        return this.watchlist.includes(auctionId);
     }
 }

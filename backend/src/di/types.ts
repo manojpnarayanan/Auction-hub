@@ -100,5 +100,14 @@ export const TYPES = {
     CreateSubscriptionPlanUseCase:Symbol.for("CreateSubscriptionPlanUseCase"),
     GetAllSubscriptionPlanUseCase:Symbol.for("GetAllSubscriptionPlanUseCase"),
     UpdateSubscriptionPlanUseCase:Symbol.for("UpdateSubscriptionPlanUseCase"),
-    DeleteSubscriptionPlanUseCase:Symbol.for("DeleteSubscriptionPlanUseCase")
+    DeleteSubscriptionPlanUseCase:Symbol.for("DeleteSubscriptionPlanUseCase"),
+
+
+    // Wallet
+    WatchlistRepository:Symbol.for("GetWatchlistRepository"),
+    WatchlistController:Symbol.for("WatchlistController"),
+    AddToWatchlistUseCase:Symbol.for("AddToWatchlistUseCase"),
+    RemoveFromWatchlistUseCase:Symbol.for("RemoveFromWatchlistUseCase"),
+    GetWatchlistUseCase:Symbol.for("GetWatchlistUseCase"),
+    CheckWatchlistUseCase:Symbol.for("CheckWatchlistUseCase")
 }

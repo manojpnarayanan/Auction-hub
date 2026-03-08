@@ -10,6 +10,7 @@ import { confirmPayment } from "../../api/User/wallet";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
+import { checkWatchlist,addToWatchlist,removeFromWatchlist } from "../../api/User/watchlist";
 
 
 interface Auction{
@@ -42,6 +43,7 @@ export default function AuctionProductDetails() {
   const [timeLeft,setTimeLeft]=useState('');
   const currentUser=useSelector((state:any)=>state.auth.user);
   const {paymentSession,initiating,initiatePayment,closePayment}=usePayment();
+  const [isWatchlisted,setIsWatchlisted]=useState(false);
 
 
   const calculateTimeLeft=()=>{
@@ -53,6 +55,16 @@ export default function AuctionProductDetails() {
     const seconds=Math.floor((diffrence/1000) % 60);
     return `${hours}h ${minutes}m ${seconds}s `
   }
+
+  useEffect(()=>{
+    const checkStatus=async()=>{
+      try{
+        const res=await checkWatchlist(id!);
+        setIsWatchlisted(res.data.data.isWatchlisted);
+      }catch{}
+    }
+    checkStatus();
+  },[id])
   
   useEffect(()=>{
     const timer=setInterval(()=>{
@@ -81,6 +93,22 @@ export default function AuctionProductDetails() {
       socket.off('bid_update');
     }
     },[id]);
+
+    const handleWatchlistToggle=async()=>{
+      try{
+        if(isWatchlisted){
+          await removeFromWatchlist(id!);
+          setIsWatchlisted(false);
+          toast.success("Removed from Watchlist");
+        }else{
+          await addToWatchlist(id!);
+          setIsWatchlisted(true);
+          toast.success("Added To Watchlist");
+        }
+      }catch{
+        toast.error("Failed to Update Watchlist");
+      }
+    }
 
   const fetchAuction = async () => {
     if (!id) return;
@@ -164,12 +192,28 @@ export default function AuctionProductDetails() {
         </div>
 
         {/* Title & Description */}
-        <div className="mb-12">
-          <h1 className="text-3xl font-extrabold text-[#1a202c] mb-3">{auction.title}</h1>
-          <p className="text-gray-500 leading-relaxed max-w-4xl text-[15px]">
-            {auction.description}
-          </p>
-        </div>
+        {/* Title & Description */}
+<div className="mb-12">
+    <div className="flex items-center justify-between mb-3">
+        <h1 className="text-3xl font-extrabold text-[#1a202c]">{auction.title}</h1>
+        
+        {/* ❤️ Watchlist Button — ADD THIS */}
+        <button
+            onClick={handleWatchlistToggle}
+            className={`text-2xl transition-transform hover:scale-110 ${
+                isWatchlisted ? "text-red-500" : "text-gray-400"
+            }`}
+            title={isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
+        >
+            {isWatchlisted ? "❤️" : "🤍"}
+        </button>
+    </div>
+
+    <p className="text-gray-500 leading-relaxed max-w-4xl text-[15px]">
+        {auction.description}
+    </p>
+</div>
+
 
         
                 {/* Details Grid */}

@@ -15,6 +15,7 @@ export interface IUserDocument extends Document {
     updatedAt: Date;
     phone?:string;
     profileImage?:string;
+    watchlist?:string[];
 }
 
 const UserSchema = new Schema<IUserDocument>({
@@ -28,7 +29,8 @@ const UserSchema = new Schema<IUserDocument>({
     isVerified: { type: Boolean, default: false },
     isBlocked:{type:Boolean, default:false},
     phone:{type:String},
-    profileImage:{type:String}
+    profileImage:{type:String},
+    watchlist:{type:[String],default:[]}
 }, { timestamps: true });
 
 export const UserModel = model<IUserDocument>("User", UserSchema)

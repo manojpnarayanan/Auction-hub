@@ -25,6 +25,7 @@ import AdminWallet from './pages/admin/AdminWallet';
 import AdminSubscriptionPlan from './pages/admin/AdminSubscriptionPlan';
 import SubscriptionPlans from './pages/user/SubscriptionPlans';
 import LiveAuctionRoom from './pages/user/LiveAuctionRoom';
+import Watchlist from './pages/user/Watchlist';
 
 
 
@@ -83,6 +84,11 @@ function App() {
           <Route path="auction/:id" element={
             <PrivateRoute><AuctionProductDetails /></PrivateRoute>
           } />
+          <Route path='/watchlist' element={
+            <PrivateRoute><Watchlist/></PrivateRoute>
+          }>
+
+          </Route>
 
           <Route path="admin/login" element={
             <PublicRoute><AdminLogin /></PublicRoute>

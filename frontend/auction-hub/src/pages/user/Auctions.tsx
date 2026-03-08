@@ -95,7 +95,7 @@ const Auctions=()=>{
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {auctions.map((auction: any) => (
                                 <div key={auction.id} 
-                                     onClick={() => navigate(`/auction/${auction.id}`)}
+                                     onClick={() => navigate(auction.type==='live'? `/live-auction/${auction.id}`:`/auction/${auction.id}`)}
                                      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
                                     <div className="h-48 overflow-hidden bg-gray-200 relative">
                                         <img src={auction.images?.[0] || 'https://via.placeholder.com/300'} alt={auction.title} className="w-full h-full object-cover" />

@@ -5,7 +5,6 @@ import { IPlaceBidUseCase } from "../../../application/use-cases/Usecase Interfa
 import { IGetAuctionBidsUseCase } from "../../../application/use-cases/Usecase Interfaces/Bid-interface/IGetAuctionBidsUseCase";
 import { IGetUserBidsUseCase } from "../../../application/use-cases/Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
 import { HttpStatus } from "../../Enums/StatusCodes";
-import { success } from "zod";
 
 
 @injectable()
@@ -20,25 +19,25 @@ export class BidController {
         try {
             const { auctionId, amount } = req.body;
             const bidderId = (req.user as any)?.id;
-            if (!bidderId) return res.status(401).json({ success: false, message: "Unauthorized" });
+            if (!bidderId) return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
             const bid = await this.placeBidUseCase.execute({ auctionId, bidderId, amount });
 
-            res.status(201).json({
+            res.status(HttpStatus.CREATED).json({
                 success: true,
                 message: "Bid placed Successsfully",
                 data: bid
             });
-        } catch (error: any) {
-            res.status(400).json({ success: false, message: error.message });
+        } catch (error) {
+            next(error);
         }
     }
     async getBids(req: Request, res: Response, next: NextFunction) {
         try {
             const { auctionId } = req.params;
             const bids = await this.getAuctionBidsUseCase.execute(auctionId);
-            res.status(200).json({ success: true, data: bids });
-        } catch (error: any) {
-            res.status(400).json({ success: false, message: error.message })
+            res.status(HttpStatus.OK).json({ success: true, data: bids });
+        } catch (error) {
+            next(error);
         }
     }
     async getMyBids(req: Request, res: Response, next: NextFunction) {
@@ -49,8 +48,8 @@ export class BidController {
             }
             const bids = await this.getUserBidUseCase.execute(userId);
             res.status(HttpStatus.OK).json({ success: true, data: bids });
-        } catch (error: any) {
-            res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: error.message })
+        } catch (error) {
+            next(error);
         }
     }
 }

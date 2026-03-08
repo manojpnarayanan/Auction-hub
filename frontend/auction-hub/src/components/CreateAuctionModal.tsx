@@ -173,6 +173,13 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         setLoading(false);
         return;
       }
+      // const durationHours=(endDate.getTime() - startTime.getTime() )/1000*60*60;
+      const durationHours = (endDate.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+      if(durationHours>2){
+        setError("Live auctions cannot exceedded 2 hours. Please shorten the duration");
+        setLoading(false);
+        return;
+      }
     }
     if (form.images.length < 3) {
       setError(`Please upload atlest 3 images (Current:${form.images.length}) `);

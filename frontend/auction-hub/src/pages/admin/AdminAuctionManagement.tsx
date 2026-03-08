@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { getAdminAuctionManagement, deleteAuction, updateAuctionStatus } from "../../api/Admin/adminManage";
+import { getAdminAuctionManagement, deleteAuction, updateAuctionStatus ,cancelLiveAuctionAdmin } from "../../api/Admin/adminManage";
 import toast from "react-hot-toast";
 import Pagination from "../../components/Pagination";
 import ConfirmModal from "../../components/ConfirmationModal";
-
+import { useNavigate } from "react-router-dom";
 
 const AdminAuctions = () => {
     const [auctions, setAuctions] = useState<any[]>([]);
@@ -14,6 +14,8 @@ const AdminAuctions = () => {
     const [auctionToDelete,setAuctionToDelete]=useState<string|null>(null)
     const limit = 5;
     const [searchTerm,setSearchTerm]=useState("");
+    const navigate=useNavigate();
+    
 
 
     const fetchAuctions = async () => {
@@ -32,28 +34,7 @@ const AdminAuctions = () => {
         fetchAuctions();
     }, [page,searchTerm]);
 
-    // const handleDelete = async (id: string) => {
-    //     const result = await Swal.fire({
-    //         title: "Are you sure",
-    //         text: "You wont be able to revert this",
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#d33",
-    //         cancelButtonColor: '#3085d6',
-    //         confirmButtonText: "Yes, delete it!"
-    //     });
-
-    //     if (result.isConfirmed) {
-
-    //         try {
-    //             await deleteAuction(id);
-    //             toast.success("Auction deleted successfully");
-    //             fetchAuctions();
-    //         } catch (error) {
-    //             toast.error("Failed to delte auction")
-    //         }
-    //     }
-    // };
+    
     const handleDelete=async (id:string)=>{
         setAuctionToDelete(id);
         setIsDeleteModalOpen(true);
@@ -70,8 +51,18 @@ const AdminAuctions = () => {
             toast.error("Failed to delete Auction")
         }
     }
+    const handleCancelLiveAuction=async (id:string)=>{
+        if(window.confirm("Are you sure you wan tot completely cancel this live auction?"))
+        try{
+            await cancelLiveAuctionAdmin(id);
+            toast.success("Live auction cancelled successfully");
+            fetchAuctions();
+        }catch(error:any){
+            toast.error(error.response?.data?.message || "Failed to cancel live auction");
+        }
+    }
 
-    const handleStatusUpdate = async (id: string, status: 'active' | 'rejected') => {
+    const handleStatusUpdate = async (id: string, status: 'active' | 'rejected' |'approved') => {
         try {
             await updateAuctionStatus(id, status);
             toast.success(`Auction ${status === 'active' ? 'Approved' : 'Rejected'} successfully`);
@@ -116,7 +107,11 @@ const AdminAuctions = () => {
                                             className="w-12 h-12 rounded object-cover border border-gray-200"
                                         />
                                     </td>
-                                    <td className="p-4 font-medium text-gray-200">{auction.title}</td>
+                                    {/* <td className="p-4 font-medium text-gray-200">{auction.title}</td> */}
+                                    <td className="p-4 font-medium text-blue-400 hover:text-blue-300 cursor-pointer underline"
+     onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}>
+     {auction.title}
+ </td>
                                     <td className="p-4 text-blue-600 font-bold">₹{auction.currentPrice || auction.startingPrice}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 text-xs rounded-full font-bold ${auction.status === 'active' ? 'bg-green-100 text-green-700' :
@@ -133,11 +128,11 @@ const AdminAuctions = () => {
                                             Delete
                                         </button>
                                     </td> */}
-                                    <td className="p-4 flex gap-2">
+                                    <td className="p-4 flex flex-wrap gap-2">
                                         {auction.status === 'pending' && (
                                             <>
                                                 <button
-                                                    onClick={() => handleStatusUpdate(auction.id, 'active')}
+                                                    onClick={() => handleStatusUpdate(auction.id,auction.type=== 'live' ? 'approved' :'active')}
                                                     className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium"
                                                 >
                                                     Approve
@@ -149,6 +144,24 @@ const AdminAuctions = () => {
                                                     Reject
                                                 </button>
                                             </>
+                                        )}
+                                        {/* Live auctions Control */}
+                                        {auction.status ==='active' && auction.type==='live' && (
+                                            <button onClick={()=>handleCancelLiveAuction(auction.id)}
+                                            className="text-orange-500 hover:text-orange-700 hover:bg-orange-500/10 px-3 py-1 rounded transition text-sm font-medium">
+                                                Cancel live
+                                            </button>
+                                        )}
+                                        {/* Timed Auctions Control */}
+                                        {auction.status==='active' && auction.type==='timed' && (
+                                            <button onClick={()=>handleStatusUpdate(auction.id,'rejected')} className="text-purple-500 hover:text-purple-700 hover:bg-purple-500/10 px-3 py-1 rounded transition text-sm font-medium" >
+                                                Block
+                                            </button>
+                                        )}
+                                        {auction.status==='rejected' && auction.type==='timed' && (
+                                            <button onClick={()=>handleStatusUpdate(auction.id,'active')} className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium">
+                                                Unblock
+                                            </button>
                                         )}
                                         <button
                                             onClick={() => handleDelete(auction.id)}

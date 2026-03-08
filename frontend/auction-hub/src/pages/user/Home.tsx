@@ -56,7 +56,7 @@ const Home=()=>{
                                 <h3 className="text-xl font-bold">{auction.title}</h3>
                                 <p className="text-gray-600">Current Bid: ₹{auction.currentPrice}</p>
                                 <button 
-                                    onClick={() => navigate(`/auction/${auction.id}`)}
+                                    onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                                     className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
                                     View Details
                                 </button>

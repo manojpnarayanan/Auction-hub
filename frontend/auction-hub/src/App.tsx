@@ -24,6 +24,9 @@ import Profile from './pages/user/Profile';
 import AdminWallet from './pages/admin/AdminWallet';
 import AdminSubscriptionPlan from './pages/admin/AdminSubscriptionPlan';
 import SubscriptionPlans from './pages/user/SubscriptionPlans';
+import LiveAuctionRoom from './pages/user/LiveAuctionRoom';
+
+
 
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
 
@@ -84,6 +87,10 @@ function App() {
           <Route path="admin/login" element={
             <PublicRoute><AdminLogin /></PublicRoute>
           } />
+          <Route path='live-auction/:id' element={
+            <PrivateRoute><LiveAuctionRoom/></PrivateRoute>
+          } >
+          </Route>
 
 
           <Route path='/admin' element={<AdminLayout />}>

@@ -15,7 +15,9 @@ auctionRouter.get('/all-auctions',authenticate,checkBlockedStatus,auctionControl
 auctionRouter.get('/',isUser,checkBlockedStatus,auctionController.getAll);
 auctionRouter.get("/:id",isUser,checkBlockedStatus,auctionController.getAuctionProductDetails);
 auctionRouter.put('/:id',authenticate,checkBlockedStatus,auctionController.update);
-
+auctionRouter.post('/:id/start',isUser,auctionController.startLiveAuction);
+auctionRouter.post('/:id/end',isUser,auctionController.endLiveAuction);
+auctionRouter.post("/:id/cancel",isUser,auctionController.cancelLiveAuction);
 
 
 

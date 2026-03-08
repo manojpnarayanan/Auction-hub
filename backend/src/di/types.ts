@@ -25,6 +25,9 @@ export const TYPES = {
     GetAuctionDetailsUseCase: Symbol.for("GetAuctionDetailsUseCase"),
     UpdateAuctionUseCase: Symbol.for("UpdateAuctionUseCase"),
     DeleteAuctionUseCase:Symbol.for("DeleteAuctionUseCase"),
+    StartLiveAuctionUseCase:Symbol.for("StartLiveAuctionUseCase"),
+    EndLiveAuctionUseCase:Symbol.for("EndLiveAuctionUseCase"),
+    CancelLiveAuctionUseCase:Symbol.for("CancelLiveAuctionUseCase"),
 
 
     // Admin 

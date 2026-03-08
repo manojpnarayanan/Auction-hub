@@ -26,7 +26,7 @@ const AuctionSchema:Schema=new Schema({
     endDate:{type:Date ,required:true},
     sellerId:{type:String ,required:true},
     images:{type:[String], default:[]},
-    status:{type:String,enum:['active','sold','expired' ,'pending','rejected'],default:'pending'},
+    status:{type:String,enum:['active','sold','expired' ,'pending','rejected','approved'],default:'pending'},
     type:{type:String,enum:['live','timed'],default:'timed'},
     startTime:{type:Date},
     winnerId:{type:String,default:null},

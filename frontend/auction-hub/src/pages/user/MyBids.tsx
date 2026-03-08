@@ -40,7 +40,7 @@ export default function MyBids() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {myBids.map((item: any) => (
                             <div key={item.lastBidTime}
-                                onClick={() => navigate(`/auction/${item.auction.id}`)}
+                                onClick={() => navigate(item.auction.type === 'live' ? `/live-auction/${item.auction.id}` : `/auction/${item.auction.id}`)}
                                 className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 cursor-pointer hover:shadow-md transition">
                                 <img
                                     src={item.auction.images?.[0] || "https://via.placeholder.com/150"}

@@ -18,7 +18,8 @@ export class UserPersistanceMapper{
         doc.isVerified,
         doc.isBlocked,
         doc.phone,
-        doc.profileImage
+        doc.profileImage,
+        doc.watchlist || []
         )
     }
 }

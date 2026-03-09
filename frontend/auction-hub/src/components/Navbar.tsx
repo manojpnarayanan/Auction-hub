@@ -48,6 +48,9 @@ export default function Navbar({searchText, setSearchText} : NavbarProps){
             <Link to="/subscription-plans" className={`hover:text-white/80 transition ${isActive('/user/profile')}`}>
               Plans
             </Link>
+            <Link to="/watchlist" className={`hover:text-white/80 transition ${isActive('/user/profile')}`}>
+              Watchlist
+            </Link>
           </nav>
         </div>
         {/* Right Section */}

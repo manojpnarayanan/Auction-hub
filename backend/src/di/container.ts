@@ -171,6 +171,19 @@ import { IConfirmSubscriptionPaymentUseCase } from "../application/use-cases/Use
 import { confirmSubscriptionPaymentUseCase } from "../application/use-cases/User/Subscriptions/ConfirmSubscriptionPaymentUseCase";
 
 
+// Wishlist-Section
+import { IWatchlistRepository } from "../domain/interfaces/IWatchlistRepository";
+import { MongoWatchlistRepository } from "../infrastructure/database/repositories/MongoWatchlistRepository";
+import { IGetWatchlistUseCase } from "../application/use-cases/Usecase Interfaces/Watchlist-Interface/IGetWatchlistUseCase";
+import { GetWatchlistUseCase } from "../application/use-cases/User/Watchlist/GetWatchlistUseCase";
+import { IRemoveFromWatchlistUseCase } from "../application/use-cases/Usecase Interfaces/Watchlist-Interface/IRemoveFromWatchlistUseCase";
+import { RemoveFromWatchlistUseCase } from "../application/use-cases/User/Watchlist/RemoveFromWatchlistUseCase";
+import { ICheckWatchlistUseCase } from "../application/use-cases/Usecase Interfaces/Watchlist-Interface/ICheckWatchlistUseCase";
+import { CheckWatchlistUseCase } from "../application/use-cases/User/Watchlist/CheckWatchlistUseCase";
+import { IAddToWatchlistUseCase } from "../application/use-cases/Usecase Interfaces/Watchlist-Interface/IAddToWatchlistUseCase";
+import { AddToWatchlistUseCase } from "../application/use-cases/User/Watchlist/AddToWatchlistUseCase";
+import { WatchlistController } from "../presentation/controllers/user/WatchlistController";
+
 
 
 const container = new Container();
@@ -263,6 +276,17 @@ container.bind<IGetAllSubscriptionPlanUseCase>(TYPES.GetAllSubscriptionPlanUseCa
 container.bind<IDeleteSubscriptionPlanUseCase>(TYPES.DeleteSubscriptionPlanUseCase).to(DeleteSubscriptionPlanUseCase);
 container.bind<IUpdateSubscriptionPlanUseCase>(TYPES.UpdateSubscriptionPlanUseCase).to(UpdataSubscriptionPlanUseCase);
 
+// Watchlist Section
+container.bind<IWatchlistRepository>(TYPES.WatchlistRepository).to(MongoWatchlistRepository)
+container.bind<IGetWatchlistUseCase>(TYPES.GetWatchlistUseCase).to(GetWatchlistUseCase);
+container.bind<IRemoveFromWatchlistUseCase>(TYPES.RemoveFromWatchlistUseCase).to(RemoveFromWatchlistUseCase);
+container.bind<ICheckWatchlistUseCase>(TYPES.CheckWatchlistUseCase).to(CheckWatchlistUseCase);
+container.bind<IAddToWatchlistUseCase>(TYPES.AddToWatchlistUseCase).to(AddToWatchlistUseCase);
+
+
+
+
+
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
 container.bind<AuctionController>(TYPES.AuctionController).to(AuctionController);
@@ -276,6 +300,8 @@ container.bind<AdminPaymentController>(TYPES.AdminPaymentController).to(AdminPay
 container.bind<WebhookController>(TYPES.WebhookController).to(WebhookController);
 container.bind<SubscriptionController>(TYPES.SubscriptionController).to(SubscriptionController);
 container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController)
+container.bind<WatchlistController>(TYPES.WatchlistController).to(WatchlistController);
+
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

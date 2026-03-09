@@ -27,6 +27,8 @@ import WebhookRoutes from './src/presentation/routes/WebhookRoutes.js';
 import AdminPaymentRoutes from "./src/presentation/routes/admin/AdminPaymentRoutes.js";
 import SubscriptionPlanRoutes from "./src/presentation/routes/admin/SubsriptionPlanRoutes.js";
 import SubscriptionRoutes from './src/presentation/routes/user/SubscriptionRoutes.js'
+import watchlistRoutes from './src/presentation/routes/user/watchlistRoutes.js';
+
 
 const app = express();
 const httpServer=createServer(app);
@@ -55,6 +57,7 @@ app.use('/user',WalletRoutes);
 app.use('/admin',AdminPaymentRoutes);
 app.use('/admin',SubscriptionPlanRoutes);
 app.use('/user',SubscriptionRoutes);
+app.use('/user',watchlistRoutes)
 
 app.use(errorHandler);
 

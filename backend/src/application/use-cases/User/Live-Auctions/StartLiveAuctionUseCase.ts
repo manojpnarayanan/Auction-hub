@@ -22,7 +22,7 @@ export class StartLiveAuctionUseCase implements IStartLiveAuctionUseCase{
         this._socketService.emit('auction_started',{
             auctionId,
             startTime:new Date(),
-            currentParice:auction.currentPrice
+            currentPrice:auction.currentPrice
         },auctionId);
     }
 }

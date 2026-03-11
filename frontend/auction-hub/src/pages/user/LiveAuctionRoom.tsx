@@ -9,7 +9,8 @@ import Navbar from "../../components/Navbar";
 import toast from "react-hot-toast";
 import PaymentModal from "../../components/paymentModal";
 import { confirmPayment } from "../../api/User/wallet";
-
+import type { RootState } from "../../redux/store";
+import { AxiosError } from "axios";
 
 interface Bid {
     bidderId: string;
@@ -48,7 +49,7 @@ export default function LiveAuctionRoom() {
     const {paymentSession,initiating,initiatePayment,closePayment}=usePayment();
 
     const { id } = useParams();
-    const currentUser = useSelector((state: any) => state.auth.user);
+    const currentUser = useSelector((state: RootState) => state.auth.user);
 
     // Set initial image when auction loads
     useEffect(() => {
@@ -143,8 +144,9 @@ export default function LiveAuctionRoom() {
             await placeBid(id!, amount);
             setBidAmount("");
             toast.success("Bid placed");
-        } catch (e: any) {
-            toast.error(e.response?.data?.message || "Failed");
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed");
         } finally {
             setBidding(false);
         }

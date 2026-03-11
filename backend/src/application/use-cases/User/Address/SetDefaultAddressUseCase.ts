@@ -7,9 +7,9 @@ import { ISetDefaultUseCase } from "../../Usecase Interfaces/Address-Interface/I
 @injectable()
 export class SetDefaultAddressUseCase implements ISetDefaultUseCase{
     constructor(
-        @inject(TYPES.AddressRepository) private addressRepository:IAddressRepository
+        @inject(TYPES.AddressRepository) private _addressRepository:IAddressRepository
     ){}
     async execute(userId: string, addressId: string): Promise<void> {
-        await this.addressRepository.setDeafult(userId,addressId);
+        await this._addressRepository.setDeafult(userId,addressId);
     }
 }

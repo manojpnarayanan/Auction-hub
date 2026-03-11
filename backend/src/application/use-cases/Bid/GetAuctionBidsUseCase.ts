@@ -10,14 +10,14 @@ import { AuctionBidResponseDTO } from "../../dtos/BidDTO";
 
 export class GetAuctionBidsUseCase implements IGetAuctionBidsUseCase{
     constructor(
-        @inject(TYPES.BidRepository) private bidRepository:IBidRepository,
-        @inject(TYPES.UserRepository) private userRepository:IUserRepository
+        @inject(TYPES.BidRepository) private _bidRepository:IBidRepository,
+        @inject(TYPES.UserRepository) private _userRepository:IUserRepository
     ) { }
 
     async execute(auctionId: string): Promise<AuctionBidResponseDTO[]> {
-        const bids=await this.bidRepository.findByAuctionId(auctionId);
+        const bids=await this._bidRepository.findByAuctionId(auctionId);
         const bidsWithUser=await Promise.all(bids.map(async (bid)=>{
-            const user=await this.userRepository.findById(bid.bidderId);
+            const user=await this._userRepository.findById(bid.bidderId);
             return {
                 id:bid.id!,
                 amount:bid.amount,

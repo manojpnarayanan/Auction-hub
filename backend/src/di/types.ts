@@ -83,6 +83,7 @@ export const TYPES = {
     WalletController:Symbol.for('WalletController'),
     AdminPaymentController:Symbol.for('AdminPaymentController'),
     WebhookController:Symbol.for('WebhookController'),
+    GetPendingReleaseUseCase:Symbol.for("GetPendingReleaseUseCase"),
 
     // Subscription 
     SubscriptionRepository:Symbol.for('SubscriptionRepository'),

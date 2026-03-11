@@ -11,10 +11,10 @@ import { UserResponseDTO } from "../../dtos/user.dto";
 
 export class AdminUserManagementUseCase implements IAdminUserManagementUseCase{
     constructor(
-        @inject(TYPES.UserRepository) private userRepository:IUserRepository 
+        @inject(TYPES.UserRepository) private _userRepository:IUserRepository 
     ) { }
     async execute(page: number, limit: number, search: string): Promise<{ users: UserResponseDTO[]; total: number; }> {
-        const {users,total}=await this.userRepository.adminUserManage(page,limit,search);
+        const {users,total}=await this._userRepository.adminUserManage(page,limit,search);
         return {
             users:users.map(user=>UserDTOMapper.toResponseDTO(user)),total
         }

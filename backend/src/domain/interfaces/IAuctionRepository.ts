@@ -11,7 +11,7 @@ export interface IAuctionRepository {
         page?:number,
         limit?:number, 
     }): Promise<{auction:Auction[],total:number}>;
-    findBySellerId(sellerId: string): Promise<Auction[]>;
+    findBySellerId(sellerId: string,page?:number,limit?:number): Promise<{auctions:Auction[],total:number}>;
     findById(id: string): Promise<Auction | null>;
     update(id: string, data: Partial<Auction>): Promise<Auction | null>;
     findByCategory(category: string): Promise<Auction[]>;

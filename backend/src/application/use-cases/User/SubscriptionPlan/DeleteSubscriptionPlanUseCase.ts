@@ -9,9 +9,9 @@ import { SubscriptionPlanDTOMapper } from "../../../DTOMapper/SubscriptionPlanDT
 
 export class DeleteSubscriptionPlanUseCase implements IDeleteSubscriptionPlanUseCase{
     constructor(
-        @inject(TYPES.SubscriptionPlanRepository)private subscriptionPlanRepo:ISubscriptionPlanRepository
+        @inject(TYPES.SubscriptionPlanRepository)private _subscriptionPlanRepo:ISubscriptionPlanRepository
     ){}
     async execute(id: string): Promise<boolean> {
-        return await this.subscriptionPlanRepo.delete(id)
+        return await this._subscriptionPlanRepo.delete(id)
     }
 }

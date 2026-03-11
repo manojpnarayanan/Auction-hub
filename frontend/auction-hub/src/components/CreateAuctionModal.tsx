@@ -4,11 +4,13 @@ import { getSubscription } from "../api/User/subscription";
 import { getCategories } from "../api/Admin/Category";
 import API from "../api/axiosInstances";
 import type{ checkSubscription } from "../types/subscribe";
+import  type { AuctionItem } from "../types/auction";
+import { AxiosError } from "axios";
 
 interface Props {
   onClose: () => void;
   onSuccess: () => void;
-  initialData?: any;
+  initialData?: Partial<AuctionItem>;
 }
 
 export default function CreateAuctionModal({ onClose, onSuccess, initialData }: Props) {
@@ -45,13 +47,13 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
   useEffect(() => {
     if (initialData) {
       setForm({
-        title: initialData.title,
-        description: initialData.description,
-        category: initialData.category,
-        startingPrice: initialData.startingPrice,
+        title: initialData.title || '',
+        description: initialData.description || '',
+        category: initialData.category || 'others',
+        startingPrice: initialData.startingPrice?.toString() || "",
         endDate: initialData.endDate ? new Date(initialData.endDate).toISOString().slice(0, 16) : "",
         images: initialData.images || [],
-        type: initialData.type,
+        type: initialData.type || 'timed',
         startTime: initialData.startTime ? new Date(initialData.startTime).toISOString().slice(0, 16) : ""
       });
     }
@@ -198,15 +200,16 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
       // onSuccess();
       // onClose();
       if (initialData) {
-        await updateAuction(initialData.id, auctionData);
+        await updateAuction(initialData.id!, auctionData);
       } else {
         await createAuction(auctionData);
       }
       onSuccess();
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      setError(error.response?.data?.message)
+      const err=error as AxiosError<{message:string}>
+      setError(err.response?.data?.message  || "Failed" )
     } finally {
       setLoading(false);
     }

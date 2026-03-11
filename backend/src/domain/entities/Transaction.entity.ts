@@ -20,6 +20,7 @@ export class Transactions {
         public readonly auctionId?:string,
         public readonly stripePaymentIntentId?:string,
         public readonly description:string="",
+        public readonly isReleased?:boolean,
         public readonly createdAt:Date=new Date(),
     ){}
 }

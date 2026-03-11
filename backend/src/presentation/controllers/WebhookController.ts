@@ -9,12 +9,12 @@ import { HttpStatus } from '../Enums/StatusCodes';
 @injectable()
 export class WebhookController{
     constructor(
-        @inject(TYPES.HandleWebhookUseCase) private handleWebhookUseCase:IHandleWebhookUseCase
+        @inject(TYPES.HandleWebhookUseCase) private _handleWebhookUseCase:IHandleWebhookUseCase
     ){}
     handleStripeWebhook=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
         try{
             const signature=req.headers['stripe-signature'] as string;
-            await this.handleWebhookUseCase.execute(req.body as Buffer,signature);
+            await this._handleWebhookUseCase.execute(req.body as Buffer,signature);
             res.status(HttpStatus.OK).json({received:true});
         }catch(error){
             next(error);

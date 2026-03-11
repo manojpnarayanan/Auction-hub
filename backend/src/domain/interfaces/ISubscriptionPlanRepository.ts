@@ -11,4 +11,5 @@ export interface ISubscriptionPlanRepository{
     update(id:string,data:Partial<SubscriptionPlan>):Promise<SubscriptionPlan | null>;
     delete(id:string):Promise<boolean>;
     findByName(name:string):Promise<SubscriptionPlan | null>;
+    findDefaultPlan():Promise<SubscriptionPlan|null>;
 }

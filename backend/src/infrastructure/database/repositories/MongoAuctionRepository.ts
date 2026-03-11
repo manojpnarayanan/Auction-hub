@@ -19,7 +19,7 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         page?:number;
         limit?:number,
      }): Promise<{auction:Auction[],total:number}> {
-        const query: any = {};
+        const query: Record<string,unknown> = {};
         if (filters?.status && filters.status !== 'all') {
             // query.status = filters.status
             if(filters.status === 'active'){
@@ -51,9 +51,16 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         .limit(limit)
         return {auction:auctions.map(AuctionPersistanceMapper.toEntity),total}
     }
-    async findBySellerId(sellerId: string): Promise<Auction[]> {
-        const auctions = await AuctionModel.find({ sellerId });
-        return auctions.map(AuctionPersistanceMapper.toEntity);
+    async findBySellerId(sellerId: string,page:number,limit:number): Promise<{auctions:Auction[],total:number}> {
+        const skip=(page-1)*limit;
+        const query={sellerId};
+        const total=await AuctionModel.countDocuments(query);
+        
+        const auctions = await AuctionModel.find(query)
+        .sort({createdAt:-1})
+        .skip(skip)
+        .limit(limit)
+        return {auctions:auctions.map(AuctionPersistanceMapper.toEntity),total};
     }
 
     async findByCategory(category: string): Promise<Auction[]> {

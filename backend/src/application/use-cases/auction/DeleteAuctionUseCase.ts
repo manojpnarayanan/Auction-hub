@@ -8,9 +8,9 @@ import { IDeleteAuctionUseCase } from "../Usecase Interfaces/Auction-Interface/I
 
 export class DeleteAuctionUseCase implements IDeleteAuctionUseCase{
     constructor(
-       @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository
+       @inject(TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository
     ){}
     async execute(id: string): Promise<boolean> {
-        return await this.auctionRepository.delete(id);
+        return await this._auctionRepository.delete(id);
     }
 }

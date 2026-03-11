@@ -12,12 +12,12 @@ import { ConflictError } from "../../../../domain/errors/errors";
 @injectable()
 export class CreateCategoryUseCase implements ICreatecategoryUseCase {
     constructor(
-        @inject(TYPES.CategoryRepository)private categoryRepository:ICategoryRepository
+        @inject(TYPES.CategoryRepository)private _categoryRepository:ICategoryRepository
     ) {}
     
     async execute(data: CategoryRequestDTO): Promise<CategoryDTO> {
 
-        const {categories}=await this.categoryRepository.findAll(1,2,data.name)
+        const {categories}=await this._categoryRepository.findAll(1,2,data.name)
         // console.log("Cat",categories);
 
         const checkExists=categories.find((c)=>c.name.toLowerCase()===data.name.trim().toLowerCase());
@@ -31,7 +31,7 @@ export class CreateCategoryUseCase implements ICreatecategoryUseCase {
             new Date(),
             new Date(),
         );
-        const createdCategory=await this.categoryRepository.create(newCategory);
+        const createdCategory=await this._categoryRepository.create(newCategory);
         
 
         return categoryDTOMapper.toDTO(createdCategory);

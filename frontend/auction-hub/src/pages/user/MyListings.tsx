@@ -4,16 +4,21 @@ import Footer from "../../components/Footer";
 import { getMyAuctions } from "../../api/auctions";
 import CreateAuctionModal from "../../components/CreateAuctionModal";
 import { useNavigate,useLocation } from "react-router-dom";
-
+import type { AuctionItem } from "../../types/auction";
+import Pagination from "../../components/Pagination";
 
 
 export default function MyListings(){
     const navigate=useNavigate();
     const location=useLocation();
-    const [myAuctions,setMyAuctions]=useState<any[]>([]);
+    const [myAuctions,setMyAuctions]=useState<AuctionItem[]>([]);
     const [loading,setLoading]=useState(true);
     const [isModalOpen,setIsModalOpen]=useState(false);
-    const [selectedAuction,setSelectedAuction]=useState<any>(null);
+    const [selectedAuction,setSelectedAuction]=useState<AuctionItem| null>(null);
+    const [currentPage,setCurrentPage]=useState(1);
+    const [totalPages,setTotalPages]=useState(1);
+    const limit=6;
+
 
     useEffect(()=>{
         setIsModalOpen(false);
@@ -22,8 +27,10 @@ export default function MyListings(){
 
     const fetchMyListings=async()=>{
         try{
-            const res=await getMyAuctions();
+            setLoading(true);
+            const res=await getMyAuctions(currentPage,limit);
             setMyAuctions(res.data.data || [] );
+            setTotalPages(res.data.totalPages);
         }catch(error){
             console.error("Failed to fetch my listings");
         }finally
@@ -33,7 +40,7 @@ export default function MyListings(){
     }
     useEffect(()=>{
         fetchMyListings();
-    },[]);
+    },[currentPage]);
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
             <Navbar />
@@ -58,13 +65,13 @@ export default function MyListings(){
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {myAuctions.map((auction: any) => (
+                        {myAuctions.map((auction: AuctionItem) => (
                             <div key={auction.id}
                                 onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition group">
                                 <div className="h-48 bg-gray-200 overflow-hidden relative">
-                                    {auction.images?.[0] || auction.image ? (
-                                        <img src={auction.images?.[0] || auction.image} alt={auction.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                                    {auction.images?.[0] ? (
+                                        <img src={auction.images?.[0]} alt={auction.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
                                     )}
@@ -102,9 +109,14 @@ export default function MyListings(){
             {isModalOpen && (
                 <CreateAuctionModal onClose={() => setIsModalOpen(false)}
                     onSuccess={fetchMyListings} // Refresh list after create/edit
-                    initialData={selectedAuction}
+                    initialData={selectedAuction || undefined}
                 />
             )}
+            <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            />
         </div>
     );
 }

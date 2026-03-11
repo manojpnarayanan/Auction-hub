@@ -142,6 +142,8 @@ import { HandleWebhookUseCase } from "../application/use-cases/User/Wallet/handl
 import { WalletController } from "../presentation/controllers/user/WalletController";
 import { AdminPaymentController } from "../presentation/controllers/admin/AdminWalletController";
 import { WebhookController } from "../presentation/controllers/WebhookController";
+import { IGetPendingReleaseUseCase } from "../application/use-cases/Usecase Interfaces/Wallet-interfaces/IGetPendingUseCase";
+import { GetPendingReleaseUseCase } from "../application/use-cases/User/Wallet/GetPendingReleaseUseCase";
 
 //Subscription-Section
 
@@ -260,6 +262,8 @@ container.bind<ICreatePaymentIntentUseCase>(TYPES.CreatePaymentIntentUseCase).to
 container.bind<IconfirmPaymentUseCase>(TYPES.ConfirmPaymentUseCase).to(ConfirmPayment);
 container.bind<IReleasePaymentUseCase>(TYPES.ReleasePaymentUseCase).to(ReleasePaymentUseCase);
 container.bind<IHandleWebhookUseCase>(TYPES.HandleWebhookUseCase).to(HandleWebhookUseCase);
+container.bind<IGetPendingReleaseUseCase>(TYPES.GetPendingReleaseUseCase).to(GetPendingReleaseUseCase);
+
 
 // Subscription
 container.bind<ISubscriptionRepository>(TYPES.SubscriptionRepository).to(MongoSubscriptionRepository);

@@ -7,7 +7,8 @@ import { getSubscription, createSubscriptionPaymentIntent, confirmSubscriptionPa
 import PaymentModal from "../../components/paymentModal";
 import { getAllSubscriptionPlan } from "../../api/Admin/subscription";
 import { flushSync } from "react-dom";
-
+import type { RootState } from "../../redux/store";
+import { AxiosError } from "axios";
 
 interface SubscriptionPlan {
     id: string;
@@ -35,7 +36,7 @@ export default function SubscriptionPlans() {
     const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeSubscription, setActiveSubscription] = useState<ActiveSubscription | null>(null);
-    const currentUser = useSelector((state: any) => state.auth.user);
+    const currentUser = useSelector((state: RootState) => state.auth.user);
     // Modal State
     const [paymentSession, setPaymentSession] = useState<{ clientSecret: string, paymentIntentId: string, amount: number, planId: string, planName: string } | null>(null);
     const [initiating, setInitiating] = useState<string | null>(null);
@@ -82,8 +83,9 @@ export default function SubscriptionPlans() {
                 planId: planId,
                 planName: planName
             });
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to initiate payment");
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to initiate payment");
         } finally {
             setInitiating(null);
         }
@@ -101,8 +103,9 @@ export default function SubscriptionPlans() {
             toast.success(`Successfully subscribed to ${paymentSession.planName}!`);
             setPaymentSession(null);
             // fetchUserSubscription(); // Refresh their status!
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || "Subscription activation failed");
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Subscription activation failed");
         }
     };
     if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50">Loading...</div>

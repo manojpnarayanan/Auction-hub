@@ -9,10 +9,10 @@ import { SubscriptionPlanResponseDTO } from "../../../dtos/SubscriptionPlanDTO";
 @injectable()
 export class GetAllSubscriptionPlanUseCase implements IGetAllSubscriptionPlanUseCase{
     constructor(
-        @inject(TYPES.SubscriptionPlanRepository)private subscriptionPlanRepo:ISubscriptionPlanRepository
+        @inject(TYPES.SubscriptionPlanRepository)private _subscriptionPlanRepo:ISubscriptionPlanRepository
     ){}
     async execute(): Promise<SubscriptionPlanResponseDTO[]> {
-        const plans=await this.subscriptionPlanRepo.findAll();
+        const plans=await this._subscriptionPlanRepo.findAll();
         return plans.map(SubscriptionPlanDTOMapper.toResponseDTO)
     }
 }

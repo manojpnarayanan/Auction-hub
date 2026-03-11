@@ -25,6 +25,7 @@ export interface confirmPaymentDTO{
 }
 
 export interface releasePaymentDTO{
+    transactionId:string;
     auctionId?:string;
     sellerId:string;
     amount:number;

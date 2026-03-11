@@ -15,7 +15,7 @@ export default function Navbar({searchText, setSearchText} : NavbarProps){
     <header className="bg-[#1da1f2] text-white py-3 px-6 shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Search Bar (Only shows if setSearchText is provided) */}
-        <div className="hidden lg:flex items-center bg-white/20 rounded-full px-4 py-1.5 border border-white/30 focus-within:bg-white focus-within:text-gray-800 transition mx-4">
+        {/* <div className="hidden lg:flex items-center bg-white/20 rounded-full px-4 py-1.5 border border-white/30 focus-within:bg-white focus-within:text-gray-800 transition mx-4">
           <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           <input
             type="text"
@@ -25,7 +25,23 @@ export default function Navbar({searchText, setSearchText} : NavbarProps){
             disabled={!setSearchText}
             className="bg-transparent border-none outline-none text-sm ml-2 placeholder-white/70 text-white w-64 focus:text-gray-800 focus:placeholder-gray-400 disabled:opacity-50"
           />
-        </div>
+        </div> */}
+        {/* Search Bar (Only shows if on Dashboard) */}
+{location.pathname === "/user/dashboard" && (
+  <div className="hidden lg:flex items-center bg-white/20 rounded-full px-4 py-1.5 border border-white/30 focus-within:bg-white focus-within:text-gray-800 transition mx-4">
+    <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <input
+      type="text"
+      placeholder="Search auctions..."
+      value={searchText || ""}
+      onChange={(e) => setSearchText && setSearchText(e.target.value)}
+      className="bg-transparent border-none outline-none text-sm ml-2 placeholder-white/70 text-white w-64 focus:text-gray-800 focus:placeholder-gray-400"
+    />
+  </div>
+)}
+
         {/* Navigation Links */}
         <div className="flex items-center gap-8">
           <h1 className="text-2xl font-bold italic" style={{ fontFamily: "cursive" }}>Auction Hub</h1>

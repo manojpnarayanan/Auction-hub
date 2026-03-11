@@ -8,6 +8,6 @@ export const placeBid=(auctionId:string,amount:number)=>{
 export const getBids=(auctionId:string)=>{
     return API.get(`/bids/${auctionId}`);
 }
-export const getMyBids=()=>{
-    return API.get("/bids/my-bids")
+export const getMyBids=(page:number,limit:number)=>{
+    return API.get(`/bids/my-bids?page=${page}&limit=${limit}`)
 }

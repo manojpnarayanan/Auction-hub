@@ -12,6 +12,7 @@ export interface ITransactionDocument extends Document{
     auctionId?:Types.ObjectId;
     stripePaymentIntentId?:string;
     description:string;
+    isReleased:boolean;
     createdAt:Date;
 }
 
@@ -24,7 +25,8 @@ const TransactionSchema= new Schema<ITransactionDocument>({
     purpose:{type:String,required:true},
     auctionId:{type:Schema.Types.ObjectId,ref:"Auction"},
     stripePaymentIntentId:{type:String},
-    description:{type:String,default:""}
+    description:{type:String,default:""},
+    isReleased:{type:Boolean,default:false}
 },{timestamps:true});
 
 export const TransactionModel=model<ITransactionDocument>("Transaction",TransactionSchema);

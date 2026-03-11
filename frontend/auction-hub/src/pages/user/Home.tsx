@@ -2,10 +2,13 @@ import { useEffect } from "react";
 import { getAllAuctions ,getAllCategories } from "../../api/auctions";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import type { AuctionItem } from "../../types/auction";
+import type { CategoryItem } from "../../types/category";
+
 
 const Home=()=>{
-    const [categories,setCategories]=useState<any>([]);
-    const [auctions,setAuctions]=useState<any>([]);
+    const [categories,setCategories]=useState<CategoryItem[]>([]);
+    const [auctions,setAuctions]=useState<AuctionItem[]>([]);
     const navigate=useNavigate();
     useEffect(()=>{
         getAllCategories().then(res=>setCategories(res.data)).catch(console.error);
@@ -32,7 +35,7 @@ const Home=()=>{
             <section className="container mx-auto py-12 px-4">
                 <h2 className="text-3xl font-bold mb-8">Explore Categories</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {categories.map((cat: any) => (
+                    {categories.map((cat: CategoryItem) => (
                         <div key={cat._id} 
                              onClick={() => navigate('/auctions?category=' + cat.name)}
                              className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition">
@@ -45,10 +48,10 @@ const Home=()=>{
             <section className="container mx-auto py-12 px-4">
                 <h2 className="text-3xl font-bold mb-8">Live & Trending Auctions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {auctions.slice(0, 6).map((auction: any) => (
+                    {auctions.slice(0, 6).map((auction: AuctionItem) => (
                         <div key={auction.id} className="bg-white rounded-lg shadow-md overflow-hidden">
                              {/* You can use your existing AuctionCard component if you have one, or build a simple one here */}
-                            <img src={auction.images[0] || 'https://via.placeholder.com/300'} alt={auction.title} className="w-full h-48 object-cover" />
+                            <img src={auction.images?.[0] || 'https://via.placeholder.com/300'} alt={auction.title} className="w-full h-48 object-cover" />
                             <div className="p-4">
                                 <span className={`inline-block px-2 py-1 text-xs font-semibold rounded mb-2 ${auction.type === 'live' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
                                     {auction.type === 'live' ? 'LIVE' : 'TIMED'}

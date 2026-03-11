@@ -10,10 +10,10 @@ import { IAddressRepository } from "../../../../domain/interfaces/IAddressReposi
 @injectable()
 export class AddAddressUseCase implements IAddAddressUseCase{
     constructor(
-        @inject(TYPES.AddressRepository)private addressRepository:IAddressRepository
+        @inject(TYPES.AddressRepository)private _addressRepository:IAddressRepository
     ){}
     async execute(userId: string, data: CreateAddressDTO): Promise<AddressResponseDTO> {
-        const addresses=await this.addressRepository.create(userId,data);
+        const addresses=await this._addressRepository.create(userId,data);
         return AddressDTOMapper.toResponseDTO(addresses);
     }
 }

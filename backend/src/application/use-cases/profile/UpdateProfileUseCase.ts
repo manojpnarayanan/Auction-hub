@@ -9,10 +9,10 @@ import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
 @injectable()
 export class UpdateProfileUseCase implements IUpdateProfileUseCase{
     constructor(
-        @inject(TYPES.UserRepository)private userRepository:IUserRepository
+        @inject(TYPES.UserRepository)private _userRepository:IUserRepository
     ){}
     async execute(userId: string, data: updateUserProfileDTO): Promise<UserResponseDTO> {
-        const user=await this.userRepository.updateProfile(userId,data);
+        const user=await this._userRepository.updateProfile(userId,data);
         return UserDTOMapper.toResponseDTO(user);
     }
 }

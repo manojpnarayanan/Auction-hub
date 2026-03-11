@@ -5,6 +5,8 @@ import type { User } from '../../types/admin';
 import type { RootState } from "../../redux/store";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../components/ConfirmationModal";
+import DataTable  from "../../components/reuseabletable";
+import type {Column} from '../../components/reuseabletable';
 
 
 
@@ -82,6 +84,39 @@ export default function UserManagement() {
             toast.error("Failed to update status")
         }
     }
+    const columns:Column<User>[]=[
+        {
+            header:"User Details",
+            render:(u)=>(
+                <div>
+                    <div className="text-white font-medium" >{u.name}</div>
+                    <div className="text-blue-400 text-xs" >{u.email}</div>
+                </div>
+            )
+        },
+        {
+            header:"Joined Date",
+            render:(u)=><span  className="text-gray-400">{new Date(u.createdAt).toLocaleDateString()}</span>
+        },
+        {
+            header:"Status",
+            render:(u)=>(
+                <span className={u.isBlocked ? "text-red-500" : "text-emerald-500"}>{u.isBlocked ? 'Blocked':"Active"}</span>
+            )
+        },
+        {
+            header:"Actions",
+            className:'text-right',
+            render:(u)=>(
+                <button 
+                onClick={()=>handleBlockToggle(u.id,!!u.isBlocked)} 
+                 className={`${u.isBlocked ? "text-emerald-500" : "text-red-500"} hover:underline font-medium`}
+                 >
+                    {u.isBlocked? "UnBlock" :"Block"}
+                </button>
+            )
+        }
+    ]
 
     return (
         <div>
@@ -108,7 +143,7 @@ export default function UserManagement() {
                 </div>
             </div>
             {/* Table */}
-            <div className="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden min-h-[400px]">
+            {/* <div className="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden min-h-[400px]">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center h-[400px] gap-4">
                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
@@ -150,14 +185,27 @@ export default function UserManagement() {
                         </tbody>
                     </table>
                 )}
-            </div>
+            </div> */}
 
             {/* Simple Pagination */}
-            <div className="flex gap-2 mt-4 justify-end">
+            {/* <div className="flex gap-2 mt-4 justify-end">
                 <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="text-gray-400 disabled:opacity-50">Prev</button>
                 <span className="text-gray-300">Page {page} of {totalPages}</span>
                 <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="text-gray-400 disabled:opacity-50">Next</button>
-            </div>
+            </div> */}
+
+<DataTable<User>
+columns={columns}
+data={users}
+isLoading={loading}
+page={page}
+totalPages={totalPages}
+onPageChange={setPage}
+keyExtractor={(u)=>u.id}
+emptyMessage="No users found matching your search"
+/>
+
+
             <ConfirmModal 
             isOpen={isModalOpen}
             onClose={()=>setIsModalOpen(false)} 

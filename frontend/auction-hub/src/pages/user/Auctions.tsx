@@ -1,13 +1,15 @@
 import {useEffect,useState} from "react";
 import { useSearchParams,useNavigate } from "react-router-dom";
 import { getAllAuctions,getAllCategories } from "../../api/auctions";
+import type { AuctionItem } from "../../types/auction";
+import type { CategoryItem } from "../../types/category";
 
 const Auctions=()=>{
     const [searchParams,setSearchParams]=useSearchParams();
     const navigate=useNavigate();
 
-    const[auctions,setAuctions]=useState<any[]>([]);
-    const [categories,setCategories] =useState<any[]>([]);
+    const[auctions,setAuctions]=useState<AuctionItem[]>([]);
+    const [categories,setCategories] =useState<CategoryItem[]>([]);
     const [loading,setLoading]=useState(true);
 
     const currentType=searchParams.get('type') || 'all';
@@ -57,7 +59,7 @@ const Auctions=()=>{
                             >
                                 All Categories
                             </div>
-                            {categories.map((cat: any) => (
+                            {categories.map((cat: CategoryItem) => (
                                 <div 
                                     key={cat._id}
                                     onClick={() => updateFilter('category', cat.name)}
@@ -93,7 +95,7 @@ const Auctions=()=>{
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {auctions.map((auction: any) => (
+                            {auctions.map((auction: AuctionItem) => (
                                 <div key={auction.id} 
                                      onClick={() => navigate(auction.type==='live'? `/live-auction/${auction.id}`:`/auction/${auction.id}`)}
                                      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">

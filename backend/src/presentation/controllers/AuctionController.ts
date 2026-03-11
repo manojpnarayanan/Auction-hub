@@ -35,7 +35,7 @@ export class AuctionController {
         try {
             const auctionData = {
                 ...req.body,
-                sellerId: (req as any).user.id
+                sellerId: req.user!.id
             };
             const result = await this._createAuctionUseCase.execute(auctionData);
             res.status(HttpStatus.CREATED).json({ success: true, data: result });
@@ -61,9 +61,11 @@ export class AuctionController {
     }
     getMine = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const userId = (req as any).user.id;
-            const auctions = await this._getAllListedAuctionUseCase.execute(userId);
-            res.status(HttpStatus.OK).json({ success: true, data: auctions })
+            const userId = req.user!.id;
+            const page=parseInt(req.query.page as string);
+            const limit=parseInt(req.query.limit as string);
+            const auctions = await this._getAllListedAuctionUseCase.execute(userId,page,limit);
+            res.status(HttpStatus.OK).json({ success: true, ...auctions })
         } catch (error) {
             next(error);
         }

@@ -20,7 +20,8 @@ export class AuctionDTOMapper {
             type:auction.type,
             startTime:auction.startTime,
             winnerId:auction.winnerId,
-            bids:auction.bids
+            bids:auction.bids,
+            paymentStatus:auction.paymentStatus
         }
     }
     static toResponseDTOs(auctions: Auction[]): AuctionResponseDTO[] {

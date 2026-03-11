@@ -11,6 +11,9 @@ import toast from "react-hot-toast";
 import ConfirmModal from "../../components/ConfirmationModal";
 import { getWallet } from "../../api/User/wallet";
 import type { WalletWithTransactions } from "../../types/wallet";
+import { AxiosError } from "axios";
+import type { TransactionItem } from "../../types/transaction";
+
 
 type Section = "profile" | "password" | "address" | "wallet";
 
@@ -229,7 +232,8 @@ export default function Profile() {
             });
             toast.success("Password changed successfully!");
             setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
-        } catch (err: any) {
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
             toast.error(err?.response?.data?.message || "Failed to change password");
         } finally {
             setLoading(false);
@@ -624,7 +628,7 @@ export default function Profile() {
                                     <h3 className="font-bold text-gray-800 mb-4">Recent Transactions</h3>
                                     {walletLoading ? (
                                         <p className="text-center text-gray-400 py-8">Loading...</p>
-                                    ) : walletData?.transactions && walletData.transactions.filter((tx: any) => tx.status === 'completed').length > 0 ? (
+                                    ) : walletData?.transactions && walletData.transactions.filter((tx: TransactionItem) => tx.status === 'completed').length > 0 ? (
                                         <div className="space-y-3">
                                             {walletData.transactions.filter((tx:any)=>tx.status==='completed').map((tx: any) => (
                                                 <div key={tx.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">

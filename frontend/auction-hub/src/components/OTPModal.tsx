@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { verifyOtp, resendOtp } from "../api/auth";
+import { AxiosError } from "axios";
+
 
 interface OTPModalProps {
   email: string;
@@ -51,8 +53,9 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
       localStorage.removeItem("otpExpiry");
       localStorage.removeItem("otpEmail");
       onSuccess();
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Verification Failed";
+    } catch (error: unknown) {
+      const err=error as AxiosError<{message:string}>
+      const errorMsg = err.response?.data?.message || "Verification Failed";
       // If OTP is already verified (race condition), just proceed!
       if (errorMsg === "OTP Invalid" || errorMsg.includes("Invalid")) {
         // Optional: You could choose to treat this as success if you trust the user flow, 
@@ -73,8 +76,9 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
       setTimer(60);
       setcanResend(false);
       setMessage({ text: "New OTP sent!", type: "success" });
-    } catch (error: any) {
-      setMessage({ text: error.response?.data?.message || "Failed to resend", type: "error" });
+    } catch (error: unknown) {
+      const err=error as AxiosError<{message:string}>
+      setMessage({ text: err.response?.data?.message || "Failed to resend", type: "error" });
     }
   }
   return (

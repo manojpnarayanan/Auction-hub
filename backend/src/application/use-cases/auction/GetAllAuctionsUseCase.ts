@@ -12,7 +12,7 @@ import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
 
 export class GetAllAuctionsUseCase implements IGetAllAuctionUseCase{
     constructor(
-        @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository,
+        @inject(TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository,
 
     ) { }
     async execute(
@@ -23,7 +23,7 @@ export class GetAllAuctionsUseCase implements IGetAllAuctionUseCase{
         page:number=1,
         limit:number=10
     ): Promise<{data:AuctionResponseDTO[],total:number,page:number,totalPages:number}> {
-        const {auction,total}=await this.auctionRepository.findAll({category,search,type,status,page,limit})
+        const {auction,total}=await this._auctionRepository.findAll({category,search,type,status,page,limit})
 
 
 

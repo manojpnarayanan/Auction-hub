@@ -11,11 +11,11 @@ import { ISetDefaultUseCase } from "../../../application/use-cases/Usecase Inter
 @injectable()
 export class AddressController{
     constructor(
-        @inject(TYPES.GetAddressUseCase) private getAddressUseCase:IGetAddressUseCase,
-        @inject (TYPES.AddAddressUseCase) private addAddressUseCase:IAddAddressUseCase,
-        @inject (TYPES.UpdateAddressUseCase)private updateAddressUseCase:IUpdateAddressUseCase,
-        @inject (TYPES.DeleteAddressUseCase) private deleteAddressUseCase:IDeleteAddressUseCase,
-        @inject (TYPES.SetDefaultAddressUseCase) private setDefaultUseCase:ISetDefaultUseCase
+        @inject(TYPES.GetAddressUseCase) private _getAddressUseCase:IGetAddressUseCase,
+        @inject (TYPES.AddAddressUseCase) private _addAddressUseCase:IAddAddressUseCase,
+        @inject (TYPES.UpdateAddressUseCase)private _updateAddressUseCase:IUpdateAddressUseCase,
+        @inject (TYPES.DeleteAddressUseCase) private _deleteAddressUseCase:IDeleteAddressUseCase,
+        @inject (TYPES.SetDefaultAddressUseCase) private _setDefaultUseCase:ISetDefaultUseCase
     ){}
     getAddress=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
         try{
@@ -24,7 +24,7 @@ export class AddressController{
                 res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
                 return;
             }
-            const addresses=await this.getAddressUseCase.execute(userId);
+            const addresses=await this._getAddressUseCase.execute(userId);
             res.status(HttpStatus.OK).json(addresses);
 
         }catch(error){
@@ -38,7 +38,7 @@ export class AddressController{
                 res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
                 return;
             }
-            const address=await this.addAddressUseCase.execute(userId,req.body);
+            const address=await this._addAddressUseCase.execute(userId,req.body);
             res.status(HttpStatus.OK).json(address);
         }catch(error){
             next(error);
@@ -47,7 +47,7 @@ export class AddressController{
     updateAddress=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
         try{
             const {id}=req.params;
-            const address=await this.updateAddressUseCase.execute(id,req.body);
+            const address=await this._updateAddressUseCase.execute(id,req.body);
             res.status(HttpStatus.OK).json(address);
         }catch(error){
             next(error);
@@ -56,7 +56,7 @@ export class AddressController{
     deleteAddress=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
         try{
             const {id}=req.params;
-            await this.deleteAddressUseCase.execute(id);
+            await this._deleteAddressUseCase.execute(id);
             res.status(HttpStatus.OK).json({message:"Address Deleted successfully"})
         }catch(error){
             next(error);
@@ -70,7 +70,7 @@ export class AddressController{
                 res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
                 return;
             }
-            await this.setDefaultUseCase.execute(userId,id);
+            await this._setDefaultUseCase.execute(userId,id);
             res.status(HttpStatus.OK).json({message:"Default address updated"});
         }catch(error){
             next(error);

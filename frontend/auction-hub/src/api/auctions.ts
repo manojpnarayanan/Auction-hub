@@ -6,8 +6,8 @@ export const getAllCategories=async()=>{
     return API.get('/admin/category');
 }
 
-export const getMyAuctions=async ()=>{
-    return API.get('/auctions/all-auctions');
+export const getMyAuctions=async (page:number,limit:number)=>{
+    return API.get(`/auctions/all-auctions?page=${page}&limit=${limit}`);
 }
 
 export const getAllAuctions=async (filters:{category?:string,search?:string,type?:string})=>{

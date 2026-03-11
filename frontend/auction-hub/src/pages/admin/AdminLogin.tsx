@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/slices/authSlices";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 
 export default function AdminLogin() {
     const dispatch = useDispatch();
@@ -38,9 +39,10 @@ export default function AdminLogin() {
             );
 
             navigate("/admin/dashboard");
-        } catch (err: any) {
-            console.error("Admin login failed", err);
-            setMsg(err.response?.data?.error || "Login Failed - Please check credentials")
+        } catch (error: unknown) {
+            console.error("Admin login failed", error);
+            const err=error as AxiosError<{message:string}>
+            setMsg(err.response?.data?.message || "Login Failed - Please check credentials")
         } finally {
             setLoading(false);
         }

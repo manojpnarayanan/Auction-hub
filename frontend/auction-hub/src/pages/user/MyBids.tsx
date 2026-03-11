@@ -3,18 +3,24 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getMyBids } from "../../api/User/Bidding";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../components/Pagination";
 
 export default function MyBids() {
     const navigate = useNavigate();
     const [myBids, setMyBids] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage,setCurrentPage]=useState(1);
+    const [totalPages,setTotalPages]=useState(1);
+    const limit=10;
 
     useEffect(() => {
         const fetchBids = async () => {
             try {
-                const res =await getMyBids();
+                setLoading(true);
+                const res =await getMyBids(currentPage,limit);
                 console.log("API response",res);
                 setMyBids( res?.data?.data || []);
+                setTotalPages(Math.ceil(res.data.total/limit));
             } catch (error) {
                 console.error("Failed to fetch bids", error);
                 setMyBids([]);
@@ -23,7 +29,7 @@ export default function MyBids() {
             }
         }
         fetchBids();
-    }, []);
+    }, [currentPage]);
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
             <Navbar />
@@ -77,6 +83,11 @@ export default function MyBids() {
                 )}
             </main>
             <Footer />
+            <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            />
         </div>
     );
 }

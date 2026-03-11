@@ -72,4 +72,7 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
         return UserPersistanceMapper.toEntity(doc)
     }
     
+    async updateGoogleId(userId: string, googleId: string): Promise<void> {
+        await UserModel.updateOne({_id:userId},{googleId});
+    }
 }

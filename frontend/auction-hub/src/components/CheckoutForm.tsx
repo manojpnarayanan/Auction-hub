@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import toast from "react-hot-toast";
+import { AxiosError } from "axios";
 
 interface CheckoutFormProps {
 //   paymentIntentId: string;
@@ -36,8 +37,9 @@ export default function CheckoutForm({ onSuccess, onCancel }: CheckoutFormProps)
       await onSuccess();
       toast.success('Payment successful');
       
-    } catch (error: any) {
-      setPaymentError(error?.response?.data?.message || "Payment confirmation failed. Please try again");
+    } catch (error: unknown) {
+        const err=error as AxiosError<{message:string}>
+      setPaymentError(err?.response?.data?.message || "Payment confirmation failed. Please try again");
     } finally {
       setIsProcessing(false);
     }

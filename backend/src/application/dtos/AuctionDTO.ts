@@ -37,4 +37,5 @@ export interface AuctionResponseDTO {
     startTime?:Date,
     winnerId?:string;
     bids:{bidderId:string,amount:number,time:Date}[];
+    paymentStatus?:string;
 }

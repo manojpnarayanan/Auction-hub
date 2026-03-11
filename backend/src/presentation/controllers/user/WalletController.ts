@@ -10,17 +10,19 @@ import { HttpStatus } from "../../Enums/StatusCodes";
 @injectable()
 export class WalletController{
     constructor(
-        @inject(TYPES.GetWalletUseCase) private getWalletUseCase:IGetWalletUseCase,
-        @inject(TYPES.CreatePaymentIntentUseCase) private createPaymentIntentUseCase:ICreatePaymentIntentUseCase,
-        @inject(TYPES.ConfirmPaymentUseCase) private confirmPaymentUseCase:IconfirmPaymentUseCase
+        @inject(TYPES.GetWalletUseCase) private _getWalletUseCase:IGetWalletUseCase,
+        @inject(TYPES.CreatePaymentIntentUseCase) private _createPaymentIntentUseCase:ICreatePaymentIntentUseCase,
+        @inject(TYPES.ConfirmPaymentUseCase) private _confirmPaymentUseCase:IconfirmPaymentUseCase
     ){}
-    getWallet=async (req:Request,res:Response,next:NextFunction):Promise<void>=>{
-        try{
-            const userId=req.user?.id;
-            if(!userId) {res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"}); return}
-            const result=await this.getWalletUseCase.execute(userId);
+    getWallet = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) { res.status(HttpStatus.UNAUTHORIZED).json({ message: "Unauthorized" }); return }
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            const result = await this._getWalletUseCase.execute(userId, page, limit);
             res.status(HttpStatus.OK).json(result);
-        }catch(error){
+        } catch (error) {
             next(error);
         }
     }
@@ -31,7 +33,7 @@ export class WalletController{
                 res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
                 return;
             }
-            const result=await this.createPaymentIntentUseCase.execute(userId,req.body);
+            const result=await this._createPaymentIntentUseCase.execute(userId,req.body);
             res.status(HttpStatus.OK).json(result)
         }catch(error){
             next(error);
@@ -44,7 +46,7 @@ export class WalletController{
                 res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
                 return;
             }
-            await this.confirmPaymentUseCase.execute(userId,req.body);
+            await this._confirmPaymentUseCase.execute(userId,req.body);
             res.status(HttpStatus.OK).json({message:"Payment confirmed"});
         }catch(error){
             next(error);

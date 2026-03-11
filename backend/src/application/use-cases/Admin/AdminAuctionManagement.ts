@@ -6,9 +6,9 @@ import { IAdminAuctionManagamentUseCase } from "../Usecase Interfaces/Admin/IAdm
 
 export class ApproveAuctionUseCase implements IAdminAuctionManagamentUseCase {
     constructor(
-        @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository
+        @inject(TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository
     ){}
     async execute(auctionId:string,status:'active' | 'rejected'):Promise <void>{
-        await this.auctionRepository.updateAuctionStatus(auctionId,status);
+        await this._auctionRepository.updateAuctionStatus(auctionId,status);
     }
 }

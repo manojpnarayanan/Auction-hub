@@ -11,10 +11,10 @@ import { AddressDTOMapper } from "../../../DTOMapper/AddressDTOMapper";
 @injectable()
 export class UpdateAddressUseCase implements IUpdateAddressUseCase{
     constructor(
-        @inject(TYPES.AddressRepository)private addressRepository:IAddressRepository
+        @inject(TYPES.AddressRepository)private _addressRepository:IAddressRepository
     ){}
     async execute(addressId: string, data: updateAddressDTO): Promise<AddressResponseDTO> {
-        const addresses=await this.addressRepository.update(addressId,data);
+        const addresses=await this._addressRepository.update(addressId,data);
         return AddressDTOMapper.toResponseDTO(addresses);
     }
 }

@@ -5,7 +5,7 @@ import { IUserDocument } from "../models/UserModel";
 export class UserPersistanceMapper{
     static toEntity(doc:IUserDocument):User{
         return new User(
-            (doc._id as any).toString(),
+            (doc._id as unknown as string).toString(),
         doc.name,
         doc.email,
         doc.password ||"",

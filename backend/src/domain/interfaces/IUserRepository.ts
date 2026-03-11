@@ -22,4 +22,5 @@ export interface IUserRepository {
     updateBlockStatus(userId:string,isBlocked:boolean):Promise<void>;
 
     updateProfile(userId:string,data:updateUserProfileDTO):Promise<User>;
+    updateGoogleId(userId:string,googleId:string):Promise<void>
 }

@@ -8,11 +8,11 @@ import bcrypt from "bcrypt";
 @injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
     constructor(
-        @inject(TYPES.UserRepository) private userRepository: IUserRepository
+        @inject(TYPES.UserRepository) private _userRepository: IUserRepository
     ) { }
 
     async execute(email: string, otp: string, newPassword: string): Promise<void> {
-        const user = await this.userRepository.findByEmail(email);
+        const user = await this._userRepository.findByEmail(email);
         if (!user) throw new NotFoundError("User not found");
 
         if (user.otp !== otp) throw new ValidationError("OTP Invalid");
@@ -23,7 +23,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        await this.userRepository.updatePassword(user.id, hashedPassword);
-        await this.userRepository.updateOTP(user.id, null, null);
+        await this._userRepository.updatePassword(user.id, hashedPassword);
+        await this._userRepository.updateOTP(user.id, null, null);
     }
 }

@@ -8,10 +8,10 @@ import { IVerifyOtpUseCase } from "../Usecase Interfaces/IVerifyOtpUseCase";
 @injectable()
 export class VerifyOtpUseCase implements IVerifyOtpUseCase {
     constructor(
-        @inject(TYPES.UserRepository) private userRepository: IUserRepository
+        @inject(TYPES.UserRepository) private _userRepository: IUserRepository
     ) { }
     async execute(email: string, otp: string): Promise<void> {
-        const user = await this.userRepository.findByEmail(email);
+        const user = await this._userRepository.findByEmail(email);
         if (!user) throw new NotFoundError("User not found");
 
         // if (user.otp !== otp) throw new Error("OTP Invalid");
@@ -21,7 +21,7 @@ export class VerifyOtpUseCase implements IVerifyOtpUseCase {
         if(!user.isOTPValid(otp)){
             throw new ValidationError('Invalid or Expired OTP')
         }
-        await this.userRepository.updateVerifyStatus(user.id, true)
-        await this.userRepository.updateOTP(user.id, null, null);
+        await this._userRepository.updateVerifyStatus(user.id, true)
+        await this._userRepository.updateOTP(user.id, null, null);
     }
 }

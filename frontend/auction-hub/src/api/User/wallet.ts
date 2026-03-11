@@ -4,8 +4,8 @@ import type { WalletWithTransactions,CreatePaymentIntentRequest } from "../../ty
 
 
 
-export const getWallet=():Promise<AxiosResponse<WalletWithTransactions>>=>{
-    return API.get('/user/getwallet');
+export const getWallet=(page:number=1,limit:number=10):Promise<AxiosResponse<WalletWithTransactions & {total:number}>>=>{
+    return API.get(`/user/getwallet?page=${page}&limit=${limit}`);
 }
 
 export const createPaymentIntent=(data:CreatePaymentIntentRequest):Promise<AxiosResponse<{clientSecret:string;paymentIntentId:string}>>=>{

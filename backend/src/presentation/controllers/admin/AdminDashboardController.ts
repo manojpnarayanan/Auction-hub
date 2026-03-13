@@ -16,7 +16,7 @@ export class AdminController{
         try{
             const page=parseInt(req.query.page as string) ||1
             const limit=parseInt(req.query.limit as string) || 3;
-            // console.log(req.query)
+            // logger.info(req.query)
             const search=req.query.search as string || "";
             // const query:any={role:"user"};
             const result=await this._adminUserManagementUseCase.execute(page,limit,search);

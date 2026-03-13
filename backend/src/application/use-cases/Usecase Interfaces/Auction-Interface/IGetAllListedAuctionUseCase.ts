@@ -1,4 +1,4 @@
-import { AuctionResponseDTO, CreateAuctionDTO } from "../../../dtos/AuctionDTO";
+import { AuctionResponseDTO } from "../../../dtos/AuctionDTO";
 
 
 

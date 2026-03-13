@@ -15,7 +15,7 @@ export class ConfirmPayment implements IconfirmPaymentUseCase{
         @inject (TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository
     ){}
     async execute(buyerId: string, data: confirmPaymentDTO): Promise<void> {
-        // console.log("Checking payment for Auction:", data.auctionId); // DEBUG LOG
+        // logger.info("Checking payment for Auction:", data.auctionId); // DEBUG LOG
         const intent=await this._paymentService.retrievePaymentIntent(data.paymentIntentId);
         
         // Sometimes Stripe is still 'processing' for a half-second
@@ -42,6 +42,6 @@ export class ConfirmPayment implements IconfirmPaymentUseCase{
         }
         await this._walletRepository.updateTransactions(data.paymentIntentId,'completed');
         await this._auctionRepository.updatePaymentStatus(data.auctionId,'completed');
-        // console.log("DATABASE UPDATED SUCCESSFULLY for auction:", data.auctionId); // DEBUG LOG
+        // logger.info("DATABASE UPDATED SUCCESSFULLY for auction:", data.auctionId); // DEBUG LOG
     }
 }

@@ -3,7 +3,7 @@ import {TYPES} from '../../../di/types';
 import bcrypt from 'bcrypt';
 import { IChangePasswordUseCase } from "../Usecase Interfaces/profile-interface/IChangePasswordUseCase";
 import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { ConflictError, NotFoundError ,ValidationError} from "../../../domain/errors/errors";
+import {  NotFoundError ,ValidationError} from "../../../domain/errors/errors";
 
 
 @injectable()

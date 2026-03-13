@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState ,useCallback} from "react";
 import { useParams } from "react-router-dom";
 import { getAuctionProductDetails } from "../../api/auctions";
 import { placeBid } from "../../api/User/Bidding";
@@ -47,7 +47,7 @@ export default function AuctionProductDetails() {
     const { paymentSession, initiating, initiatePayment, closePayment } = usePayment();
     const [isWatchlisted, setIsWatchlisted] = useState(false);
 
-    const calculateTimeLeft = () => {
+    const calculateTimeLeft = useCallback(() => {
         if (!auction?.endDate) return { h: "00", m: "00", s: "00", ended: true };
         const difference = +new Date(auction.endDate) - +new Date();
         if (difference <= 0) return { h: "00", m: "00", s: "00", ended: true };
@@ -58,14 +58,17 @@ export default function AuctionProductDetails() {
             s: String(Math.floor((difference / 1000) % 60)).padStart(2, '0'),
             ended: false
         };
-    };
+    },[auction?.endDate]);
 
     useEffect(() => {
         const checkStatus = async () => {
             try {
                 const res = await checkWatchlist(id!);
                 setIsWatchlisted(res.data.data.isWatchlisted);
-            } catch { }
+            } catch(error) {
+                console.error(error)
+
+             }
         }
         if (id) checkStatus();
     }, [id]);
@@ -75,7 +78,7 @@ export default function AuctionProductDetails() {
             setTimeLeft(calculateTimeLeft());
         }, 1000);
         return () => clearInterval(timer);
-    }, [auction]);
+    }, [calculateTimeLeft]);
 
     useEffect(() => {
         if (id) {
@@ -110,7 +113,7 @@ export default function AuctionProductDetails() {
         }
     };
 
-    const fetchAuction = async () => {
+    const fetchAuction = useCallback(async () => {
         if (!id) return;
         try {
             const res = await getAuctionProductDetails(id);
@@ -120,12 +123,13 @@ export default function AuctionProductDetails() {
             else setSelectedImage(data.image || "");
         } catch (error) {
             console.error(error);
+
         } finally {
             setLoading(false);
         }
-    };
+    },[id]);
 
-    useEffect(() => { fetchAuction(); }, [id]);
+    useEffect(() => { fetchAuction(); }, [fetchAuction]);
 
     const handlePlaceBid = async () => {
         if (!auction || !bidAmount || Number(bidAmount) <= (auction.currentPrice || auction.startingPrice)) {

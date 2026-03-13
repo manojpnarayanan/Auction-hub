@@ -1,6 +1,7 @@
 import { injectable,inject } from "inversify";
 import {TYPES} from '../../../../di/types';
 import { IWalletRepository } from "../../../../domain/interfaces/IWalletRepository";
+import { Wallet } from "../../../../domain/entities/Wallet.entity";
 import { IGetWalletUseCase, WalletWithTransactions } from "../../Usecase Interfaces/Wallet-interfaces/IGetWalletUseCase";
 
 
@@ -14,7 +15,8 @@ export class GetWalletUseCase implements IGetWalletUseCase{
     async execute(userId: string, page: number = 1, limit: number = 10): Promise<WalletWithTransactions> {
         let wallet = await this._walletRepository.findByUserId(userId);
         if (!wallet) {
-            wallet = await this._walletRepository.create(userId);
+            const newWallet=new Wallet("",userId,0,'inr',new Date(),new Date())
+            wallet = await this._walletRepository.create(newWallet);
         }
         const { transactions, total } = await this._walletRepository.getTransactions(userId, page, limit);
         return {

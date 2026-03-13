@@ -8,7 +8,7 @@ import Footer from "../../components/Footer";
 
 
 
-const watchlist = () => {
+const Watchlist = () => {
     const [auctions, setAuctions] = useState<watchlistDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -105,4 +105,4 @@ if (loading) return (
 
 }
 
-export default watchlist
+export default Watchlist

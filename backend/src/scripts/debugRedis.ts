@@ -1,31 +1,33 @@
 
+import logger from '../infrastructure/Global/Logger';
 import { createClient } from 'redis';
+
 import dotenv from 'dotenv';
 import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const checkRedis = async () => {
-    // console.log("🔌 Connecting to Redis...");
+    // logger.info("🔌 Connecting to Redis...");
     const client = createClient({ url: process.env.REDIS_URL });
 
-    client.on('error', (err) => console.error('Redis Client Error', err));
+    client.on('error', (err) => logger.error({ err }, 'Redis Client Error'));
 
     await client.connect();
-    // console.log(" Connected!");
+    // logger.info(" Connected!");
 
     // Search for Refresh Tokens
-    // console.log(" Searching for Refresh Tokens (Pattern: refresh_Token:*)");
+    // logger.info(" Searching for Refresh Tokens (Pattern: refresh_Token:*)");
     const keys = await client.keys('refresh_Token:*');
 
     if (keys.length === 0) {
-        // console.log(" No tokens found. Try logging in first!");
+        // logger.info(" No tokens found. Try logging in first!");
     } else {
-        // console.log(` Found ${keys.length} tokens:`);
+        // logger.info(` Found ${keys.length} tokens:`);
         for (const key of keys) {
-            const value = await client.get(key);
-            // console.log(`  Key: ${key}`);
-            // console.log(`  Value (Truncated): ${value?.substring(0, 20)}...`);
+            const _value = await client.get(key);
+            // logger.info(`  Key: ${key}`);
+            // logger.info(`  Value (Truncated): ${value?.substring(0, 20)}...`);
         }
     }
 

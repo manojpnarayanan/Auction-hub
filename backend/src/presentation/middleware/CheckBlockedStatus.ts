@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import logger from "../../infrastructure/Global/Logger";
 import container from "../../di/container";
 import { TYPES } from "../../di/types";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
@@ -13,7 +14,7 @@ export const checkBlockedStatus = async (req: Request, res: Response, next: Next
         const userId=req.user?.id
         if (!userId) {
             // return res.status(401).json({messgae:"Unauthorized"});
-            // console.log("No User ID -> Treating as Guest");
+            // logger.info("No User ID -> Treating as Guest");
             return next();
         }
         const userRepository = container.get<IUserRepository>(TYPES.UserRepository);
@@ -24,7 +25,7 @@ export const checkBlockedStatus = async (req: Request, res: Response, next: Next
         }
         next();
     } catch (error) {
-        console.error("Block check error", error);
+        logger.error({ error }, "Block check error");
         res.status(HttpStatus.INERNAL_SERVER_ERROR).json({ message: "Server Error" });
     }
 }

@@ -19,7 +19,7 @@ export class profileController {
     getProfile = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.id;
-            // console.log("Get profilr",userId);
+            // logger.info("Get profilr",userId);
             if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json({message:"UnAuthirized"});
             const profile = await this._getProfileUseCase.execute(userId);
             res.status(HttpStatus.OK).json(profile);

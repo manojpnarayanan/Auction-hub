@@ -3,7 +3,7 @@ import { TYPES } from "../../../di/types";
 import { IBidRepository } from "../../../domain/interfaces/IBidRepository";
 import { IGetUserBidsUseCase } from "../Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
 import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
-import { UserBidResponseDTO, AuctionSummaryDTO, BidStatusType } from "../../dtos/BidDTO";
+import { UserBidResponseDTO, BidStatusType } from "../../dtos/BidDTO";
 
 import { BidDTOMapper } from "../../DTOMapper/BidDTOMapper";
 

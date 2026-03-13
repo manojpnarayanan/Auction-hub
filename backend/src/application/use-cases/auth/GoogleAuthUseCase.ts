@@ -2,7 +2,7 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../../../di/types";
 import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { ICacheService } from "../../../domain/interfaces/ICacheService";
-import { GoogleAuthDTO, OAuthResponseDTO } from "../../dtos/user.dto";
+import {  OAuthResponseDTO } from "../../dtos/user.dto";
 import jwt from "jsonwebtoken";
 import { config } from "../../../infrastructure/config/environment";
 import { IGoogleAuthUseCase } from "../Usecase Interfaces/IGoogleAuthUseCase";

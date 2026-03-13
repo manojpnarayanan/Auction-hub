@@ -4,7 +4,6 @@ import { ICategoryRepository } from "../../../../domain/interfaces/ICategoryRepo
 import { IGetAllCategoriesUseCase } from "../../Usecase Interfaces/Admin/Category Interface/IGetAllCategoriesUseCase";
 import { CategoryDTO } from "../../../dtos/CategoryDTO";
 import { categoryDTOMapper } from "../../../DTOMapper/CategoryDTOMapper";
-import { Category } from "../../../../domain/entities/Category.entity";
 
 
 @injectable()

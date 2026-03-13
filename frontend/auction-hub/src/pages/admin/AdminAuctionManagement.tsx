@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useCallback} from "react";
 import { getAdminAuctionManagement, deleteAuction, updateAuctionStatus ,cancelLiveAuctionAdmin } from "../../api/Admin/adminManage";
 import toast from "react-hot-toast";
 import Pagination from "../../components/Pagination";
 import ConfirmModal from "../../components/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
+import type { AuctionItem } from "../../types/auction";
+import { AxiosError } from "axios";
 
 const AdminAuctions = () => {
-    const [auctions, setAuctions] = useState<any[]>([]);
+    const [auctions, setAuctions] = useState<AuctionItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -18,7 +20,7 @@ const AdminAuctions = () => {
     
 
 
-    const fetchAuctions = async () => {
+    const fetchAuctions = useCallback(async () => {
         try {
             setLoading(true);
             const res = await getAdminAuctionManagement(page, limit,searchTerm);
@@ -26,13 +28,15 @@ const AdminAuctions = () => {
             setTotalPages(Math.ceil(res.data.total / limit));
         } catch (error) {
             console.error("Failed to fetch auctions");
+            const err = error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to fetch data")
         } finally {
             setLoading(false);
         }
-    }
+    },[page,limit,searchTerm]);
     useEffect(() => {
         fetchAuctions();
-    }, [page,searchTerm]);
+    }, [page,searchTerm,fetchAuctions]);
 
     
     const handleDelete=async (id:string)=>{
@@ -57,8 +61,9 @@ const AdminAuctions = () => {
             await cancelLiveAuctionAdmin(id);
             toast.success("Live auction cancelled successfully");
             fetchAuctions();
-        }catch(error:any){
-            toast.error(error.response?.data?.message || "Failed to cancel live auction");
+        }catch(error:unknown){
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to cancel live auction");
         }
     }
 
@@ -67,8 +72,9 @@ const AdminAuctions = () => {
             await updateAuctionStatus(id, status);
             toast.success(`Auction ${status === 'active' ? 'Approved' : 'Rejected'} successfully`);
             fetchAuctions();
-        } catch (error) {
-            toast.error("Failed to update status")
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to update status")
         }
     }
 
@@ -79,7 +85,7 @@ const AdminAuctions = () => {
                 <div className="mb-4" >
                     <input type="text" placeholder="search Auctions..." 
                     className="w-full bg-[#0f111a] border border-gray-700 text-gray-300 rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm"
-                    value={searchTerm} onChange={(e)=>{setSearchTerm(e.target.value),setPage(1)}}
+                    value={searchTerm} onChange={(e)=>{setSearchTerm(e.target.value);setPage(1)}}
                      />
                 </div>
                 <table className="w-full text-left border-collapse">

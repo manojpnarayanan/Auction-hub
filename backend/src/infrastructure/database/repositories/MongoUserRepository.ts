@@ -1,4 +1,5 @@
 import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
+import logger from "../../Global/Logger";
 import { User } from "../../../domain/entities/User.entity";
 import { CreateUserDTO, updateUserProfileDTO } from "../../../application/dtos/user.dto";
 import { UserModel, IUserDocument } from "../models/UserModel";
@@ -6,6 +7,7 @@ import { injectable } from "inversify";
 import { BaseRepository } from "./BaseRepository";
 import { UserPersistanceMapper } from "../Mappers/UserPersistanceMapper";
 import { NotFoundError } from "../../../domain/errors/errors";
+import { FilterQuery } from "mongoose";
 
 @injectable()
 export class MongoUserRepository extends BaseRepository<User,IUserDocument> implements IUserRepository {
@@ -41,11 +43,11 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     async updateVerifyStatus(userId: string, isVerified: boolean): Promise<void> {
         await UserModel.updateOne({ _id: userId }, { isVerified })
     }
-    async updatePassword(userId: string, password: string): Promise<void> {
-        const userdoc = await UserModel.findByIdAndUpdate(userId, { password });
+    async updatePassword(_userId: string, _password: string): Promise<void> {
+        // const userdoc = await UserModel.findByIdAndUpdate(userId, { password });
     }
     async adminUserManage(page: number, limit: number, search: string): Promise<{ users: User[]; total: number }> {
-        const query:any={role:"user"};
+        const query:FilterQuery<IUserDocument>={role:"user"};
         if(search){
             query.$or=[
                 {name:{$regex:search,$options:"i"}},
@@ -57,13 +59,13 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
             UserModel.find(query).sort({createdAt:-1}).skip(skip).limit(limit),
             UserModel.countDocuments(query)
         ]);
-        // console.log("DB fetch ",JSON.stringify(userDoc,null,2))
+        // logger.info("DB fetch ",JSON.stringify(userDoc,null,2))
         return {
             users:userDoc.map(doc=>UserPersistanceMapper.toEntity(doc)),total
         }
     }
     async updateBlockStatus(userId: string, isBlocked: boolean): Promise<void> {
-        console.log("Blocking user", userId,isBlocked)
+        logger.info({ userId, isBlocked }, "Blocking user");
         await UserModel.findByIdAndUpdate(userId,{isBlocked});
     }
     async updateProfile(userId: string, data: updateUserProfileDTO): Promise<User> {

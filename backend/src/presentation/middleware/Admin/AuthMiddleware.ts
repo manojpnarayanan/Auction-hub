@@ -16,7 +16,7 @@ export const authenticate=(req:Request, res:Response, next:NextFunction)=>{
         const decoded=jwt.verify(token,config.jwtSecret);
         req.user=decoded as Express.User;
         next();
-    }catch(Error){
+    }catch(_error){
         return res.status(HttpStatus.UNAUTHORIZED).json({success:false,message:"Invalid or Expired token"})
     }
 }

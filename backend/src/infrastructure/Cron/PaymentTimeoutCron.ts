@@ -1,10 +1,11 @@
 import cron from 'node-cron';
+import logger from '../Global/Logger';
 import { AuctionModel } from '../database/models/AuctionModel';
 
 export function startPaymentTimeoutJob() {
     cron.schedule('*/5 * * * *', async () => {
         try {
-            console.log("Running payment Timeout Check..");
+            logger.info("Running payment Timeout Check..");
             const oneHourAgo = new Date();
             oneHourAgo.setHours(oneHourAgo.getHours() - 1);
             
@@ -17,7 +18,7 @@ export function startPaymentTimeoutJob() {
             for (const auction of expiredAuctions) {
                 if (auction.bids && auction.bids.length > 0) {
                     // Extract unique bidders array sorted by highest bid
-                    const uniqueBidders: any[] = [];
+                    const uniqueBidders: {bidderId:string;amount:number;time:Date}[] = [];
                     const seen = new Set();
                     
                     const sortedBids = [...auction.bids].sort((a, b) => b.amount - a.amount);
@@ -40,12 +41,12 @@ export function startPaymentTimeoutJob() {
                         // Reset the 1-hour clock starting from NOW for the new winner
                         auction.endDate = new Date(); 
                         await auction.save();
-                        console.log(`Auction ${auction._id} shifted to next winner: ${nextBidder.bidderId}`);
+                        logger.info(`Auction ${auction._id} shifted to next winner: ${nextBidder.bidderId}`);
                     } else {
                         // Nobody left to shift to!
                         auction.status = 'expired';
                         await auction.save();
-                        console.log(`Auction ${auction._id} fully expired.`);
+                        logger.info(`Auction ${auction._id} fully expired.`);
                     }
                 } else {
                     auction.status = 'expired';
@@ -53,7 +54,7 @@ export function startPaymentTimeoutJob() {
                 }
             }
         } catch (error) {
-            console.error("Error in payment Timeout", error);
+            logger.error({ err: error }, "Error in payment Timeout");
         }
     })
 }

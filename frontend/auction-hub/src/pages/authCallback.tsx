@@ -24,6 +24,6 @@ export default function AuthCallback() {
         } else {
             navigate('/login?error=auth_failed')
         }
-    }, [searchParams, navigate])
+    }, [searchParams, navigate,dispatch]);
     return <div>Authenticating...</div>;
 }

@@ -28,7 +28,7 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
     return 60;
   });
   useEffect(() => {
-    let interval: any;
+    let interval: ReturnType<typeof setInterval> | undefined;
     if (timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => {

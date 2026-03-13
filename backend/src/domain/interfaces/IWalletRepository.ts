@@ -4,7 +4,7 @@ import { Transactions } from "../entities/Transaction.entity";
 
 export interface IWalletRepository {
     findByUserId(userId: string): Promise<Wallet | null>;
-    create(userId: string): Promise<Wallet>;
+    create(wallet: Wallet): Promise<Wallet>;
     credit(userId: string, amount: number): Promise<Wallet>;
     debit(userId: string, amount: number): Promise<Wallet>;
     getTransactions(userId: string, page?: number, limit?: number): Promise<{ transactions: Transactions[], total: number }>;

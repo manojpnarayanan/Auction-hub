@@ -28,7 +28,9 @@ import AdminPaymentRoutes from "./src/presentation/routes/admin/AdminPaymentRout
 import SubscriptionPlanRoutes from "./src/presentation/routes/admin/SubsriptionPlanRoutes.js";
 import SubscriptionRoutes from './src/presentation/routes/user/SubscriptionRoutes.js'
 import watchlistRoutes from './src/presentation/routes/user/watchlistRoutes.js';
-
+import PinoHttp, { pinoHttp } from "pino-http";
+import logger from './src/infrastructure/Global/Logger.js';
+import {pinoerrorHandler} from './src/presentation/middleware/ErrorHandler.js'
 
 const app = express();
 const httpServer=createServer(app);
@@ -39,6 +41,7 @@ app.use(cors({
     origin: config.corsOrigin,
     credentials: true
 }));
+app.use(pinoHttp({logger}));
 app.use('/user',WebhookRoutes);
 app.use(express.json());
 app.use(cookieParser());
@@ -60,6 +63,7 @@ app.use('/user',SubscriptionRoutes);
 app.use('/user',watchlistRoutes)
 
 app.use(errorHandler);
+app.use(pinoerrorHandler);
 
 
 connectDB();
@@ -71,7 +75,7 @@ socketService.init(httpServer)
 
 const PORT = config.port;
 httpServer.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
 });
 
 

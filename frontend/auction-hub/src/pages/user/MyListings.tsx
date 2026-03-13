@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState,useEffect, useCallback } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getMyAuctions } from "../../api/auctions";
@@ -6,6 +6,8 @@ import CreateAuctionModal from "../../components/CreateAuctionModal";
 import { useNavigate,useLocation } from "react-router-dom";
 import type { AuctionItem } from "../../types/auction";
 import Pagination from "../../components/Pagination";
+import type { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 
 export default function MyListings(){
@@ -25,22 +27,23 @@ export default function MyListings(){
         setSelectedAuction(null);
     },[location]);
 
-    const fetchMyListings=async()=>{
+    const fetchMyListings= useCallback(async()=>{
         try{
             setLoading(true);
             const res=await getMyAuctions(currentPage,limit);
             setMyAuctions(res.data.data || [] );
             setTotalPages(res.data.totalPages);
-        }catch(error){
+        }catch(error:unknown){
+            const err=error as AxiosError<{message:string}>
             console.error("Failed to fetch my listings");
-        }finally
-        {
+            toast.error(err?.response?.data?.message || "Failed to fetch my listings")
+        }finally{
             setLoading(false);
         }
-    }
+    },[currentPage,limit])
     useEffect(()=>{
         fetchMyListings();
-    },[currentPage]);
+    },[currentPage,fetchMyListings]);
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
             <Navbar />
@@ -105,11 +108,10 @@ export default function MyListings(){
                     </div>
                 )}
             </main>
-            <Footer />
             {isModalOpen && (
                 <CreateAuctionModal onClose={() => setIsModalOpen(false)}
-                    onSuccess={fetchMyListings} // Refresh list after create/edit
-                    initialData={selectedAuction || undefined}
+                onSuccess={fetchMyListings} // Refresh list after create/edit
+                initialData={selectedAuction || undefined}
                 />
             )}
             <Pagination 
@@ -117,6 +119,7 @@ export default function MyListings(){
             totalPages={totalPages}
             onPageChange={setCurrentPage}
             />
+                <Footer />
         </div>
     );
 }

@@ -6,6 +6,7 @@ import API from "../api/axiosInstances";
 import type{ checkSubscription } from "../types/subscribe";
 import  type { AuctionItem } from "../types/auction";
 import { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 interface Props {
   onClose: () => void;
@@ -37,8 +38,10 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
       try {
         const data = await getCategories(1, 100,'');
         setCategories(data.categories);
-      } catch (err) {
+      } catch (err:unknown) {
+        const error=err as AxiosError<{message:string}>
         console.error("Failed to load categories");
+        toast.error(error.response?.data?.message || 'Failed to load Categories');
       }
     }
     fetchCat();
@@ -90,7 +93,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      const newUrls = res.data.images.map((img: any) => img.url);
+      const newUrls = res.data.images.map((img: {url:string}) => img.url);
 
       setForm((prev) => ({ ...prev, images: [...prev.images, ...newUrls] }));
     } catch (err) {
@@ -195,7 +198,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         startingPrice: Number(form.startingPrice),
         currentPrice: Number(form.startingPrice),
         images: form.images
-      }
+      }as AuctionItem
       // await createAuction(auctionData);
       // onSuccess();
       // onClose();

@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import type { Column } from "../../components/reuseabletable";
 import DataTable from "../../components/reuseabletable";
 import ConfirmModal from "../../components/ConfirmationModal";
+import type { AxiosError } from "axios";
 
 
 interface Plan {
@@ -41,8 +42,9 @@ export default function AdminSubscriptionPlan() {
         try {
             const res = await getAllSubscriptionPlan();
             setPlans(res.data);
-        } catch {
-            toast.error("Failed to fetch Plans");
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to fetch Plans");
         }
     }
     const handleSubmit = async (e: React.FormEvent) => {
@@ -59,8 +61,9 @@ export default function AdminSubscriptionPlan() {
             setIsCreating(false);
             setEditingId(null);
             fetchPlans();
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to save Plan")
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to save Plan")
         }
     }
     const handleEdit = async (plan: Plan) => {
@@ -75,8 +78,9 @@ export default function AdminSubscriptionPlan() {
                 commission: plan.commission,
             })
             setIsCreating(true);
-        } catch (error) {
-            toast.error("Editing failed");
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Editing failed");
         }
     }
 
@@ -91,8 +95,9 @@ export default function AdminSubscriptionPlan() {
             toast.success("Plan deleted");
             fetchPlans();
             setIsDeleteModalOpen(false);
-        } catch {
-            toast.error("Failed to delete plan")
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to delete plan")
         }
     }
     const columns:Column<Plan>[]=[

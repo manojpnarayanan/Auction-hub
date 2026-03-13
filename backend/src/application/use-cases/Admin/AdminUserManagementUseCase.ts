@@ -1,7 +1,6 @@
 import { injectable ,inject } from "inversify";
 import {TYPES} from "../../../di/types";
 import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
-import { User } from "../../../domain/entities/User.entity";
 import { IAdminUserManagementUseCase } from "../Usecase Interfaces/Admin/IAdminUserManagementUseCase";
 import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
 import { UserResponseDTO } from "../../dtos/user.dto";

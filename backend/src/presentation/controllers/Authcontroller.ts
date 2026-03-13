@@ -3,7 +3,6 @@ import { injectable, inject } from "inversify";
 import { TYPES } from "../../di/types";
 import { HttpStatus } from "../Enums/StatusCodes"
 import { CustomMessages } from "../Enums/CustomMessages";
-import { OAuthResponseDTO } from "../../application/dtos/user.dto";
 import { ILoginUseCase } from "../../application/use-cases/Usecase Interfaces/ILoginUseCase";
 import { IRefreshTokenUseCase } from "../../application/use-cases/Usecase Interfaces/IRefreshTokenUseCase";
 import { IVerifyOtpUseCase } from "../../application/use-cases/Usecase Interfaces/IVerifyOtpUseCase";
@@ -32,7 +31,7 @@ export class AuthController {
 
     signup = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // console.log(req.body);
+            // logger.info(req.body);
             const result = await this._signupUseCase.execute(req.body);
             res.status(HttpStatus.CREATED).json({ success: true, data: result });
         } catch (error) {
@@ -101,7 +100,7 @@ export class AuthController {
             const accessToken = await this._refreshTokenUseCase.execute(refreshToken);
             res.status(HttpStatus.OK).json({ success: true, accessToken });
         } catch (error) {
-            // console.error("Signup failed", error);
+            // logger.error("Signup failed", error);
             next(error);
         }
     }

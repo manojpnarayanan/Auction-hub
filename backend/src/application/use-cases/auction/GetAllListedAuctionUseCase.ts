@@ -1,7 +1,6 @@
 import { injectable,inject } from "inversify";
 import {TYPES} from "../../../di/types";
 import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
-import { CreateAuctionDTO } from "../../dtos/AuctionDTO";
 import { IGetAllListedAuctionUseCase } from "../Usecase Interfaces/Auction-Interface/IGetAllListedAuctionUseCase";
 import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
 import { AuctionResponseDTO } from "../../dtos/AuctionDTO";

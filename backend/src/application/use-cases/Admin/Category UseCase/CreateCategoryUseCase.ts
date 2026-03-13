@@ -18,7 +18,7 @@ export class CreateCategoryUseCase implements ICreatecategoryUseCase {
     async execute(data: CategoryRequestDTO): Promise<CategoryDTO> {
 
         const {categories}=await this._categoryRepository.findAll(1,2,data.name)
-        // console.log("Cat",categories);
+        // logger.info("Cat",categories);
 
         const checkExists=categories.find((c)=>c.name.toLowerCase()===data.name.trim().toLowerCase());
         if(checkExists) throw new ConflictError("Category already exists");

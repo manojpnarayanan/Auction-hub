@@ -15,7 +15,7 @@ export class LogoutUseCase implements ILogoutUseCase {
         try {
             const decoded = jwt.verify(token, config.jwtSecret) as jwt.JwtPayload;
             await this._cacheService.delete(`refresh_Token:${decoded.id}`);
-        } catch (error) {
+        } catch (_error) {
             const decoded = jwt.decode(token) as jwt.JwtPayload;
             if (decoded && decoded.id) {
                 await this._cacheService.delete('refresh_Token:${decoded.id}')

@@ -14,7 +14,9 @@ export interface IAuctionDocument extends Document{
     type:'live' |'timed',
     startTime?:Date,
     winnerId?:string,
-    bids:{bidderId:string;amount:number;time:Date}[]
+    bids:{bidderId:string;amount:number;time:Date}[],
+    createdAt:Date,
+    paymentStatus:'pending'|'completed'|'pending'
 }
 
 const AuctionSchema:Schema=new Schema({

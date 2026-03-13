@@ -127,10 +127,10 @@ export default function LiveAuctionRoom() {
                         setAuctionStatus(d.status);
                         setAuction(d);
                     }
-                }catch(r){}
+                }catch(r){console.error(r)}
             },30000);
             return()=>clearInterval(poll)
-    }, [id]);
+    }, [id,auctionStatus]);
 
     const handleBid = async () => {
         if (!auction || !bidAmount) return;

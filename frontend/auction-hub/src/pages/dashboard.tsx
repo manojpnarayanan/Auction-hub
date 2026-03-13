@@ -1,5 +1,5 @@
 import { useSelector, useDispatch, } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useCallback} from "react";
 import type { RootState } from "../redux/store";
 import { setAllAuctions } from "../redux/slices/auctionSlice";
 import { getAllAuctions } from "../api/auctions";
@@ -29,23 +29,26 @@ export default function Dashboard() {
         const data = await getCategories(1,100,searchText);
         setCategories([{ id: "all", name: "All" }, ...data.categories]);
       } catch (error) {
-        console.error(error);
+      console.error("Failed to load auctions", error);
+
       }
     }
     loadCats()
-  }, [])
+  }, [searchText])
   
-  const fetchAll = async (category: string = "All", search: string = "") => {
+  const fetchAll = useCallback(async (category: string = "All", search: string = "") => {
     try {
       const res = await getAllAuctions({ category, search });
       dispatch(setAllAuctions(res.data.data));
     } catch (error) {
       console.error("Failed to load auctions", error);
+
     }
-  }
+  },[dispatch]);
+
   useEffect(() => {
     fetchAll(selectedCategory, searchText);
-  }, [selectedCategory, searchText]);
+  }, [selectedCategory, searchText,fetchAll]);
 
   
   const getCategoryIcon = (name: string) => {

@@ -2,6 +2,7 @@ import { injectable, inject } from "inversify";
 import { TYPES } from '../../../../di/types';
 import { IWalletRepository } from "../../../../domain/interfaces/IWalletRepository";
 import { ISubscriptionRepository } from "../../../../domain/interfaces/ISubscriptionRepository";
+import { Wallet } from "../../../../domain/entities/Wallet.entity";
 import { ISubscriptionPlanRepository } from "../../../../domain/interfaces/ISubscriptionPlanRepository";
 import { releasePaymentDTO } from "../../../dtos/WalletDTO";
 import { IReleasePaymentUseCase } from "../../Usecase Interfaces/Wallet-interfaces/IReleasePaymentUseCase";
@@ -16,7 +17,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
     ) { }
 
     async execute(data: releasePaymentDTO): Promise<void> {
-        console.log("Execute start", data);
+        logger.info("Execute start", data);
 
         // 1. Fetch REAL commission from seller's active plan (The Security Step)
         const sub = await this._subscriptionRepository.findActiveByUSerId(data.sellerId);
@@ -26,23 +27,26 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         if (!plan) {
             plan = await this._subscriptionPlanRepository.findDefaultPlan();
         }
-        // console.log("PLAN FOUND",plan?{name:plan.name,commission:plan.commission}:"NO PLAN FOUND")
+        // logger.info("PLAN FOUND",plan?{name:plan.name,commission:plan.commission}:"NO PLAN FOUND")
 
         // Use plan percent, or fallback to 5% if something goes wrong
         const percent = plan ? plan.commission : 6;
         const commission = Math.round(data.amount * percent);
         const sellerAmount = data.amount - commission;
 
-        // console.log("MATH:AMOUNT ",data.amount)
-        // console.log("MATH:percent ",percent)
-        // console.log("MATH:Commission ",commission)
-        // console.log("MATH:SellerAmount ",sellerAmount)
+        // logger.info("MATH:AMOUNT ",data.amount)
+        // logger.info("MATH:percent ",percent)
+        // logger.info("MATH:Commission ",commission)
+        // logger.info("MATH:SellerAmount ",sellerAmount)
 
         // 2. Setup Wallet Details
         const adminId = process.env.ADMIN_WALLET_USER_ID!;
         if (!adminId) throw new Error("ADMIN_WALLET_USER_ID is missing from .env");
         let adminWallet = await this._walletRepository.findByUserId(adminId);
-        if (!adminWallet) adminWallet = await this._walletRepository.create(adminId);
+        if (!adminWallet) {
+            const newAdminWallet=new Wallet("",adminId,0,'inr',new Date(),new Date())
+            adminWallet = await this._walletRepository.create(newAdminWallet);
+        }
 
         const sellerWallet = await this._walletRepository.findByUserId(data.sellerId);
         if (!sellerWallet) throw new Error("Seller wallet not found!");
@@ -89,7 +93,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             description: `Auction payout received for ${data.auctionId}`
         });
 
-        // console.log("2. Calling markTransactions", data.transactionId);
+        // logger.info("2. Calling markTransactions", data.transactionId);
         // 3. Mark the original Escrow as Released
         await this._walletRepository.markTransactionAsReleased(data.transactionId);
     }

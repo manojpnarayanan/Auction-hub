@@ -11,4 +11,5 @@ export interface AuctionItem{
     category:string;
     endDate:Date | string;
     startTime?:Date |string;
+    image?:string;
 }

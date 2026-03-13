@@ -1,4 +1,4 @@
-import { GoogleAuthDTO, OAuthResponseDTO } from "../../dtos/user.dto";
+import {  OAuthResponseDTO } from "../../dtos/user.dto";
 
 
 export interface IGoogleAuthUseCase{

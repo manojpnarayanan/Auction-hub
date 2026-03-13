@@ -2,6 +2,7 @@ import { injectable,inject  } from "inversify";
 import { TYPES } from "../../../../di/types";
 import { IWalletRepository } from "../../../../domain/interfaces/IWalletRepository";
 import { IPaymentService } from "../../../../domain/interfaces/IPaymentService";
+import { Wallet } from "../../../../domain/entities/Wallet.entity";
 import { createPaymentIntentDTO } from "../../../dtos/WalletDTO";
 import { ICreatePaymentIntentUseCase,PaymentIntentResponse } from "../../Usecase Interfaces/Wallet-interfaces/ICreatePaymentIntentUseCase";
 
@@ -17,7 +18,8 @@ export class CreatePaymentIntentUseCase implements ICreatePaymentIntentUseCase{
     async execute(buyerId: string, data: createPaymentIntentDTO): Promise<PaymentIntentResponse> {
         let wallet=await this._walletRepository.findByUserId(buyerId);
         if(!wallet) {
-            wallet=await this._walletRepository.create(buyerId)
+            const newWallet=new Wallet("",buyerId,0,'inr',new Date(),new Date())
+            wallet=await this._walletRepository.create(newWallet);
         }
         const intent=await this._paymentService.createPaymentIntent(data.amount,'inr',{auctionId:data.auctionId,buyerId});
         await this._walletRepository.createTransactions({

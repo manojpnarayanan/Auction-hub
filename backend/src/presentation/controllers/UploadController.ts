@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import logger from "../../infrastructure/Global/Logger";
 import cloudinary from "../../infrastructure/config/cloudinary";
 import fs from "fs";
 import { HttpStatus } from "../Enums/StatusCodes";
@@ -29,7 +30,7 @@ export class UploadController {
             const results=await Promise.all(uploadPromises);
             res.status(HttpStatus.OK).json({success:true,images:results});
         }catch(error){
-            console.error("Upload error",error);
+            logger.error({ error }, "Upload error");
             res.status(HttpStatus.INERNAL_SERVER_ERROR).json({success:false,message:"Image upload failed"})
         }
     }

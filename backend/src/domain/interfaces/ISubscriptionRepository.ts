@@ -1,4 +1,4 @@
-import {Subscription,PlanType} from '../../domain/entities/Subscription.entity';
+import {Subscription} from '../../domain/entities/Subscription.entity';
 
 
 

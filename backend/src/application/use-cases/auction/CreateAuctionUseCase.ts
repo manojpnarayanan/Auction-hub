@@ -7,7 +7,6 @@ import { CreateAuctionDTO } from "../../dtos/AuctionDTO";
 import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
 import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
 import { ISubscriptionRepository } from "../../../domain/interfaces/ISubscriptionRepository";
-import { PLAN_LIMITS } from "../../../config/SubscriptionConfig";
 import { ValidationError } from "../../../domain/errors/errors";
 import { ISubscriptionPlanRepository } from "../../../domain/interfaces/ISubscriptionPlanRepository";
 
@@ -52,7 +51,7 @@ export class CreateAuctionUseCase implements ICreateAuctionUseCase {
                 throw new ValidationError("Live auction cannot exceeded 2 hours in duration");
             }
         }
-        // console.log("data", data);
+        // logger.info("data", data);
         const newAuction = new Auction(
             data.title,
             data.description,

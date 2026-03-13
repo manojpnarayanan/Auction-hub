@@ -1,4 +1,3 @@
-import { Auction } from "../../../../domain/entities/Auction.entity";
 import { AuctionResponseDTO } from "../../../dtos/AuctionDTO";
 
 

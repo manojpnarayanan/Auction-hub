@@ -26,7 +26,7 @@ export const isUser = (req: Request, res: Response, next: NextFunction) => {
         req.user = decoded as Express.User;
         next();
 
-    } catch (error) {
+    } catch (_error) {
         return res.status(HttpStatus.UNAUTHORIZED).json({ message: "Token expired or invalid" });
     }
 

@@ -1,4 +1,5 @@
 import cron from "node-cron";
+import logger from "../Global/Logger";
 import container from "../../di/container";
 import {TYPES} from "../../di/types";
 import { ICloseExpiredAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/ICloseExpiredAuctionUseCase";
@@ -9,15 +10,15 @@ import { ISocketService } from "../../domain/interfaces/ISocketService";
 
 
 export function startCronJobs():void{
-    // console.log("[Cron] Starting cron jobs");
+    // logger.info("[Cron] Starting cron jobs");
     cron.schedule("* * * * *",async ()=>{
-        // console.log("[Cron] Checking for ExpiredAuctions");
+        // logger.info("[Cron] Checking for ExpiredAuctions");
         try{
             const closeExpiredAuctionsUseCase=container.get<ICloseExpiredAuctionUseCase>(
                 TYPES.CloseExpiredAuctionsUseCase);
                 await closeExpiredAuctionsUseCase.execute();
         }catch(error){
-            console.log("[Cron] error closing expired auctions ", error);
+            logger.info({ error }, "[Cron] error closing expired auctions ");
         }
     });
 
@@ -28,25 +29,25 @@ export function startCronJobs():void{
             const auctions=await auctionRepo.findAuctionstoStart();
             for(const auction of auctions){
                 await auctionRepo.updateAuctionStatus(auction.id!,'active');
-                console.log(`[Cron] Auto started Auction`);
+                logger.info(`[Cron] Auto started Auction`);
                 socketService.emit('auction_started',{
                     auctionId:auction.id
                 },auction.id!);
             }
             }catch(error){
-                console.error("Error auto start auctions",error);
+                logger.error({ error }, "Error auto start auctions");
         }
     })
 
 
-    // console.log("[Cron] Cron jobs started successfully");
+    // logger.info("[Cron] Cron jobs started successfully");
     cron.schedule('0 0 * * *',async()=>{
         try{
             const subscriptionRepo=container.get<ISubscriptionRepository>(TYPES.SubscriptionRepository);
             await subscriptionRepo.expireOldPlans();
-            console.log('[Cron] expired old subscription plans')
+            logger.info('[Cron] expired old subscription plans')
         }catch(error){
-            console.error('[Cron] error expiring susbcription plans:',error);
+            logger.error({ error }, '[Cron] error expiring susbcription plans:');
         }
     })
 }

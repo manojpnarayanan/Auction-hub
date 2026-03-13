@@ -45,12 +45,12 @@ export class BidController {
             const userId = req.user!.id;
             const page=parseInt(req.query.page as string)
             const limit=parseInt(req.query.limit as string)
-            // console.log("getMyBids",page,limit)
+            // logger.info("getMyBids",page,limit)
             if (!userId) {
                 return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "unAuthorized" });
             }
             const bids = await this._getUserBidUseCase.execute(userId,page,limit);
-            // console.log("bids",bids)
+            // logger.info("bids",bids)
             res.status(HttpStatus.OK).json({ success: true, ...bids });
         } catch (error) {
             next(error);

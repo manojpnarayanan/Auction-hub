@@ -11,17 +11,17 @@ export class CloseExpiredAuctionUseCase implements ICloseExpiredAuctionUseCase{
         @inject(TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository
     ){ }
      async execute(): Promise<void> {
-         const now=new Date();
+         
          const expiredAuctions=await this._auctionRepository.findExpiredActiveAuctions();
-        //  console.log(`[Cron] found ${expiredAuctions.length} expired Auctions`);
+        //  logger.info(`[Cron] found ${expiredAuctions.length} expired Auctions`);
          for(const auction of expiredAuctions){
             if(auction.bids && auction.bids.length>0){
                 const highestBid=auction.bids.reduce((max,bid)=>bid.amount>max.amount? bid:max)
                 await this._auctionRepository.updateAuctionStatus(auction.id!,'sold',highestBid.bidderId);
-                // console.log(`[Cron ] Auction ${auction.id} marked as SOLD to ${highestBid.bidderId}`);
+                // logger.info(`[Cron ] Auction ${auction.id} marked as SOLD to ${highestBid.bidderId}`);
             }else{
                 await this._auctionRepository.updateAuctionStatus(auction.id!,'expired');
-                // console.log(`[Cron] Auction ${auction.id} marked as Expired`);
+                // logger.info(`[Cron] Auction ${auction.id} marked as Expired`);
             }
          }
      }

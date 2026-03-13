@@ -1,3 +1,4 @@
+import type { AuctionItem } from "../types/auction";
 import API from "./axiosInstances";
 
 
@@ -24,7 +25,7 @@ export const getAllAuctions=async (filters:{category?:string,search?:string,type
     return API.get(`auctions?${params.toString()}`);
 }
 
-export const createAuction=async (auctionData:any)=>{
+export const createAuction=async (auctionData:AuctionItem)=>{
     return API.post('/auctions',auctionData);
 }
 
@@ -32,7 +33,7 @@ export const getAuctionProductDetails=async(id:string)=>{
     return API.get(`/auctions/${id}`);
 }
 
-export const updateAuction=async(id:string,data:any)=>{
+export const updateAuction=async(id:string,data:Partial<AuctionItem>)=>{
     return await API.put(`/auctions/${id}`,data);
 }
 

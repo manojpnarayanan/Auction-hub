@@ -2,7 +2,6 @@ import { Router } from "express";
 import container from "../../di/container";
 import { validate } from "../middleware/validation.middleware";
 import { signupSchema, loginSchema } from "../validation/validation.schemas";
-import passport from 'passport'
 import { AuthController } from "../controllers/Authcontroller";
 import { TYPES } from "../../di/types";
 import { rateLimit } from "../middleware/rateLimit.middleware";

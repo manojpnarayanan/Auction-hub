@@ -55,7 +55,7 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
             //  Update Auction Status
             if (intent.metadata && intent.metadata.auctionId) {
                 await this._auctionRepository.updatePaymentStatus(intent.metadata.auctionId, 'completed');
-                console.log(`Auction ${intent.metadata.auctionId} finalized via Webhook.`);
+                logger.info(`Auction ${intent.metadata.auctionId} finalized via Webhook.`);
             }
         }
     }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createPaymentIntent } from "../api/User/wallet";
 import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
 
 
 export interface PaymentSession{
@@ -19,8 +20,9 @@ export function usePayment(){
                 clientSecret:res.data.clientSecret,
                 paymentIntentId:res.data.paymentIntentId
             });
-        }catch(err:any){
-            toast.error(err?.response?.data?.message || "Failed to initiate payment")
+        }catch(err:unknown){
+            const error=err as AxiosError<{message:string}>
+            toast.error(error?.response?.data?.message || "Failed to initiate payment")
         }finally{
             setInitiating(false);
         }

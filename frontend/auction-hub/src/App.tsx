@@ -37,6 +37,7 @@ function App() {
     socket.connect();
     socket.on("connect", () => {
       console.log("Connected to Socket.io :Server", socket.id)
+
     });
     return () => {
       socket.disconnect();

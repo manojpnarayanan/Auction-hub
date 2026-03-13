@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useCallback } from "react";
 import { useSelector, } from "react-redux";
 import { getUsers, toggleUserBlock } from "../../api/Admin/adminUser";
 import type { User } from '../../types/admin';
@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import ConfirmModal from "../../components/ConfirmationModal";
 import DataTable  from "../../components/reuseabletable";
 import type {Column} from '../../components/reuseabletable';
+import type { AxiosError } from "axios";
 
 
 
@@ -20,7 +21,7 @@ export default function UserManagement() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
         if (!token) return;
         setLoading(true);
         try {
@@ -34,11 +35,12 @@ export default function UserManagement() {
         } finally {
             setLoading(false);
         }
-    }
+    },[page,searchTerm,token])
     useEffect(() => {
         const handler = setTimeout(() => fetchUserData(), 500);
         return () => clearTimeout(handler)
-    }, [page, searchTerm, token]);
+        
+    }, [page, searchTerm, token,fetchUserData]);
 
     // const handleBlockToggle = async (_userId: string, currentStatus: boolean) => {
     //     if (!token) return;
@@ -59,10 +61,10 @@ export default function UserManagement() {
     //         toast.success(currentStatus ? "USer unblocked Successfully" : "user blocked successfully")
 
     //     } catch (error) {
-    //         console.error("Failed to update status")
+             console.error("Failed to update status")
     //     }
     // };
-    const handleBlockToggle=(_userId:string,_currentStatus:boolean)=>{
+    const handleBlockToggle=(_userId:string)=>{
         const user=users.find(u=>u.id ===_userId);
         if(user){
             setSelectedUser(user);
@@ -79,9 +81,10 @@ export default function UserManagement() {
             setUsers(prev=>prev.map(user=>user.id ===selectedUser.id ? {...user,isBlocked:newStatus}:user));
             toast.success(selectedUser.isBlocked? "User Unblocked successfully":"User blocked successfully");
             setIsModalOpen(false);
-        }catch(error){
+        }catch(error:unknown){
             console.error("Failed to update status");
-            toast.error("Failed to update status")
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to update status")
         }
     }
     const columns:Column<User>[]=[
@@ -109,7 +112,7 @@ export default function UserManagement() {
             className:'text-right',
             render:(u)=>(
                 <button 
-                onClick={()=>handleBlockToggle(u.id,!!u.isBlocked)} 
+                onClick={()=>handleBlockToggle(u.id)} 
                  className={`${u.isBlocked ? "text-emerald-500" : "text-red-500"} hover:underline font-medium`}
                  >
                     {u.isBlocked? "UnBlock" :"Block"}

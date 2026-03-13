@@ -1,27 +1,31 @@
 import { injectable } from "inversify";
+import logger from "../../Global/Logger";
 import { IWalletRepository } from "../../../domain/interfaces/IWalletRepository";
 import { Wallet } from "../../../domain/entities/Wallet.entity";
-import { WalletModel } from "../models/WalletModel";
+import { IWalletDocumet, WalletModel } from "../models/WalletModel";
 import { WalletPersistanceMapper } from "../Mappers/WalletPersistanceMapper";
 import { Transactions } from "../../../domain/entities/Transaction.entity";
 import { TransactionModel } from "../models/TransactionModel";
 import { TransactionPersistanceMapper } from "../Mappers/TransactionPersistanceMapper";
+import { BaseRepository } from "./BaseRepository";
 
 
 
 
 
 @injectable()
-export class MongoWalletRepository implements IWalletRepository {
+export class MongoWalletRepository extends BaseRepository<Wallet,IWalletDocumet> implements IWalletRepository {
+
+    constructor(){super(WalletModel,WalletPersistanceMapper.toEntity)}
 
     async findByUserId(userId: string): Promise<Wallet | null> {
         const doc = await WalletModel.findOne({ userId });
         return doc ? WalletPersistanceMapper.toEntity(doc) : null;
     }
-    async create(userId: string): Promise<Wallet> {
+    async create(wallet:Wallet): Promise<Wallet> {
         const doc = await WalletModel.create({
-            userId: userId,
-            balance: 0
+            userId: wallet.userId,
+            balance: wallet.balance ||0
         });
         return WalletPersistanceMapper.toEntity(doc);
     }
@@ -32,7 +36,7 @@ export class MongoWalletRepository implements IWalletRepository {
     }
 
     async debit(userId: string, amount: number): Promise<Wallet> {
-        const wallet = await WalletModel.findOne({ userId });
+        // const wallet = await WalletModel.findOne({ userId });
         const doc = await WalletModel.findOneAndUpdate({ userId }, { $inc: { balance: -amount } }, { new: true });
         return WalletPersistanceMapper.toEntity(doc!);
     }
@@ -79,9 +83,9 @@ export class MongoWalletRepository implements IWalletRepository {
     async markTransactionAsReleased(transactionId: string): Promise<void> {
         const result=await TransactionModel.findByIdAndUpdate(transactionId,{isReleased:true},{new:true});
         if(result){
-            console.log("Success:Transaction marked as release");
+            logger.info("Success:Transaction marked as release");
         }else{
-            console.log("Could not find transction");
+            logger.info("Could not find transction");
         }
     
     }

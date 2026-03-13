@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createCategory, getCategories, updateCategory, deleteCategory } from "../../api/Admin/Category";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmationModal";
 import type { Column } from "../../components/reuseabletable";
 import DataTable from "../../components/reuseabletable";
+import type { AxiosError } from "axios";
 
 
 interface Category {
@@ -36,20 +37,21 @@ export default function AdminCategories() {
         return () => clearTimeout(timerId);
     }, [searchTerm])
 
-    useEffect(() => {
-        fetchCategories();
-    }, [page, debounceTerm])
-
-    const fetchCategories = async () => {
+    
+    const fetchCategories = useCallback(async () => {
         try {
             const data = await getCategories(page, limit, debounceTerm);
             console.log(data);
             setCategories(data.categories);
             setTotalPages(Math.ceil(data.total / limit));
-        } catch (error) {
-            console.error("Failed to fetch Categories", error);
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            console.error(err.response?.data?.message || "Failed to fetch Categories", error);
         }
-    }
+    },[page,limit,debounceTerm]);
+    useEffect(() => {
+        fetchCategories();
+    }, [page, debounceTerm ,fetchCategories])
 
     const handleDelete = async (id: string) => {
         setCategoryToDelete(id);
@@ -62,9 +64,11 @@ export default function AdminCategories() {
             toast.success("Category deleted successfully");
             fetchCategories();
             setIsDeleteModalOpen(false);
-        } catch (error) {
+        } catch (error:unknown) {
             console.error(error);
-            toast.error("Failed to delete category");
+
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to delete category");
         }
     }
     const handleEdit = async (category: Category) => {
@@ -93,10 +97,11 @@ export default function AdminCategories() {
             setIsCreating(false);
             setEditingId(null);
             fetchCategories()
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            const errorMessage = error.response?.data?.message || "Failed to create category"
-            toast.error(errorMessage);
+
+            const err = error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to create category");
         }
     }
     const columns: Column<Category>[] = [

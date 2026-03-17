@@ -4,6 +4,8 @@ import { IAuctionRepository } from "../../../../domain/interfaces/IAuctionReposi
 import { ISocketService } from "../../../../domain/interfaces/ISocketService";
 import { IEndLiveAuctionUseCase } from "../../Usecase Interfaces/live-Auctions/IEndLiveAuctionUseCase";
 import { NotFoundError,ForbiddenError,ValidationError } from "../../../../domain/errors/errors";
+import { IEventEmitter } from "../../../../domain/interfaces/IEventEmitter";
+import { AuctionEndedEvent } from "../../../../domain/events/AuctionEvents";
 
 
 
@@ -11,7 +13,8 @@ import { NotFoundError,ForbiddenError,ValidationError } from "../../../../domain
 export class EndLiveAuctionUseCase implements IEndLiveAuctionUseCase{
     constructor(
         @inject(TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository,
-        @inject (TYPES.SocketService) private _socketService:ISocketService
+        @inject (TYPES.SocketService) private _socketService:ISocketService,
+        @inject (TYPES.EventEmitter) private _eventEmitter:IEventEmitter
     ){}
     async execute(auctionId: string, hostId: string): Promise<void> {
         const auction=await this._auctionRepository.findById(auctionId);
@@ -25,11 +28,18 @@ export class EndLiveAuctionUseCase implements IEndLiveAuctionUseCase{
             auction.endDate=new Date();
         }
         await this._auctionRepository.updateAuctionStatus(auctionId,finalStatus,winnerId);
-        this._socketService.emit("auction_ended",{
+        // this._socketService.emit("auction_ended",{
+        //     auctionId,
+        //     status:finalStatus,
+        //     winnerId,
+        //     finalPrice:auction.currentPrice,
+        // },auctionId);
+
+        this._eventEmitter.dispatch(new AuctionEndedEvent(
             auctionId,
-            status:finalStatus,
+            finalStatus,
             winnerId,
-            finalPrice:auction.currentPrice,
-        },auctionId);
+            auction.currentPrice
+        ));
     }
 }

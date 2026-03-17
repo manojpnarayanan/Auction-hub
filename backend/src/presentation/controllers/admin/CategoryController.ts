@@ -11,15 +11,15 @@ import { ApiResponse } from "../../Common/APIResponse";
 @injectable()
 export class CategoryController{
     constructor(
-        @inject(TYPES.CreateCategoryUseCase) private createCategoryUseCase:ICreatecategoryUseCase,
-        @inject (TYPES.GetAllCategoriesUseCase) private getAllCategoryUseCase:IGetAllCategoriesUseCase,
-        @inject(TYPES.UpdateCategoryUSeCase) private updateCategoryUseCase:IUpdateCategoryUseCase,
-        @inject(TYPES.DeleteCategoryUseCase)private deleteCategoryUseCase:IDeleteCategoryUseCase,
+        @inject(TYPES.CreateCategoryUseCase) private _createCategoryUseCase:ICreatecategoryUseCase,
+        @inject (TYPES.GetAllCategoriesUseCase) private _getAllCategoryUseCase:IGetAllCategoriesUseCase,
+        @inject(TYPES.UpdateCategoryUSeCase) private _updateCategoryUseCase:IUpdateCategoryUseCase,
+        @inject(TYPES.DeleteCategoryUseCase)private _deleteCategoryUseCase:IDeleteCategoryUseCase,
 
     ){}
      create= async (req:Request, res:Response, next:NextFunction)=>{
         try{
-            const category=await this.createCategoryUseCase.execute(req.body);
+            const category=await this._createCategoryUseCase.execute(req.body);
             res.status(HttpStatus.CREATED).json(category);
         }catch(error){
             next(error)
@@ -30,7 +30,7 @@ export class CategoryController{
             const page=parseInt(req.query.page as string) || 1;
             const limit=parseInt(req.query.limit as string) || 5
             const searchTerm=req.query.searchTerm as string
-            const categories=await this.getAllCategoryUseCase.execute(page,limit,searchTerm);
+            const categories=await this._getAllCategoryUseCase.execute(page,limit,searchTerm);
             const response=ApiResponse.success(categories,'Categories Fetched Successfully')
             return res.status(response.statusCode).json(response);
         }catch(error){
@@ -40,7 +40,7 @@ export class CategoryController{
     update=async (req:Request,res:Response,next:NextFunction)=>{
         try{
             const {id}=req.params;
-            const category=await this.updateCategoryUseCase.execute(id,req.body);
+            const category=await this._updateCategoryUseCase.execute(id,req.body);
             if(!category){
                 res.status(HttpStatus.NOT_FOUND).json({message:"Category not Found"});
             };
@@ -52,7 +52,7 @@ export class CategoryController{
     delete=async (req:Request,res:Response,next:NextFunction)=>{
         try{
             const {id}=req.params;
-            const success=await this.deleteCategoryUseCase.execute(id);
+            const success=await this._deleteCategoryUseCase.execute(id);
             if(!success){
                 return res.status(HttpStatus.NOT_FOUND).json({message:"Category not found or could be deleted"})
             };

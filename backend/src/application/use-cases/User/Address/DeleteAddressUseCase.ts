@@ -8,9 +8,9 @@ import { IDeleteAddressUseCase } from "../../Usecase Interfaces/Address-Interfac
 @injectable()
 export class DeleteAddressUseCase implements IDeleteAddressUseCase{
     constructor(
-        @inject (TYPES.AddressRepository) private addressRepository:IAddressRepository
+        @inject (TYPES.AddressRepository) private _addressRepository:IAddressRepository
     ){}
     async execute(addressId: string): Promise<void> {
-        await this.addressRepository.delete(addressId);
+        await this._addressRepository.delete(addressId);
     }
 }

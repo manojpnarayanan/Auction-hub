@@ -18,26 +18,43 @@ export class WatchlistController{
         @inject(TYPES.CheckWatchlistUseCase) private _checkWatchlistUseCase:ICheckWatchlistUseCase
     ){}
     addToWatchlist= async (req:Request,res:Response,next:NextFunction)=>{
-        const userId=req.user!.id;
-        const {auctionId}=req.params;
-        await this._addToWatchlistUSeCase.execute(userId,auctionId);
-        return res.status(HttpStatus.OK).json(ApiResponse.success(null,"Added to Watchlist"));
+        
+        try{
+            const userId=req.user!.id;
+            const {auctionId}=req.params;
+            await this._addToWatchlistUSeCase.execute(userId,auctionId);
+            return res.status(HttpStatus.OK).json(ApiResponse.success(null,"Added to Watchlist"));
+        }catch(error){
+            next(error)
+        }
     }
     removeFromWatchlist=async(req:Request,res:Response,next:NextFunction)=>{
-        const userId=req.user!.id;
-        const {auctionId}=req.params;
-        await this._removeFromWatchlistUseCase.execute(userId,auctionId);
-        return res.status(HttpStatus.OK).json(ApiResponse.success(null,"Removed from watchlist"));
+        try{
+            const userId=req.user!.id;
+            const {auctionId}=req.params;
+            await this._removeFromWatchlistUseCase.execute(userId,auctionId);
+            return res.status(HttpStatus.OK).json(ApiResponse.success(null,"Removed from watchlist"));
+        }catch(error){
+            next(error)
+        }
     }
     getWatchlist=async (req:Request,res:Response,next:NextFunction)=>{
-        const userId=req.user!.id;
-        const auctions=await this._getWatchlistUseCase.execute(userId);
-        return res.status(HttpStatus.OK).json(ApiResponse.success(auctions,"Watchlist Fetched"));
+        try{
+            const userId=req.user!.id;
+            const auctions=await this._getWatchlistUseCase.execute(userId);
+            return res.status(HttpStatus.OK).json(ApiResponse.success(auctions,"Watchlist Fetched"));
+        }catch(error){
+            next(error)
+        }
     }
     checkWatchlist=async(req:Request,res:Response,next:NextFunction)=>{
-        const userId=req.user!.id;
-        const {auctionId}=req.params;
-        const isWatchlisted=await this._checkWatchlistUseCase.execute(userId,auctionId);
-        return res.status(HttpStatus.OK).json(ApiResponse.success({isWatchlisted},"Status Checked"));
+        try{
+            const userId=req.user!.id;
+            const {auctionId}=req.params;
+            const isWatchlisted=await this._checkWatchlistUseCase.execute(userId,auctionId);
+            return res.status(HttpStatus.OK).json(ApiResponse.success({isWatchlisted},"Status Checked"));
+        }catch(error){
+            next(error)
+        }
     }
 }

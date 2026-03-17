@@ -1,74 +1,117 @@
-import { useState, useEffect } from "react";
-import { getAdminAuctionManagement, deleteAuction, updateAuctionStatus ,cancelLiveAuctionAdmin } from "../../api/Admin/adminManage";
+import { useState, useEffect, useCallback } from "react";
+import { getAdminAuctionManagement, deleteAuction, updateAuctionStatus, cancelLiveAuctionAdmin } from "../../api/Admin/adminManage";
 import toast from "react-hot-toast";
 import Pagination from "../../components/Pagination";
 import ConfirmModal from "../../components/ConfirmationModal";
 import { useNavigate } from "react-router-dom";
+import type { AuctionItem } from "../../types/auction";
+import { AxiosError } from "axios";
+import ReasonModal from "../../components/ReasonModal";
+
 
 const AdminAuctions = () => {
-    const [auctions, setAuctions] = useState<any[]>([]);
+    const [auctions, setAuctions] = useState<AuctionItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [isDeleteModalOpen,setIsDeleteModalOpen]=useState(false);
-    const [auctionToDelete,setAuctionToDelete]=useState<string|null>(null)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [auctionToDelete, setAuctionToDelete] = useState<string | null>(null)
     const limit = 5;
-    const [searchTerm,setSearchTerm]=useState("");
-    const navigate=useNavigate();
-    
+    const [searchTerm, setSearchTerm] = useState("");
+    const navigate = useNavigate();
+    const [isReasonModalOpen, setIsReasonModalopen] = useState(false);
+    const [selectedAuctionId, setSelectedAuctionId] = useState<string | null>(null);
+    const [reasonModal, setReasonModal] = useState<'reject' | 'cancel'>('reject')
 
 
-    const fetchAuctions = async () => {
+
+    const fetchAuctions = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await getAdminAuctionManagement(page, limit,searchTerm);
+            const res = await getAdminAuctionManagement(page, limit, searchTerm);
             setAuctions(res.data.data || []);
             setTotalPages(Math.ceil(res.data.total / limit));
         } catch (error) {
             console.error("Failed to fetch auctions");
+            const err = error as AxiosError<{ message: string }>
+            toast.error(err.response?.data?.message || "Failed to fetch data")
         } finally {
             setLoading(false);
         }
-    }
+    }, [page, limit, searchTerm]);
     useEffect(() => {
         fetchAuctions();
-    }, [page,searchTerm]);
+    }, [page, searchTerm, fetchAuctions]);
 
-    
-    const handleDelete=async (id:string)=>{
+
+    const handleDelete = async (id: string) => {
         setAuctionToDelete(id);
         setIsDeleteModalOpen(true);
     };
-    const confirmDelete=async()=>{
-        if(!auctionToDelete) return;
-        try{
+    const confirmDelete = async () => {
+        if (!auctionToDelete) return;
+        try {
             await deleteAuction(auctionToDelete);
             toast.success("Auction deleted successfully");
             fetchAuctions();
             setIsDeleteModalOpen(false);
-        }catch(error){
+        } catch (error) {
             console.error(error);
             toast.error("Failed to delete Auction")
         }
     }
-    const handleCancelLiveAuction=async (id:string)=>{
-        if(window.confirm("Are you sure you wan tot completely cancel this live auction?"))
-        try{
-            await cancelLiveAuctionAdmin(id);
-            toast.success("Live auction cancelled successfully");
-            fetchAuctions();
-        }catch(error:any){
-            toast.error(error.response?.data?.message || "Failed to cancel live auction");
-        }
-    }
+    // const handleCancelLiveAuction = async (id: string) => {
+    //     if (window.confirm("Are you sure you wan tot completely cancel this live auction?"))
+    //         try {
+    //             await cancelLiveAuctionAdmin(id);
+    //             toast.success("Live auction cancelled successfully");
+    //             fetchAuctions();
+    //         } catch (error: unknown) {
+    //             const err = error as AxiosError<{ message: string }>
+    //             toast.error(err.response?.data?.message || "Failed to cancel live auction");
+    //         }
+    // }
 
-    const handleStatusUpdate = async (id: string, status: 'active' | 'rejected' |'approved') => {
+    const handleStatusUpdate = async (id: string, status: 'active' | 'rejected' | 'approved' | 'cancelled') => {
+        if (status === 'rejected') {
+            setSelectedAuctionId(id);
+            setReasonModal('reject');
+            setIsReasonModalopen(true);
+            return;
+        }
+
         try {
             await updateAuctionStatus(id, status);
             toast.success(`Auction ${status === 'active' ? 'Approved' : 'Rejected'} successfully`);
             fetchAuctions();
-        } catch (error) {
-            toast.error("Failed to update status")
+        } catch (error: unknown) {
+            const err = error as AxiosError<{ message: string }>
+            toast.error(err.response?.data?.message || "Failed to update status")
+        }
+    }
+    const handleRejectConfirm = async (reason: string) => {
+        if (!selectedAuctionId) return;
+        try {
+            await updateAuctionStatus(selectedAuctionId, 'rejected', reason);
+            toast.success("Auction rejected with reason");
+            setIsReasonModalopen(false);
+            fetchAuctions();
+        } catch (error: unknown) {
+            const err = error as AxiosError<{ message: string }>
+            toast.error(err.response?.data?.message || "Failed to reject Auction");
+        }
+    }
+
+    const handleCancelLiveConfirm = async (reason: string) => {
+        if (!selectedAuctionId) return;
+        try {
+            await cancelLiveAuctionAdmin(selectedAuctionId, reason);
+            toast.success("Live auction cancelled with reason");
+            setIsReasonModalopen(false);
+            fetchAuctions();
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message ||"Failed to cancel live auction");
         }
     }
 
@@ -77,10 +120,10 @@ const AdminAuctions = () => {
             <h1 className="text-2xl font-bold mb-6 text-white">Auction Management</h1>
             <div className="bg-[#1c2128] rounded-xl shadow-sm border border-gray-800 overflow-hidden">
                 <div className="mb-4" >
-                    <input type="text" placeholder="search Auctions..." 
-                    className="w-full bg-[#0f111a] border border-gray-700 text-gray-300 rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm"
-                    value={searchTerm} onChange={(e)=>{setSearchTerm(e.target.value),setPage(1)}}
-                     />
+                    <input type="text" placeholder="search Auctions..."
+                        className="w-full bg-[#0f111a] border border-gray-700 text-gray-300 rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition text-sm"
+                        value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setPage(1) }}
+                    />
                 </div>
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-[#0d1117] border-b border-gray-700">
@@ -109,13 +152,13 @@ const AdminAuctions = () => {
                                     </td>
                                     {/* <td className="p-4 font-medium text-gray-200">{auction.title}</td> */}
                                     <td className="p-4 font-medium text-blue-400 hover:text-blue-300 cursor-pointer underline"
-     onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}>
-     {auction.title}
- </td>
+                                        onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}>
+                                        {auction.title}
+                                    </td>
                                     <td className="p-4 text-blue-600 font-bold">₹{auction.currentPrice || auction.startingPrice}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 text-xs rounded-full font-bold ${auction.status === 'active' ? 'bg-green-100 text-green-700' :
-                                                auction.status === 'sold' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'
+                                            auction.status === 'sold' ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'
                                             }`}>
                                             {auction.status ? auction.status.toUpperCase() : 'UNKNOWN'}
                                         </span>
@@ -129,10 +172,34 @@ const AdminAuctions = () => {
                                         </button>
                                     </td> */}
                                     <td className="p-4 flex flex-wrap gap-2">
+                                        {/* Cancellation Request Section */}
+                                        {auction.status === 'pending_cancellation' && (
+                                            <div className="flex items-center gap-2 bg-red-500/10 p-2 rounded-lg border border-red-500/20 w-full mb-2">
+                                                <div className="flex-1">
+                                                    <p className="text-[10px] text-red-400 font-bold uppercase">Cancel Request</p>
+                                                    <p className="text-xs text-gray-300 italic">"{auction.cancellationReason}"</p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(auction.id, 'cancelled')}
+                                                        className="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded font-bold transition"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(auction.id, 'active')}
+                                                        className="bg-gray-700 hover:bg-gray-600 text-white text-[10px] px-2 py-1 rounded font-bold transition"
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {auction.status === 'pending' && (
                                             <>
                                                 <button
-                                                    onClick={() => handleStatusUpdate(auction.id,auction.type=== 'live' ? 'approved' :'active')}
+                                                    onClick={() => handleStatusUpdate(auction.id, auction.type === 'live' ? 'approved' : 'active')}
                                                     className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium"
                                                 >
                                                     Approve
@@ -146,23 +213,31 @@ const AdminAuctions = () => {
                                             </>
                                         )}
                                         {/* Live auctions Control */}
-                                        {auction.status ==='active' && auction.type==='live' && (
-                                            <button onClick={()=>handleCancelLiveAuction(auction.id)}
-                                            className="text-orange-500 hover:text-orange-700 hover:bg-orange-500/10 px-3 py-1 rounded transition text-sm font-medium">
+                                        {auction.status === 'active' && auction.type === 'live' && (
+                                            <button onClick={() => {
+                                                setSelectedAuctionId(auction.id);
+                                                setReasonModal('cancel');
+                                                setIsReasonModalopen(true);
+                                            }}
+                                                className="text-orange-500 hover:text-orange-700 hover:bg-orange-500/10 px-3 py-1 rounded transition text-sm font-medium">
                                                 Cancel live
                                             </button>
                                         )}
                                         {/* Timed Auctions Control */}
-                                        {auction.status==='active' && auction.type==='timed' && (
-                                            <button onClick={()=>handleStatusUpdate(auction.id,'rejected')} className="text-purple-500 hover:text-purple-700 hover:bg-purple-500/10 px-3 py-1 rounded transition text-sm font-medium" >
+                                        {auction.status === 'active' && auction.type === 'timed' && (
+                                            <button onClick={() => {
+                                                setSelectedAuctionId(auction.id);
+                                                setReasonModal('reject');
+                                                setIsReasonModalopen(true);
+                                            }} className="text-purple-500 hover:text-purple-700 hover:bg-purple-500/10 px-3 py-1 rounded transition text-sm font-medium" >
                                                 Block
                                             </button>
                                         )}
-                                        {auction.status==='rejected' && auction.type==='timed' && (
-                                            <button onClick={()=>handleStatusUpdate(auction.id,'active')} className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium">
+                                        {/* {auction.status === 'rejected' && auction.type === 'timed' && (
+                                            <button onClick={() => handleStatusUpdate(auction.id, 'active')} className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium">
                                                 Unblock
                                             </button>
-                                        )}
+                                        )} */}
                                         <button
                                             onClick={() => handleDelete(auction.id)}
                                             className="text-red-500 hover:text-red-700 hover:bg-red-500/10 px-3 py-1 rounded transition text-sm font-medium"
@@ -181,14 +256,21 @@ const AdminAuctions = () => {
                 totalPages={totalPages}
                 onPageChange={setPage}
             />
-            <ConfirmModal 
-            isOpen={isDeleteModalOpen}
-            onClose={()=>setIsDeleteModalOpen(false)}
-            onConfirm={confirmDelete}
-            title="Delete Auction"
-            message="Are you sure to delete this auction?"
-            confirmText="Yes Delete "
-            isDanger={true}
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                title="Delete Auction"
+                message="Are you sure to delete this auction?"
+                confirmText="Yes Delete "
+                isDanger={true}
+            />
+            <ReasonModal
+                isOpen={isReasonModalOpen}
+                onClose={() => setIsReasonModalopen(false)}
+                onConfirm={reasonModal === 'reject' ? handleRejectConfirm : handleCancelLiveConfirm}
+                title={reasonModal === 'reject' ? "Reject Auction" : "Cancel live Auction"}
+                options={reasonModal === 'reject' ? ["Blurry Images", "Incorrect Category", "Suspecious Item", "Wrong Pricing", "Others"] : ["Emergency", "Violation", "Seller  Request", "Others"]}
             />
         </div>
     );

@@ -5,16 +5,16 @@ import { ISubscriptionPlanRepository } from "../../../../domain/interfaces/ISubs
 import { IcreateSubscriptionCheckoutUseCase } from "../../Usecase Interfaces/Subscription-Interface/ICreateSubscriptionCheckoutUseCase";
 
 
-
 @injectable()
 export class createSubscriptionCheckoutUseCase implements IcreateSubscriptionCheckoutUseCase{
     constructor(
         @inject(TYPES.SubscriptionPlanRepository) private _subscriptionPlanRepository:ISubscriptionPlanRepository,
-        @inject(TYPES.PaymentService) private _paymentService:IPaymentService
+        @inject(TYPES.PaymentService) private _paymentService:IPaymentService,
     ){}
     async execute(userId: string, planId: string, planName: string): Promise<string> {
         const plan=await this._subscriptionPlanRepository.findById(planId);
         if(!plan) throw new Error("Plan not found");
+        
         const amountInPaise=plan.price*100;
         const successUrl=`${process.env.FRONTEND_URL}/user-profile?success=true`;
         const cancelUrl=`${process.env.FRONTEND_URL}/subscription-plans?caceled=true`;

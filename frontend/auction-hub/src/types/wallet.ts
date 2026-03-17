@@ -14,6 +14,7 @@ export interface TransactionResponseDTO{
     description:string;
     auctionId?:string;
     createdAt:string;
+    commissionPercent?:number;
 }
 
 export interface WalletWithTransactions{

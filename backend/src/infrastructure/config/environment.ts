@@ -21,6 +21,7 @@ interface Config {
     stripeSecretKey:string;
     stripePublishKey:string;
     stripeWebhook:string;
+    redisCacheTtl:number;
 }
 
 
@@ -57,5 +58,6 @@ export const config: Config = {
     redisUrl: process.env.REDIS_URL!,
     stripeSecretKey:process.env.STRIPE_SECRET_KEY!,
     stripePublishKey:process.env.STRIPE_PUBLISH_KEY!,
-    stripeWebhook:process.env.STRIPE_WEBHOOK_SECRET!
+    stripeWebhook:process.env.STRIPE_WEBHOOK_SECRET!,
+    redisCacheTtl:parseInt(process.env.REDIS_CACHE_TTL || '3600',10)
 };

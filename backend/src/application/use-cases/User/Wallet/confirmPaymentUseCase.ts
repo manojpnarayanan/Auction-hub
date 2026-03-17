@@ -10,21 +10,24 @@ import { IAuctionRepository } from "../../../../domain/interfaces/IAuctionReposi
 @injectable()
 export class ConfirmPayment implements IconfirmPaymentUseCase{
     constructor(
-        @inject(TYPES.WalletRepository) private walletRepository:IWalletRepository,
-        @inject (TYPES.PaymentService) private paymentService:IPaymentService,
-        @inject (TYPES.AuctionRepository) private auctionRepository:IAuctionRepository
+        @inject(TYPES.WalletRepository) private _walletRepository:IWalletRepository,
+        @inject (TYPES.PaymentService) private _paymentService:IPaymentService,
+        @inject (TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository
     ){}
     async execute(buyerId: string, data: confirmPaymentDTO): Promise<void> {
-        const intent=await this.paymentService.retrievePaymentIntent(data.paymentIntentId);
-        if(intent.status!=='succeeded'){
-            throw new ValidationError("Payment not confirmed by stripe");
+        // logger.info("Checking payment for Auction:", data.auctionId); // DEBUG LOG
+        const intent=await this._paymentService.retrievePaymentIntent(data.paymentIntentId);
+        
+        // Sometimes Stripe is still 'processing' for a half-second
+        if(intent.status !== 'succeeded' && intent.status !== 'processing'){
+            throw new ValidationError(`Payment status is ${intent.status}, not succeeded.`);
         }
+
         const adminId=process.env.ADMIN_WALLET_USER_ID!;
-        console.log("Confirm paytment",adminId);
-        await this.walletRepository.credit(adminId,intent.amount/100);
-        const adminWallet=await this.walletRepository.findByUserId(adminId);
+        await this._walletRepository.credit(adminId,intent.amount/100);
+        const adminWallet=await this._walletRepository.findByUserId(adminId);
         if(adminWallet){
-            await this.walletRepository.createTransactions({
+            await this._walletRepository.createTransactions({
                 walletId:adminWallet.id,
                 userId:adminId,
                 amount:intent.amount/100,
@@ -33,10 +36,12 @@ export class ConfirmPayment implements IconfirmPaymentUseCase{
                 purpose:'auction_payment',
                 auctionId:data.auctionId,
                 stripePaymentIntentId:data.paymentIntentId,
-                description:`Payment received for auction ${data.auctionId}`
+                description:`Payment received for auction ${data.auctionId}`,
+                isReleased:false
             });
         }
-        await this.walletRepository.updateTransactions(data.paymentIntentId,'completed');
-        await this.auctionRepository.updatePaymentStatus(data.auctionId,'completed')
+        await this._walletRepository.updateTransactions(data.paymentIntentId,'completed');
+        await this._auctionRepository.updatePaymentStatus(data.auctionId,'completed');
+        // logger.info("DATABASE UPDATED SUCCESSFULLY for auction:", data.auctionId); // DEBUG LOG
     }
 }

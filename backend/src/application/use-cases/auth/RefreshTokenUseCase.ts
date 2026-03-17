@@ -12,29 +12,29 @@ import { IRefreshTokenUseCase } from "../Usecase Interfaces/IRefreshTokenUseCase
 
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
     constructor(
-        @inject(TYPES.CacheService) private cacheService: ICacheService,
-        @inject(TYPES.UserRepository) private userRepository: IUserRepository
+        @inject(TYPES.CacheService) private _cacheService: ICacheService,
+        @inject(TYPES.UserRepository) private _userRepository: IUserRepository
     ) { }
 
     async execute(refreshToken: string): Promise<string> {
-        let payload: any
+        let payload: string | jwt.JwtPayload
         try {
             payload = jwt.verify(refreshToken, config.jwtRefreshSecret);
         } catch {
             throw new UnauthorizedError("Invalid refresh token");
         }
-        const userid = payload.id;
-        const storedToken = await this.cacheService.get(`refresh_Token:${userid}`);
+        const userid = (payload as jwt.JwtPayload).id;
+        const storedToken = await this._cacheService.get(`refresh_Token:${userid}`);
 
         if (!storedToken || storedToken !== refreshToken) {
             throw new UnauthorizedError("Refresh token revoked or invalid");
         }
-        const user = await this.userRepository.findById(userid);
+        const user = await this._userRepository.findById(userid);
         if (!user) throw new UnauthorizedError("User not found");
         const newAccessToken = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
             config.jwtSecret,
-            { expiresIn: config.jwtExpiry as any }
+            { expiresIn: config.jwtExpiry as jwt.SignOptions["expiresIn"] }
         );
         return newAccessToken;
     }

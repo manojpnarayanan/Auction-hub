@@ -1,5 +1,6 @@
 import { injectable,inject } from "inversify";
 import { TYPES } from "../../../../di/types";
+import { PlanType } from "../../../dtos/SubscriptionDTO";
 import { IPaymentService } from "../../../../domain/interfaces/IPaymentService";
 import { ISubscribePlanUseCase } from "../../Usecase Interfaces/Subscription-Interface/ISubcribePlanUseCase";
 import { IConfirmSubscriptionPaymentUseCase } from "../../Usecase Interfaces/Subscription-Interface/IConfirmSubscriptionPaymentUseCase";
@@ -24,7 +25,7 @@ export class confirmSubscriptionPaymentUseCase implements IConfirmSubscriptionPa
         const dto:SubscribePlanDTO={
             userId:userId,
             planId:planId,
-            plan:planName.toLowerCase() as any
+            plan:planName.toLowerCase() as PlanType
         }
         const activatedSubcription=await this._subscribePlanUseCase.execute(dto);
         const amount=intent.amount/100;

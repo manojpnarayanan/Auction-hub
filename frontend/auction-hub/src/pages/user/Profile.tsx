@@ -11,6 +11,9 @@ import toast from "react-hot-toast";
 import ConfirmModal from "../../components/ConfirmationModal";
 import { getWallet } from "../../api/User/wallet";
 import type { WalletWithTransactions } from "../../types/wallet";
+import { AxiosError } from "axios";
+import type { TransactionItem } from "../../types/transaction";
+
 
 type Section = "profile" | "password" | "address" | "wallet";
 
@@ -59,7 +62,8 @@ export default function Profile() {
                 const res = await getAddress();
                 setAddresses(res.data);
             } catch (error) {
-                toast.error("Failed to load Addresses");
+                const err=error as AxiosError<{message:string}>
+                toast.error(err.response?.data?.message ||"Failed to load Addresses");
             }
         }
         fetchAddresses();
@@ -162,8 +166,9 @@ export default function Profile() {
                     phone: res.data.phone || "",
                     profileImage: res.data.profileImage || "",
                 });
-            } catch {
-                toast.error("Failed to load profile");
+            } catch (error){
+                const err=error as AxiosError<{message:string}>
+                toast.error(err.response?.data?.message || "Failed to load profile");
             }
         };
         fetchProfile();
@@ -175,8 +180,9 @@ export default function Profile() {
             try {
                 const res = await getWallet();
                 setWalletData(res.data);
-            } catch {
-                toast.error('Failed to load Wallet');
+            } catch (error) {
+                const err=error as AxiosError<{message:string}>
+                toast.error(err.response?.data?.message || 'Failed to load Wallet');
             } finally {
                 setWalletLoading(false);
             }
@@ -193,8 +199,9 @@ export default function Profile() {
                 profileImage: profileData.profileImage,
             });
             toast.success("Profile updated successfully!");
-        } catch {
-            toast.error("Failed to update profile");
+        } catch (error) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message ||"Failed to update profile");
         } finally {
             setLoading(false);
         }
@@ -229,7 +236,8 @@ export default function Profile() {
             });
             toast.success("Password changed successfully!");
             setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
-        } catch (err: any) {
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
             toast.error(err?.response?.data?.message || "Failed to change password");
         } finally {
             setLoading(false);
@@ -258,7 +266,8 @@ export default function Profile() {
             setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
             toast.success("Profile updated successfully");
         } catch (error) {
-            toast.error("Failed to upload photo");
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to upload photo");
         }
 
     }
@@ -624,9 +633,9 @@ export default function Profile() {
                                     <h3 className="font-bold text-gray-800 mb-4">Recent Transactions</h3>
                                     {walletLoading ? (
                                         <p className="text-center text-gray-400 py-8">Loading...</p>
-                                    ) : walletData?.transactions && walletData.transactions.filter((tx: any) => tx.status === 'completed').length > 0 ? (
+                                    ) : walletData?.transactions && walletData.transactions.filter((tx: TransactionItem) => tx.status === 'completed').length > 0 ? (
                                         <div className="space-y-3">
-                                            {walletData.transactions.filter((tx:any)=>tx.status==='completed').map((tx: any) => (
+                                            {walletData.transactions.filter((tx:TransactionItem)=>tx.status==='completed').map((tx: TransactionItem) => (
                                                 <div key={tx.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
                                                     <div>
                                                         <p className="font-semibold text-gray-700 text-sm capitalize">{tx.purpose?.replace('_', ' ')}</p>

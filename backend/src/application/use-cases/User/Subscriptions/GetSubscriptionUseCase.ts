@@ -4,7 +4,6 @@ import { TYPES } from "../../../../di/types";
 import { ISubscriptionRepository } from "../../../../domain/interfaces/ISubscriptionRepository";
 import { SubscriptionDTOMapper } from "../../../DTOMapper/SubscriptionDTOMapper";
 import { GetSubscriptionResponseDTO} from "../../../dtos/SubscriptionDTO";
-import { PLAN_LIMITS } from "../../../../config/SubscriptionConfig";
 import { ISubscriptionPlanRepository } from "../../../../domain/interfaces/ISubscriptionPlanRepository";
 
 @injectable()

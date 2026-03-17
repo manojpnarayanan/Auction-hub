@@ -73,6 +73,7 @@ API.interceptors.response.use(
                 return API(originalRequest);
             } catch (refreshError) {
                 console.error("Session failed", refreshError);
+
                 Store.dispatch(logout());
                 window.location.href = '/login'
             }

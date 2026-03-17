@@ -1,5 +1,5 @@
 
 
 export interface ICancelLiveAuctionUseCase{
-    execute(auctionId:string,requestId:string,isAdmin:boolean):Promise<void>
+    execute(auctionId:string,requestId:string,isAdmin:boolean,reason?:string):Promise<void>
 }

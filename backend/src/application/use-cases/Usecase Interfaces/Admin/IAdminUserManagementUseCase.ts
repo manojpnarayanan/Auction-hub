@@ -1,6 +1,5 @@
 
 
-import { User } from "../../../../domain/entities/User.entity";
 import { UserResponseDTO } from "../../../dtos/user.dto";
 
 export interface IAdminUserManagementUseCase{

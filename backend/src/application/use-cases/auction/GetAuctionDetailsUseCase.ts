@@ -12,32 +12,32 @@ import { AuctionDTOMapper } from "../../DTOMapper/AuctionDTOMapper";
 
 export class GetAuctionDetailsUSeCase implements IGetAuctionDetailsUseCase{
     constructor(
-        @inject(TYPES.AuctionRepository) private auctionRepository:IAuctionRepository,
-        @inject(TYPES.UserRepository) private userRepository:IUserRepository
+        @inject(TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository,
+        @inject(TYPES.UserRepository) private _userRepository:IUserRepository
     ) { };
     async execute(id: string): Promise<AuctionResponseDTO | null> {
-        const auction=await  this.auctionRepository.findById(id);
+        const auction=await  this._auctionRepository.findById(id);
 
         if(!auction) return null;
 
-        if(auction.status === 'active' && auction.type=== 'timed' && new Date() > new Date(auction.endDate)){
+        if(auction.status === 'active' && auction.type === 'timed' && new Date() > new Date(auction.endDate)){
             const hasBids=auction.bids && auction.bids.length>0;
             if (hasBids){
-                const winner=auction.bids[0];
-                auction.status='sold',
-                auction.winnerId=winner.bidderId,
-                auction.currentPrice=winner.amount
+                const winner = auction.bids[0];
+                auction.status = 'sold';
+                auction.winnerId = winner.bidderId;
+                auction.currentPrice= winner.amount;
             }else{
-                auction.status='expired'
+                auction.status= 'expired'
             }
-            await this.auctionRepository.update(auction.id!,{
+            await this._auctionRepository.update(auction.id!,{
                 status:auction.status,
                 winnerId:auction.winnerId,
                 currentPrice:auction.currentPrice
             })
         }
         const enrichedBids=await Promise.all((auction.bids || []).map(async (bid)=>{
-            const bidder=await this.userRepository.findById(bid.bidderId);
+            const bidder=await this._userRepository.findById(bid.bidderId);
             return {
                 ...bid,
                 bidderName:bidder?.name ||"Anonymous" 

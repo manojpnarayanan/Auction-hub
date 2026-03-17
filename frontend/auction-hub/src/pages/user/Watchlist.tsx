@@ -8,7 +8,7 @@ import Footer from "../../components/Footer";
 
 
 
-const watchlist = () => {
+const Watchlist = () => {
     const [auctions, setAuctions] = useState<watchlistDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -62,7 +62,7 @@ if (loading) return (
                     {auctions.map(auction => (
                         <div
                             key={auction.id}
-                            onClick={() => navigate(`/auctions/${auction.id}`)}
+                            onClick={() => navigate(`/auction/${auction.id}`)}
                             className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow border border-gray-100"
                         >
                             <div className="w-full h-48 bg-[#1a1c23] flex items-center justify-center overflow-hidden">
@@ -105,4 +105,4 @@ if (loading) return (
 
 }
 
-export default watchlist
+export default Watchlist

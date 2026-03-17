@@ -2,11 +2,10 @@ import { Router } from "express";
 import container from "../../di/container";
 import { validate } from "../middleware/validation.middleware";
 import { signupSchema, loginSchema } from "../validation/validation.schemas";
-import passport from 'passport'
 import { AuthController } from "../controllers/Authcontroller";
 import { TYPES } from "../../di/types";
 import { rateLimit } from "../middleware/rateLimit.middleware";
-
+import { ROUTES } from "../Constant-Route/routes";
 
 const router = Router();
 const authController = container.get<AuthController>(TYPES.AuthController);
@@ -16,22 +15,22 @@ const authLimiter = rateLimit(100, 15 * 60);
 
 
 
-router.post("/signup", authLimiter, validate(signupSchema), authController.signup);
-router.post("/login", authLimiter, validate(loginSchema), authController.login);
-
-router.get(
-    "/auth/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
-);
-router.get(
-    "/auth/google/callback",
-    passport.authenticate("google", {
-        failureRedirect: "/user/auth/google/failure",
-        session: false
-    }),
-    authController.googleAuthCallback
-);
-router.get("/auth/google/failure", authController.googleAuthFailure);
+router.post(ROUTES.AUTH.SIGNUP, authLimiter, validate(signupSchema), authController.signup);
+router.post(ROUTES.AUTH.LOGIN, authLimiter, validate(loginSchema), authController.login);
+router.post(ROUTES.AUTH.GOOGLE, authController.googleAuth);
+// router.get(
+//     "/auth/google",
+//     passport.authenticate("google", { scope: ["profile", "email"] })
+// );
+// router.get(
+//     "/auth/google/callback",
+//     passport.authenticate("google", {
+//         failureRedirect: "/user/auth/google/failure",
+//         session: false
+//     }),
+//     authController.googleAuthCallback
+// );
+// router.get("/auth/google/failure", authController.googleAuthFailure);
 export default router;
 
 router.post("/refresh-token", authController.refreshToken);

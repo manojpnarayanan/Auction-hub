@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import container from "../../di/container";
 import { TYPES } from "../../di/types";
 import { ICacheService } from "../../domain/interfaces/ICacheService";
-import { AppError } from "../../domain/errors/errors";
 
 
 export const rateLimit = (limit: number, windowSeconds: number) => {

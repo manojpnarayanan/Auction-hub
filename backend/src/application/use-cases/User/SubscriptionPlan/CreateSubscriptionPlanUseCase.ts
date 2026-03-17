@@ -24,10 +24,10 @@ export class CreateSubscriptionPlanUseCase implements ICreateSubscriptionPlanUse
         if(data.maxDays<1 || data.maxDays>365 ){
             throw new ValidationError("Duration must be between 1 and 365 days")
         }
-        if(data.auctionsPerYear<0){
-            throw new ValidationError("Could now use negative numbers");
+        if(data.auctionsPerYear<=0){
+            throw new ValidationError("Auctions per year should be positive number");
         }
-        if(data.commission<0 || data.commission>100){
+        if(data.commission<0 || data.commission>1){
             throw new ValidationError("Commission must be between 1 and 100 percent")
         }
         const existing=await this._subcriptionPlanRepo.findByName(data.name.trim());

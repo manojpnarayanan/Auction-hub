@@ -9,9 +9,9 @@ export interface CreateAuctionDTO {
     endDate: Date | string,
     sellerId: string,
     images?: string[],
-    type:'live'|"timed",
-    startTime?:Date | string;
-    createdAt?:Date
+    type: 'live' | "timed",
+    startTime?: Date | string;
+    createdAt?: Date
 }
 
 export interface UpdateAuctionDTO {
@@ -33,8 +33,11 @@ export interface AuctionResponseDTO {
     sellerId: string,
     images: string[],
     status: string,
-    type:string,
-    startTime?:Date,
-    winnerId?:string;
-    bids:{bidderId:string,amount:number,time:Date}[];
+    type: string,
+    startTime?: Date,
+    winnerId?: string;
+    bids: { bidderId: string, amount: number, time: Date }[];
+    paymentStatus?: string;
+    rejectionReason?:string;
+    cancellationReason?:string;
 }

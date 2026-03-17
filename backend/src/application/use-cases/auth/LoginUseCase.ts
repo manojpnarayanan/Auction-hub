@@ -14,11 +14,11 @@ import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
 @injectable()
 export class LoginUseCase implements ILoginUseCase {
     constructor(
-        @inject(TYPES.UserRepository) private userRepository: IUserRepository,
-        @inject(TYPES.CacheService) private cacheService: ICacheService,
+        @inject(TYPES.UserRepository) private _userRepository: IUserRepository,
+        @inject(TYPES.CacheService) private _cacheService: ICacheService,
     ) { };
     async execute(credentials: LoginDTO): Promise<LoginResponseDTO> {
-        const user = await this.userRepository.findByEmail(credentials.email);
+        const user = await this._userRepository.findByEmail(credentials.email);
         if (!user || !user.password) {
             throw new UnauthorizedError("Invalid Credentials");
         }
@@ -33,16 +33,16 @@ export class LoginUseCase implements ILoginUseCase {
         const token = jwt.sign(
             { id: user.id, email: user.email, role: user.role },
             config.jwtSecret,
-            { expiresIn: config.jwtExpiry as any }
+            { expiresIn: config.jwtExpiry as jwt.SignOptions["expiresIn"] }
         );
 
         // Refresh Token
         const refreshToken = jwt.sign(
             { id: user.id },
             config.jwtRefreshSecret,
-            { expiresIn: config.jwtRefreshExpiry as any }
+            { expiresIn: config.jwtRefreshExpiry as jwt.SignOptions["expiresIn"] }
         );
-        await this.cacheService.set(`refresh_Token:${user.id}`, refreshToken, 7 * 24 * 60 * 60);
+        await this._cacheService.set(`refresh_Token:${user.id}`, refreshToken, 7 * 24 * 60 * 60);
 
         return {
             message: "Login successful",

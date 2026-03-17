@@ -15,5 +15,6 @@ export const getUsers = async (page: number, search: string, token: string) => {
 }
 export const toggleUserBlock = async (userId: string, isBlocked: boolean) => {
     // console.log(`Toggling back for ${userId} to ${shouldBlock}`);
+
     return API.patch(`/admin/users/${userId}/block`,{isBlocked})
 }

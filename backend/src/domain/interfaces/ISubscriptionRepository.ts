@@ -1,4 +1,4 @@
-import {Subscription,PlanType} from '../../domain/entities/Subscription.entity';
+import {Subscription} from '../../domain/entities/Subscription.entity';
 
 
 
@@ -7,4 +7,5 @@ export interface ISubscriptionRepository{
     findActiveByUSerId(userId:string):Promise<Subscription | null>;
     countAuctionsThisYear(userId:string):Promise<number>;
     expireOldPlans():Promise<void>;
+    update(id:string,data:Partial<Subscription | null>):Promise<Subscription | null>
 }

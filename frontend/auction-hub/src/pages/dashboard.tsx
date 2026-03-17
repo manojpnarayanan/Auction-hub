@@ -1,5 +1,5 @@
 import { useSelector, useDispatch, } from "react-redux";
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useCallback} from "react";
 import type { RootState } from "../redux/store";
 import { setAllAuctions } from "../redux/slices/auctionSlice";
 import { getAllAuctions } from "../api/auctions";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { getCategories } from "../api/Admin/Category";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import type { AuctionItem } from "../types/auction";
 
 
 
@@ -16,8 +17,8 @@ export default function Dashboard() {
   const [searchText, setSearchText] = useState("");
   const [categories, setCategories] = useState<{ id: string, name: string, icon?: string }[]>([]);
   const { allAuctions } = useSelector((state: RootState) => state.auctions)
-  const liveAuction = allAuctions.filter((a: any) => a.type === 'live' || a.type==='approved');
-  const timedAuctions = allAuctions.filter((a: any) => a.type === 'timed');
+  const liveAuction = allAuctions.filter((a: AuctionItem) => a.type === 'live' || a.type==='approved');
+  const timedAuctions = allAuctions.filter((a: AuctionItem) => a.type === 'timed');
 
   const [selectedCategory, setSelectedCategory] = useState("All");
 
@@ -28,23 +29,26 @@ export default function Dashboard() {
         const data = await getCategories(1,100,searchText);
         setCategories([{ id: "all", name: "All" }, ...data.categories]);
       } catch (error) {
-        console.error(error);
+      console.error("Failed to load auctions", error);
+
       }
     }
     loadCats()
-  }, [])
+  }, [searchText])
   
-  const fetchAll = async (category: string = "All", search: string = "") => {
+  const fetchAll = useCallback(async (category: string = "All", search: string = "") => {
     try {
       const res = await getAllAuctions({ category, search });
       dispatch(setAllAuctions(res.data.data));
     } catch (error) {
       console.error("Failed to load auctions", error);
+
     }
-  }
+  },[dispatch]);
+
   useEffect(() => {
     fetchAll(selectedCategory, searchText);
-  }, [selectedCategory, searchText]);
+  }, [selectedCategory, searchText,fetchAll]);
 
   
   const getCategoryIcon = (name: string) => {
@@ -116,7 +120,7 @@ export default function Dashboard() {
               </div>
             ) : (
               // 2. SHOW THIS IF ITEMS EXIST
-              liveAuction.map((auction: any) => (
+              liveAuction.map((auction: AuctionItem) => (
                 <div key={auction.id}
                   onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
@@ -124,7 +128,7 @@ export default function Dashboard() {
                   <div className="h-40 overflow-hidden bg-gray-200">
                     {(() => {
                       // Prioritize first image of array, fallback to old single string
-                      const imgSrc = auction.images?.[0] || auction.image;
+                      const imgSrc = auction.images?.[0];
 
                       return imgSrc ? (
                         <img src={imgSrc} alt={auction.title} className="w-full h-full object-cover" />
@@ -163,7 +167,7 @@ export default function Dashboard() {
             {timedAuctions.length === 0 ? (
               <p className="text-gray-500">No timed auctions available.</p>
             ) : (
-              timedAuctions.map((auction: any) => (
+              timedAuctions.map((auction: AuctionItem) => (
                 // ... Copy the exact same Card code from Live Auctions ...
                 // ... just change key={auction.id} ...
                 <div key={auction.id}
@@ -172,7 +176,7 @@ export default function Dashboard() {
                   {/* ... Same Image Logic ... */}
                   <div className="h-40 overflow-hidden bg-gray-200">
                     {(() => {
-                      const imgSrc = auction.images?.[0] || auction.image;
+                      const imgSrc = auction.images?.[0];
                       return imgSrc ? (
                         <img src={imgSrc} alt={auction.title} className="w-full h-full object-cover" />
                       ) : (

@@ -4,8 +4,9 @@ import { WalletResponseDTO,TransactionResponseDTO } from "../../../dtos/WalletDT
 export interface WalletWithTransactions{
     wallet:WalletResponseDTO;
     transactions:TransactionResponseDTO[];
+    total: number;
 }
 
 export interface IGetWalletUseCase{
-    execute(userId:string):Promise<WalletWithTransactions>
+    execute(userId:string, page?: number, limit?: number):Promise<WalletWithTransactions>
 }

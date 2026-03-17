@@ -11,10 +11,10 @@ import { UserDTOMapper } from "../../DTOMapper/UserDTOMapper";
 export class GetprofileUseCase implements IGetprofileUseCase{
 
     constructor(
-        @inject(TYPES.UserRepository) private userRepository:IUserRepository
+        @inject(TYPES.UserRepository) private _userRepository:IUserRepository
     ){}
     async execute(userId: string): Promise<UserResponseDTO> {
-        const user=await this.userRepository.findById(userId);
+        const user=await this._userRepository.findById(userId);
         if(!user) throw new NotFoundError("User Not Found");
         return UserDTOMapper.toResponseDTO(user);
     }

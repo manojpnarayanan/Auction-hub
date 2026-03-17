@@ -11,7 +11,7 @@ import { ConflictError } from "../../../../domain/errors/errors";
 
 export class UpdateCategoryUseCase implements IUpdateCategoryUseCase{
     constructor(
-        @inject (TYPES.CategoryRepository) private categoryRepository:ICategoryRepository
+        @inject (TYPES.CategoryRepository) private _categoryRepository:ICategoryRepository
     ){}
     async execute(id: string, data: CategoryRequestDTO): Promise<CategoryDTO | null> {
         // const updatedCategory=await this.categoryRepository.update(id,{
@@ -19,15 +19,15 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase{
         //     description:data.description,
         // });
         // if(!updatedCategory) return null;
-        const {categories}=await this.categoryRepository.findAll(1,5,data.name)
+        const {categories}=await this._categoryRepository.findAll(1,5,data.name)
         const check=categories.find((c)=>c.name.toLowerCase()===data.name.trim().toLowerCase());
 
         if(check) throw new ConflictError("Category with this name already exists");
 
-        const category=await this.categoryRepository.findById(id);
+        const category=await this._categoryRepository.findById(id);
         if(!category) return null;
         category.updateDetails(data.name,data.description || '');
-        await this.categoryRepository.update(id,category)
+        await this._categoryRepository.update(id,category)
         return categoryDTOMapper.toDTO(category);
     }
 }

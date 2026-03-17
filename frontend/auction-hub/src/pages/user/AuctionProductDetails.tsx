@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState ,useCallback} from "react";
 import { useParams } from "react-router-dom";
 import { getAuctionProductDetails } from "../../api/auctions";
 import { placeBid } from "../../api/User/Bidding";
@@ -10,349 +10,338 @@ import { confirmPayment } from "../../api/User/wallet";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
-import { checkWatchlist,addToWatchlist,removeFromWatchlist } from "../../api/User/watchlist";
+import { checkWatchlist, addToWatchlist, removeFromWatchlist } from "../../api/User/watchlist";
+import type { RootState } from "../../redux/store";
+import { AxiosError } from "axios";
+// import type { BidItem } from "../../types/Bid";
 
-
-interface Auction{
-  id:string,
-  title:string,
-  description:string,
-  currentPrice:number,
-  startingPrice:number,
-  endDate:string,
-  status:string,
-  winnerId?:string,
-  images?:string[],
-  image?:string,
-  bids:Array<{
-  bidderId:string,
-  bidderName:string,
-  amount:number,
-  time:Date;
-}>
-paymentStatus:string;
+interface Auction {
+    id: string;
+    title: string;
+    description: string;
+    currentPrice: number;
+    startingPrice: number;
+    endDate: string;
+    status: string;
+    winnerId?: string;
+    images?: string[];
+    image?: string;
+    bids: Array<{
+        bidderId: string;
+        bidderName: string;
+        amount: number;
+        time: Date;
+    }>;
+    paymentStatus: string;
 }
 
 export default function AuctionProductDetails() {
-  const { id } = useParams();
-  const [auction, setAuction] = useState<Auction | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState("");
-  const [bidAmount, setBidAmount] = useState("");
-  const [biddingLoading, setBiddingLoading] = useState(false);
-  const [timeLeft,setTimeLeft]=useState('');
-  const currentUser=useSelector((state:any)=>state.auth.user);
-  const {paymentSession,initiating,initiatePayment,closePayment}=usePayment();
-  const [isWatchlisted,setIsWatchlisted]=useState(false);
+    const { id } = useParams();
+    const [auction, setAuction] = useState<Auction | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState("");
+    const [bidAmount, setBidAmount] = useState("");
+    const [biddingLoading, setBiddingLoading] = useState(false);
+    const [timeLeft, setTimeLeft] = useState({ h: "00", m: "00", s: "00", ended: false });
+    const currentUser = useSelector((state: RootState) => state.auth.user);
+    const { paymentSession, initiating, initiatePayment, closePayment } = usePayment();
+    const [isWatchlisted, setIsWatchlisted] = useState(false);
 
+    const calculateTimeLeft = useCallback(() => {
+        if (!auction?.endDate) return { h: "00", m: "00", s: "00", ended: true };
+        const difference = +new Date(auction.endDate) - +new Date();
+        if (difference <= 0) return { h: "00", m: "00", s: "00", ended: true };
 
-  const calculateTimeLeft=()=>{
-    if(!auction?.endDate) return "";
-    const diffrence=+new Date(auction.endDate)- +new Date();
-    if(diffrence<=0) return "ended";
-    const hours=Math.floor((diffrence/(1000*60*60)));
-    const minutes=Math.floor((diffrence/1000/60) % 60);
-    const seconds=Math.floor((diffrence/1000) % 60);
-    return `${hours}h ${minutes}m ${seconds}s `
-  }
+        return {
+            h: String(Math.floor(difference / (1000 * 60 * 60))).padStart(2, '0'),
+            m: String(Math.floor((difference / 1000 / 60) % 60)).padStart(2, '0'),
+            s: String(Math.floor((difference / 1000) % 60)).padStart(2, '0'),
+            ended: false
+        };
+    },[auction?.endDate]);
 
-  useEffect(()=>{
-    const checkStatus=async()=>{
-      try{
-        const res=await checkWatchlist(id!);
-        setIsWatchlisted(res.data.data.isWatchlisted);
-      }catch{}
-    }
-    checkStatus();
-  },[id])
-  
-  useEffect(()=>{
-    const timer=setInterval(()=>{
-      setTimeLeft(calculateTimeLeft())
-    },1000);
-    return()=>clearInterval(timer);
-  },[auction]);
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                const res = await checkWatchlist(id!);
+                setIsWatchlisted(res.data.data.isWatchlisted);
+            } catch(error) {
+                console.error(error)
 
-  useEffect(()=>{
-    if(id){
-      socket.emit("join_auction",id);
-      socket.on("bid_update",(data)=>{
-        console.log("New Bid Received:",data);
-        
-        setAuction((prev)=>{
-          if(!prev) return prev;
-          return{
-            ...prev,
-            currentPrice:data.newPrice,
-            bids:[data.bid,...prev.bids]
-          }
-        })
-      });
-    }
-    return ()=>{
-      socket.off('bid_update');
-    }
+             }
+        }
+        if (id) checkStatus();
+    }, [id]);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setTimeLeft(calculateTimeLeft());
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [calculateTimeLeft]);
+
+    const fetchAuction = useCallback(async () => {
+        if (!id) return;
+        try {
+            const res = await getAuctionProductDetails(id);
+            const data = res.data.data || res.data;
+            setAuction(data);
+            if (data.images?.length > 0) setSelectedImage(data.images[0]);
+            else setSelectedImage(data.image || "");
+        } catch (error) {
+            console.error(error);
+
+        } finally {
+            setLoading(false);
+        }
     },[id]);
 
-    const handleWatchlistToggle=async()=>{
-      try{
-        if(isWatchlisted){
-          await removeFromWatchlist(id!);
-          setIsWatchlisted(false);
-          toast.success("Removed from Watchlist");
-        }else{
-          await addToWatchlist(id!);
-          setIsWatchlisted(true);
-          toast.success("Added To Watchlist");
+    useEffect(() => {
+        if (id) {
+            socket.emit("join_auction", id);
+            socket.on("bid_update", (data) => {
+                setAuction((prev) => {
+                    if (!prev) return prev;
+                    return {
+                        ...prev,
+                        currentPrice: data.newPrice,
+                        bids: [data.bid, ...prev.bids]
+                    }
+                });
+            });
+            socket.on("auction_ended",()=>{
+                fetchAuction();
+            })
         }
-      }catch{
-        toast.error("Failed to Update Watchlist");
-      }
-    }
+        return () => { 
+            socket.off('bid_update');
+            socket.off("auction_ended");
+        };
+    }, [id,fetchAuction]);
 
-  const fetchAuction = async () => {
-    if (!id) return;
-    try {
-      const res = await getAuctionProductDetails(id);
-      const data = res.data.data || res.data;
-      setAuction(data);
+    const handleWatchlistToggle = async () => {
+        try {
+            if (isWatchlisted) {
+                await removeFromWatchlist(id!);
+                setIsWatchlisted(false);
+                toast.success("Removed from Watchlist");
+            } else {
+                await addToWatchlist(id!);
+                setIsWatchlisted(true);
+                toast.success("Added To Watchlist");
+            }
+        } catch {
+            toast.error("Failed to Update Watchlist");
+        }
+    };
 
-      if (data.images?.length > 0) {
-        setSelectedImage(data.images[0]);
-      } else {
-        setSelectedImage(data.image || "");
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+    useEffect(() => { fetchAuction(); }, [fetchAuction]);
 
-  useEffect(() => {
-    fetchAuction();
-  }, [id]);
+    const handlePlaceBid = async () => {
+        if (!auction || !bidAmount || Number(bidAmount) <= (auction.currentPrice || auction.startingPrice)) {
+            toast.error("Bid must be higher than current price");
+            return;
+        }
+        setBiddingLoading(true);
+        try {
+            await placeBid(id!, Number(bidAmount));
+            toast.success("Bid placed successfully!");
+            setBidAmount("");
+            fetchAuction();
+        } catch (error: unknown) {
+            const err = error as AxiosError<{ message: string }>;
+            toast.error(err.response?.data?.message || "Bid Failed");
+        } finally {
+            setBiddingLoading(false);
+        }
+    };
 
-  const handlePlaceBid = async () => {
-    if (!auction || !bidAmount || Number(bidAmount) <= (auction.currentPrice || auction.startingPrice)) {
-      // alert("Bid must be higher than current price");
-      toast.success("Bid must be higher than current price");
-      return;
-    }
+    if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-blue-600 font-bold">Loading Premium Experience...</div>;
+    if (!auction) return <div className="min-h-screen flex items-center justify-center bg-gray-50">Auction not found</div>;
 
-    setBiddingLoading(true);
-    try {
-      await placeBid(id!, Number(bidAmount));
-      toast.success("Bid placed successfully!");
-      setBidAmount("");
-      fetchAuction(); // Refresh instantly
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Bid Failed");
-    } finally {
-      setBiddingLoading(false);
-    }
-  }
+    const isActive = auction.status === 'active';
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#dbeafe]">Loading...</div>;
-  if (!auction) return <div className="min-h-screen flex items-center justify-center bg-[#dbeafe]">Auction not found</div>;
+    return (
+        <div className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col">
+            <Navbar />
 
-  
-  return (
-    <div className="min-h-screen bg-[#dbeafe] font-sans text-gray-800 flex flex-col">
-      <Navbar/>
-          <main className="flex-grow w-full max-w-5xl mx-auto px-6 py-10">
-
-       
-      <div className="max-w-5xl mx-auto px-6 py-10">
-
-        {/* Image Section */}
-        <div className="mb-10">
-          <div className="w-full aspect-[21/9] bg-[#1a1c23] rounded-xl overflow-hidden shadow-lg flex items-center justify-center mb-4">
-            {selectedImage ? (
-              <img src={selectedImage} className="h-full object-contain" alt="Main" />
-            ) : (
-              <div className="text-white/20 text-4xl font-bold">No Image</div>
-            )}
-          </div>
-
-          {/* Thumbnails */}
-          {auction?.images?.length && auction.images.length > 1 && (
-            <div className="flex gap-4 overflow-x-auto pb-2 justify-center">
-              {auction?.images?.map((img: string, idx: number) => (
-                <div
-                  key={idx}
-                  onClick={() => setSelectedImage(img)}
-                  className={`w-24 h-16 flex-shrink-0 cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${selectedImage === img ? 'border-[#1da1f2] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                >
-                  <img src={img} className="w-full h-full object-cover" alt="Thumb" />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Title & Description */}
-        {/* Title & Description */}
-<div className="mb-12">
-    <div className="flex items-center justify-between mb-3">
-        <h1 className="text-3xl font-extrabold text-[#1a202c]">{auction.title}</h1>
-        
-        {/* ❤️ Watchlist Button — ADD THIS */}
-        <button
-            onClick={handleWatchlistToggle}
-            className={`text-2xl transition-transform hover:scale-110 ${
-                isWatchlisted ? "text-red-500" : "text-gray-400"
-            }`}
-            title={isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
-        >
-            {isWatchlisted ? "❤️" : "🤍"}
-        </button>
-    </div>
-
-    <p className="text-gray-500 leading-relaxed max-w-4xl text-[15px]">
-        {auction.description}
-    </p>
-</div>
-
-
-        
-                {/* Details Grid */}
-        <div className="mb-12 border-b border-gray-300/50 pb-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-y-10 gap-x-10"> {/* Changed to 3 columns */}
-            
-            {/* Price */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Highest Bid</label>
-<p className="text-3xl font-bold text-blue-600">₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}</p>            </div>
-
-            {/* Status */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Status</label>
-              <span className={`px-3 py-1 rounded-full text-sm font-bold ${auction.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                  {auction.status.toUpperCase()}
-              </span>
-            </div>
-
-            {/* Time Remaining (NEW) */}
-            <div>
-               <label className="block text-xs font-semibold text-gray-500 mb-1">Time Remaining</label>
-               <p className="text-xl font-mono font-medium text-gray-800">
-                  {auction.status === 'active' ? (timeLeft || "Loading...") : "00h 00m 00s"}
-               </p>
-               {auction.endDate && (
-                  <p className="text-xs text-gray-400 mt-1">Ends: {new Date(auction.endDate).toLocaleString()}</p>
-               )}
-            </div>
-
-          </div>
-        </div>
-
-        {/* Auctioneer & Action */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-10">
-          
-          {/* Left: Input or Status */}
-          <div className="w-full md:w-1/2">
-            <h3 className="text-xl font-bold text-[#1a202c] mb-4">Place a Bid</h3>
-            
-            {/* {auction.status === 'sold' && auction.winnerId ? (
-    // Show Sold Status
-    <div className="bg-green-100 text-green-800 p-4 rounded-lg font-bold border border-green-200">
-        🏆 This auction has been sold to User: <span className="underline">{auction.winnerId}</span>
-    </div> */}
-    {auction.status === 'sold' && auction.winnerId ? (
-    <div className="space-y-3">
-        <div className="bg-green-100 text-green-800 p-4 rounded-lg font-bold border border-green-200">
-            🏆 This auction has been sold to User: <span className="underline">{auction.winnerId}</span>
-        </div>
-        {/* Pay button — only visible to the winner */}
-        {currentUser?.id === auction.winnerId &&auction.paymentStatus !== 'completed' && (
-            <button
-                onClick={() => initiatePayment(auction.id, (auction.currentPrice || auction.startingPrice) * 100)}
-                disabled={initiating}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50"
-            >
-                {initiating ? 'Preparing payment...' : 'Pay Now'}
-            </button>
-        )}
-        {auction.paymentStatus === 'completed' && (
-          <div className="w-full bg-green-500 text-white py-3 rounded-lg font-bold text-center">
-        ✅ Payment Completed" 
-          </div>
-        )}
-    </div>
-
-) : auction.status !== 'active' ? (
-    <div className="bg-red-100 text-red-800 p-4 rounded-lg font-bold">
-        ⛔ This auction has ended.
-    </div>
-) : (
-                // Step 4: Show Input
-                <div className="flex gap-4">
-                    <input
-                        type="number"
-                        placeholder="Enter Amount"
-                        value={bidAmount}
-                        onChange={(e) => setBidAmount(e.target.value)}
-                        className="border p-3 rounded-lg w-full shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    />
-                    <button
-                        onClick={handlePlaceBid}
-                        disabled={biddingLoading}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 whitespace-nowrap"
-                    >
-                        {biddingLoading ? "Placing..." : "Place Bid"}
-                    </button>
-                </div>
-            )}
-          </div>
-
-          {/* Right: Bid History */}
-          <div className="w-full md:w-1/2">
-             <h3 className="text-xl font-bold text-[#1a202c] mb-4">Recent Bids</h3>
-             <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 max-h-64 overflow-y-auto">
-                {/* Step 5: Optimized History */}
-                {auction.bids && auction.bids.length > 0 ? (
-                    auction.bids.map((bid: any, i: number) => (
-                        <div key={i} className="flex justify-between items-center border-b last:border-0 py-3">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
-                                    BID
-                                </div>
-                                <span className="font-medium text-gray-700"> {bid.bidderName || 'Anonymous'}</span>
-                            </div>
-                            <div className="text-right">
-<span className="block font-bold text-gray-900">₹{bid.amount.toLocaleString('en-IN')}</span>                                <span className="text-xs text-gray-500">{new Date(bid.time).toLocaleTimeString()}</span>
+            <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
+                {/* 2-Column Hero Section */}
+                <div className="flex flex-col lg:flex-row gap-8 items-start mb-12">
+                    
+                    {/* Left Side: Image Gallery */}
+                    <div className="w-full lg:w-3/5 space-y-4">
+                        <div className="relative group aspect-square sm:aspect-video bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
+                            <img src={selectedImage} alt={auction.title} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" />
+                            <div className="absolute top-4 left-4">
+                                <span className={`px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase shadow-lg ${isActive ? 'bg-green-500 text-white animate-pulse' : 'bg-red-500 text-white'}`}>
+                                    {auction.status}
+                                </span>
                             </div>
                         </div>
-                    ))
-                ) : (
-                    <p className="text-gray-400 text-center py-4">No bids yet. Be the first!</p>
-                )}
-             </div>
-          </div>
 
-        </div>
-      </div>
-      </main>
-      <Footer/>
+                        {/* Thumbnails */}
+                        {auction.images && auction.images.length > 1 && (
+                            <div className="flex gap-4 overflow-x-auto py-2 px-1 scrollbar-hide">
+                                {auction.images.map((img, idx) => (
+                                    <button 
+                                        key={idx} 
+                                        onClick={() => setSelectedImage(img)}
+                                        className={`w-24 h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${selectedImage === img ? 'border-blue-600 scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                    >
+                                        <img src={img} className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Right Side: Auction Action Card */}
+                    <div className="w-full lg:w-2/5 sticky top-8">
+                        <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 relative overflow-hidden">
+                            {/* Decorative Background Element */}
+                            <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
+                            
+                            <div className="relative">
+                                <div className="flex justify-between items-start mb-4">
+                                    <h1 className="text-3xl font-black text-slate-800 leading-tight">{auction.title}</h1>
+                                    <button onClick={handleWatchlistToggle} className={`text-2xl p-2 rounded-full hover:bg-slate-50 transition-colors ${isWatchlisted ? 'text-red-500' : 'text-slate-300'}`}>
+                                        {isWatchlisted ? "❤️" : "🤍"}
+                                    </button>
+                                </div>
+
+                                {/* Timer Component */}
+                                <div className="mb-8 p-5 bg-slate-900 rounded-2xl text-white flex justify-between items-center shadow-inner">
+                                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ends In</span>
+                                    <div className="flex gap-3 font-mono text-2xl font-black">
+                                        <div className="flex flex-col items-center"><span>{timeLeft.h}</span><span className="text-[8px] text-slate-500 uppercase">hrs</span></div>
+                                        <span className="opacity-30 self-start mt-0.5">:</span>
+                                        <div className="flex flex-col items-center"><span>{timeLeft.m}</span><span className="text-[8px] text-slate-500 uppercase">min</span></div>
+                                        <span className="opacity-30 self-start mt-0.5">:</span>
+                                        <div className="flex flex-col items-center text-blue-400"><span>{timeLeft.s}</span><span className="text-[8px] text-slate-500 uppercase">sec</span></div>
+                                    </div>
+                                </div>
+
+                                {/* Price Section */}
+                                <div className="mb-8 group">
+                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Current Highest Bid</p>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-4xl font-black text-blue-600">₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}</span>
+                                        <span className="text-slate-400 text-sm font-medium line-through">₹{(auction.startingPrice).toLocaleString('en-IN')}</span>
+                                    </div>
+                                </div>
+
+                                {/* Action Area */}
+                                <div className="space-y-4">
+                                    {auction.status === 'sold' && auction.winnerId ? (
+                                        <div className="space-y-4">
+                                            <div className="bg-green-50 text-green-700 p-4 rounded-2xl font-bold border border-green-100 flex items-center gap-3">
+                                                <span className="text-2xl">🏆</span>
+                                                <div>
+                                                    <p className="text-xs uppercase opacity-70">Auction Won By</p>
+                                                    <p className="text-sm">User ID: {auction.winnerId.substring(0, 10)}...</p>
+                                                </div>
+                                            </div>
+                                            {currentUser?.id === auction.winnerId && auction.paymentStatus !== 'completed' && (
+                                                <button onClick={() => initiatePayment(auction.id, (auction.currentPrice || auction.startingPrice) * 100)} disabled={initiating}
+                                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-lg transition-all shadow-lg active:scale-95 disabled:opacity-50">
+                                                    {initiating ? "Processing..." : "SECURE CHECKOUT"}
+                                                </button>
+                                            )}
+                                            {auction.paymentStatus === 'completed' && (
+                                                <div className="bg-slate-900 text-white py-4 rounded-2xl font-black text-center flex items-center justify-center gap-2">
+                                                    <span className="text-green-400">✔</span> PAYMENT COMPLETED
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : !isActive ? (
+                                        <div className="bg-slate-100 text-slate-500 p-5 rounded-2xl text-center font-bold">Auction has concluded</div>
+                                    ) : (
+                                        <div className="space-y-3">
+                                            <div className="relative">
+                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
+                                                <input 
+                                                    type="number" 
+                                                    placeholder={`Min 1 + Current Price`} 
+                                                    value={bidAmount}
+                                                    onChange={(e) => setBidAmount(e.target.value)}
+                                                    className="w-full bg-slate-50 border-2 border-slate-100 p-4 pl-10 rounded-2xl outline-none focus:border-blue-500 focus:bg-white transition-all font-bold text-lg"
+                                                />
+                                            </div>
+                                            <button 
+                                                onClick={handlePlaceBid} 
+                                                disabled={biddingLoading}
+                                                className="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl active:scale-95 disabled:opacity-50"
+                                            >
+                                                {biddingLoading ? "PLACING..." : "PLACE YOUR BID"}
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom Section: Description & History */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    <div className="lg:col-span-2">
+                        <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                            <span className="w-1.5 h-8 bg-blue-600 rounded-full"></span> Description
+                        </h2>
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 leading-relaxed text-slate-600 whitespace-pre-line text-lg">
+                            {auction.description}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                            <span className="w-1.5 h-8 bg-slate-800 rounded-full"></span> Live Bid History
+                        </h2>
+                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 max-h-[400px] overflow-y-auto space-y-4 custom-scrollbar">
+                            {auction.bids && auction.bids.length > 0 ? (
+                                auction.bids.map((bid, i) => (
+                                    <div key={i} className={`flex justify-between items-center p-4 rounded-2xl border-l-4 transition-all ${i === 0 ? 'bg-blue-50 border-blue-600 shadow-sm' : 'border-slate-100 hover:bg-slate-50'}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs ${i === 0 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                                {bid.bidderName ? bid.bidderName.substring(0, 2).toUpperCase() : "AN"}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-800">{bid.bidderName || "Anonymous"}</p>
+                                                <p className="text-[10px] text-slate-400 font-medium uppercase font-mono">{new Date(bid.time).toLocaleTimeString()}</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`text-lg font-black ${i === 0 ? 'text-blue-600' : 'text-slate-800'}`}>₹{bid.amount.toLocaleString('en-IN')}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-12 text-slate-300 italic">No bids yet. Start the action!</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <Footer />
+
             {paymentSession && (
-        <PaymentModal
-          isOpen={true}
-          clientSecret={paymentSession.clientSecret}
-          // paymentIntentId={paymentSession.paymentIntentId}
-          amount={(auction.currentPrice || auction.startingPrice) * 100}
-          title="Complete Auction Payment"
-          onSuccess={async () => { 
-            // We now confirm the auction payment here instead of inside the form
-            await confirmPayment({ 
-                paymentIntentId: paymentSession.paymentIntentId, 
-                auctionId: auction.id 
-            });
-          }}
-          onClose={() => { closePayment(); fetchAuction(); }}
-        />
-      )}
-
-    </div>
-  );
+                <PaymentModal
+                    isOpen={true}
+                    clientSecret={paymentSession.clientSecret}
+                    amount={(auction.currentPrice || auction.startingPrice) * 100}
+                    title="Complete Auction Payment"
+                    onSuccess={async () => { 
+                        await confirmPayment({ 
+                            paymentIntentId: paymentSession.paymentIntentId, 
+                            auctionId: auction.id 
+                        });
+                    }}
+                    onClose={() => { closePayment(); fetchAuction(); }}
+                />
+            )}
+        </div>
+    );
 }

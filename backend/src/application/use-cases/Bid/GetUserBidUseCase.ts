@@ -3,7 +3,7 @@ import { TYPES } from "../../../di/types";
 import { IBidRepository } from "../../../domain/interfaces/IBidRepository";
 import { IGetUserBidsUseCase } from "../Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
 import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
-import { UserBidResponseDTO, AuctionSummaryDTO, BidStatusType } from "../../dtos/BidDTO";
+import { UserBidResponseDTO, BidStatusType } from "../../dtos/BidDTO";
 
 import { BidDTOMapper } from "../../DTOMapper/BidDTOMapper";
 
@@ -11,24 +11,25 @@ import { BidDTOMapper } from "../../DTOMapper/BidDTOMapper";
 
 export class GetUserBidUseCase implements IGetUserBidsUseCase {
     constructor(
-        @inject(TYPES.AuctionRepository) private auctionRepository: IAuctionRepository,
-        @inject(TYPES.BidRepository) private bidRepository: IBidRepository,
+        @inject(TYPES.AuctionRepository) private _auctionRepository: IAuctionRepository,
+        @inject(TYPES.BidRepository) private _bidRepository: IBidRepository,
 
     ) { };
-    async execute(userId: string): Promise<UserBidResponseDTO[]> {
-        const userBids = await this.bidRepository.findByBidderId(userId);
+    async execute(userId: string,page:number,limit:number): Promise<{data:UserBidResponseDTO[],total:number}> {
+        const {bids,total} = await this._bidRepository.findByBidderId(userId,page,limit);
 
-        if (userBids.length === 0) return [];
+        if (bids.length === 0) return {data:[],total:0};
 
-        const auctionIds = [...new Set(userBids.map(bid => bid.auctionId))];
+        const auctionIds = [...new Set(bids.map(bid => bid.auctionId))];
         
         const auctions = await Promise.all(
-            auctionIds.map(id => this.auctionRepository.findById(id))
+            auctionIds.map(id => this._auctionRepository.findById(id))
         );
-        const response: UserBidResponseDTO[] = auctions.filter(auction => auction !== null)
+        const data: UserBidResponseDTO[] = auctions.filter(auction => auction !== null)
             .map(auction => {
-                const myBidsforAuction = userBids.filter(bid => bid.auctionId === auction!.id)
-                const myHighestBid = Math.max(...myBidsforAuction.map(bid => bid.amount));
+                const myBidsforAuction = bids.filter(bid => bid.auctionId === auction!.id)
+                // const myHighestBid = Math.max(...myBidsforAuction.map(bid => bid.amount));
+                const myHighestBid = myBidsforAuction[0].amount;
                 const isHighestBidder = auction!.currentPrice === myHighestBid;
                 // const status=this.calculateStatus(isHighestBidder,auction!.status);
                 const lastBidTime = myBidsforAuction.reduce((latest, bid) => bid.time > latest ? bid.time : latest, myBidsforAuction[0].time);
@@ -48,6 +49,6 @@ export class GetUserBidUseCase implements IGetUserBidsUseCase {
                     lastBidTime
                 };
             });
-        return response.sort((a, b) => b.lastBidTime.getTime() - a.lastBidTime.getTime());
+        return {data:data.sort((a, b) => b.lastBidTime.getTime() - a.lastBidTime.getTime()),total};
     }
 }

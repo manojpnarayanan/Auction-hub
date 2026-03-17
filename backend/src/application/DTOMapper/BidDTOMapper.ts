@@ -1,6 +1,6 @@
 import { Auction } from "../../domain/entities/Auction.entity";
 import { Bid } from "../../domain/entities/Bid.entity";
-import { AuctionSummaryDTO, UserBidResponseDTO, BidStatusType, BidResponseDTO } from "../dtos/BidDTO";
+import { AuctionSummaryDTO, BidResponseDTO } from "../dtos/BidDTO";
 
 export class BidDTOMapper{
     static toAuctionSummaryDTO(auction:Auction):AuctionSummaryDTO{

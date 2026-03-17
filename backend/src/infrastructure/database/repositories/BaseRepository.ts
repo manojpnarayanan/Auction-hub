@@ -1,5 +1,5 @@
 
-import {Model,Document,UpdateQuery,AnyKeys} from "mongoose";
+import {Model,Document,UpdateQuery} from "mongoose";
 import {injectable, unmanaged} from "inversify";
 import { IBaseRepository } from "../../../domain/interfaces/IBaseRepository";
 

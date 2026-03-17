@@ -1,9 +1,9 @@
 import { Auction } from "../../../domain/entities/Auction.entity";
-
+import { IAuctionDocument } from "../models/AuctionModel";
 
 
 export class AuctionPersistanceMapper{
-    static toEntity(doc:any):Auction {
+    static toEntity(doc:IAuctionDocument):Auction {
         return new Auction (
             doc.title,
             doc.description,
@@ -14,17 +14,19 @@ export class AuctionPersistanceMapper{
             doc.sellerId,
             doc.images,
             doc.status,
-            doc._id.toString(),
+            doc.id,
             doc.type,
             doc.startTime,
             doc.winnerId,
-            doc.bids? doc.bids.map((b:any)=>({
+            doc.bids? doc.bids.map((b:{bidderId:string,amount:number,time:Date})=>({
                 bidderId:b.bidderId,
                 amount:b.amount,
                 time:b.time
             })):[],
             doc.createdAt,
-            doc.paymentStatus || 'pending'
+            doc.paymentStatus || 'pending',
+            doc.rejectionReason,
+            doc.cancellationReason
         )
     }
 }

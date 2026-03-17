@@ -8,9 +8,9 @@ import { IDeleteCategoryUseCase } from "../../Usecase Interfaces/Admin/Category 
 
 export class DeleteCategoryUseCase implements IDeleteCategoryUseCase{
     constructor(
-        @inject(TYPES.CategoryRepository) private categoryRepository:ICategoryRepository 
+        @inject(TYPES.CategoryRepository) private _categoryRepository:ICategoryRepository 
     ){}
     async execute(id:string):Promise<boolean>{
-        return await this.categoryRepository.delete(id);
+        return await this._categoryRepository.delete(id);
     }
 }

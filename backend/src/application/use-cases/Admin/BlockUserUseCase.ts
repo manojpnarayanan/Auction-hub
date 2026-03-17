@@ -9,9 +9,9 @@ import { IBlockUserUseCase } from "../Usecase Interfaces/Admin/IBlockUserUseCase
 
 export class BlockUserUseCase implements IBlockUserUseCase{
     constructor(
-        @inject (TYPES.UserRepository) private userRepository:IUserRepository
+        @inject (TYPES.UserRepository) private _userRepository:IUserRepository
     ) { };
     async execute(userId: string, isBlocked: boolean): Promise<void> {
-        return await this.userRepository.updateBlockStatus(userId,isBlocked);
+        return await this._userRepository.updateBlockStatus(userId,isBlocked);
     }
 }

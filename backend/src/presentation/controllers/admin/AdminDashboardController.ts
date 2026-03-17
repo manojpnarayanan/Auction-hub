@@ -3,24 +3,25 @@ import { injectable,inject } from "inversify";
 import {TYPES} from "../../../di/types";
 import { IAdminUserManagementUseCase } from "../../../application/use-cases/Usecase Interfaces/Admin/IAdminUserManagementUseCase";
 import { IBlockUserUseCase } from "../../../application/use-cases/Usecase Interfaces/Admin/IBlockUserUseCase";
+import { HttpStatus } from "../../Enums/StatusCodes";
 
 
 @injectable()
 export class AdminController{
     constructor(
-        @inject(TYPES.AdminUserManagementUseCase) private adminUserManagementUseCase:IAdminUserManagementUseCase,
-        @inject (TYPES.BlockUserUseCase) private blockUserUseCase:IBlockUserUseCase
+        @inject(TYPES.AdminUserManagementUseCase) private _adminUserManagementUseCase:IAdminUserManagementUseCase,
+        @inject (TYPES.BlockUserUseCase) private _blockUserUseCase:IBlockUserUseCase
     ){};
     async getUsers(req:Request,res:Response,next:NextFunction){
         try{
             const page=parseInt(req.query.page as string) ||1
             const limit=parseInt(req.query.limit as string) || 3;
-            console.log(req.query)
+            // logger.info(req.query)
             const search=req.query.search as string || "";
             // const query:any={role:"user"};
-            const result=await this.adminUserManagementUseCase.execute(page,limit,search);
+            const result=await this._adminUserManagementUseCase.execute(page,limit,search);
             
-            res.status(200).json({
+            res.status(HttpStatus.OK).json({
                 users:result.users,
                 totalPages:Math.ceil(result.total/limit),
                 currentPage:page,
@@ -35,8 +36,8 @@ export class AdminController{
             const {userId} =req.params;
             const {isBlocked}=req.body;
 
-            await this.blockUserUseCase.execute(userId,isBlocked);
-            res.status(200).json({message:`User ${isBlocked? "blocked" :"unblocked"} successfully`});
+            await this._blockUserUseCase.execute(userId,isBlocked);
+            res.status(HttpStatus.OK).json({message:`User ${isBlocked? "blocked" :"unblocked"} successfully`});
         }catch(error){
             next(error);
         }

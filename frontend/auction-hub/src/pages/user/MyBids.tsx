@@ -3,18 +3,32 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getMyBids } from "../../api/User/Bidding";
 import { useNavigate } from "react-router-dom";
+import Pagination from "../../components/Pagination";
+import type { AuctionItem } from "../../types/auction";
+
+interface MyBidItem{
+    auction:AuctionItem;
+    myHighestBid:number;
+    lastBidTime:string | Date;
+    status:'winning' | 'outbid' | 'won' | 'lost'
+}
 
 export default function MyBids() {
     const navigate = useNavigate();
-    const [myBids, setMyBids] = useState<any[]>([]);
+    const [myBids, setMyBids] = useState<MyBidItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage,setCurrentPage]=useState(1);
+    const [totalPages,setTotalPages]=useState(1);
+    const limit=6;
 
     useEffect(() => {
         const fetchBids = async () => {
             try {
-                const res =await getMyBids();
+                setLoading(true);
+                const res =await getMyBids(currentPage,limit);
                 console.log("API response",res);
                 setMyBids( res?.data?.data || []);
+                setTotalPages(Math.ceil(res.data.total/limit));
             } catch (error) {
                 console.error("Failed to fetch bids", error);
                 setMyBids([]);
@@ -23,7 +37,7 @@ export default function MyBids() {
             }
         }
         fetchBids();
-    }, []);
+    }, [currentPage]);
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
             <Navbar />
@@ -38,8 +52,8 @@ export default function MyBids() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {myBids.map((item: any) => (
-                            <div key={item.lastBidTime}
+                        {myBids.map((item: MyBidItem) => (
+                            <div key={item.auction.id}
                                 onClick={() => navigate(item.auction.type === 'live' ? `/live-auction/${item.auction.id}` : `/auction/${item.auction.id}`)}
                                 className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex gap-4 cursor-pointer hover:shadow-md transition">
                                 <img
@@ -76,6 +90,11 @@ export default function MyBids() {
                     </div>
                 )}
             </main>
+            <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            />
             <Footer />
         </div>
     );

@@ -4,6 +4,7 @@ import { CategoryModel, ICategoryDocument } from "../models/CategoryModel";
 import { CategoryPersistanceMapper } from "../Mappers/CategoryPersistanceMapper";
 import { BaseRepository } from "./BaseRepository";
 import { injectable } from "inversify";
+import { FilterQuery } from "mongoose";
 
 
 @injectable()
@@ -24,7 +25,7 @@ export class MongoCategoryRepository extends BaseRepository<Category,ICategoryDo
     async findAll(page:number,limit:number,searchTerm:string): Promise<{categories:Category[],total:number}> {
         // const categories=await CategoryModel.find();
         const skip=(page-1)*limit;
-        const query:any={};
+        const query:FilterQuery<ICategoryDocument>={};
         if(searchTerm){
             query.name={$regex:searchTerm,$options:'i'}
         };

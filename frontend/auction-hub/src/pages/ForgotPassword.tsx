@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword, resetPassword } from '../api/auth';
+import { AxiosError } from "axios";
 
 export default function ForgotPassword() {
     const navigate = useNavigate();
@@ -21,8 +22,9 @@ export default function ForgotPassword() {
             await forgotPassword(email);
             setStep(2);
             setMsg("OTP sent successfully");
-        } catch (error: any) {
-            setError(error.response?.data?.message || "Failed to send otp");
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            setError(err.response?.data?.message || "Failed to send otp");
         } finally {
             setLoading(false);
         }
@@ -37,7 +39,8 @@ export default function ForgotPassword() {
             setMsg("Password Reset Successfully");
             setTimeout(() => navigate('/login'), 1000);
 
-        } catch (err: any) {
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
             setError(err.response?.data?.message || "Reset failed");
         } finally {
             setLoading(false);

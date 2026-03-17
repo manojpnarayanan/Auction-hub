@@ -19,6 +19,7 @@ auctionRouter.put(ROUTES.AUCTION.UPDATE,authenticate,checkBlockedStatus,auctionC
 auctionRouter.post(ROUTES.AUCTION.START_LIVE,isUser,auctionController.startLiveAuction);
 auctionRouter.post(ROUTES.AUCTION.END_LIVE,isUser,auctionController.endLiveAuction);
 auctionRouter.post(ROUTES.AUCTION.CANCEL_LIVE,isUser,auctionController.cancelLiveAuction);
+auctionRouter.post(ROUTES.AUCTION.REQUEST_CANCELLATION,isUser,checkBlockedStatus,auctionController.requestCancellation);
 
 
 

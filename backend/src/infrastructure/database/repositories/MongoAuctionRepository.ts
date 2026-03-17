@@ -85,11 +85,13 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         return expiredAuctions.map(AuctionPersistanceMapper.toEntity)
     }
 
-    async updateAuctionStatus(id: string, status: string, winnerId?: string): Promise<void> {
-        const updateData: { status: string, winnerId?: string } = { status };
+    async updateAuctionStatus(id: string, status: string, winnerId?: string,rejectionReason?:string,cancellationReason?:string): Promise<void> {
+        const updateData: { status: string, winnerId?: string,rejectionReason?:string ,cancellationReason?:string } = { status };
         if (winnerId) {
             updateData.winnerId = winnerId
         }
+        if(rejectionReason)updateData.rejectionReason=rejectionReason;
+        if(cancellationReason)updateData.cancellationReason=cancellationReason;
         await AuctionModel.findByIdAndUpdate(id, updateData);
     }
 

@@ -1,5 +1,6 @@
 import { injectable, inject } from "inversify";
 import { TYPES } from '../../../../di/types';
+import logger from "../../../../infrastructure/Global/Logger";
 import { IWalletRepository } from "../../../../domain/interfaces/IWalletRepository";
 import { ISubscriptionRepository } from "../../../../domain/interfaces/ISubscriptionRepository";
 import { Wallet } from "../../../../domain/entities/Wallet.entity";
@@ -17,7 +18,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
     ) { }
 
     async execute(data: releasePaymentDTO): Promise<void> {
-        logger.info("Execute start", data);
+        logger.info(data,"Execute start");
 
         // 1. Fetch REAL commission from seller's active plan (The Security Step)
         const sub = await this._subscriptionRepository.findActiveByUSerId(data.sellerId);

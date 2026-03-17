@@ -28,6 +28,7 @@ export const TYPES = {
     StartLiveAuctionUseCase:Symbol.for("StartLiveAuctionUseCase"),
     EndLiveAuctionUseCase:Symbol.for("EndLiveAuctionUseCase"),
     CancelLiveAuctionUseCase:Symbol.for("CancelLiveAuctionUseCase"),
+    RequestCancellationUseCase:Symbol.for("RequestCancellationUseCase"),
 
 
     // Admin 
@@ -53,6 +54,9 @@ export const TYPES = {
     SocketService:Symbol.for("SocketService"),
     CloseExpiredAuctionsUseCase:Symbol.for("CloseExpiredAuctionsUseCase"),
     GetUserBidUseCase:Symbol.for("GetUSerBidUseCase"),
+    EventEmitter:Symbol.for("EventEmitter"),
+    BidListener:Symbol.for("BidListener"),
+
 
 
     // user Profile
@@ -110,5 +114,5 @@ export const TYPES = {
     AddToWatchlistUseCase:Symbol.for("AddToWatchlistUseCase"),
     RemoveFromWatchlistUseCase:Symbol.for("RemoveFromWatchlistUseCase"),
     GetWatchlistUseCase:Symbol.for("GetWatchlistUseCase"),
-    CheckWatchlistUseCase:Symbol.for("CheckWatchlistUseCase")
+    CheckWatchlistUseCase: Symbol.for("CheckWatchlistUseCase"),
 }

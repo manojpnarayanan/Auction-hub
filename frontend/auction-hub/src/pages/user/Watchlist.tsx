@@ -62,7 +62,7 @@ if (loading) return (
                     {auctions.map(auction => (
                         <div
                             key={auction.id}
-                            onClick={() => navigate(`/auctions/${auction.id}`)}
+                            onClick={() => navigate(`/auction/${auction.id}`)}
                             className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow border border-gray-100"
                         >
                             <div className="w-full h-48 bg-[#1a1c23] flex items-center justify-center overflow-hidden">

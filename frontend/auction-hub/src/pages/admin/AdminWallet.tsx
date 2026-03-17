@@ -79,10 +79,10 @@ export default function AdminWallet() {
                 commissionPercent: rate,
                 sellerAmount: selectedTx.amount - (selectedTx.amount * (rate / 100))
             });
-            toast.success("Funds released successfully");
+            toast.success("Funds released to user successfully");
             setPendingRelease(prev => prev.filter(r => r.id !== selectedTx.id));
             setIsConfirmOpen(false);
-            window.location.reload();
+            // window.location.reload();
         } catch (error: unknown) {
             const err=error as AxiosError<{message:string}>
             console.log("THE ACTUAL BACKEND ERROR IS:", );

@@ -10,4 +10,8 @@ export class SubscriptionPlan{
         public isDefault:boolean,
         public id?:string
     ){}
+    
+    isUpgrade(currentPlan:SubscriptionPlan):boolean{
+        return this.price>currentPlan.price
+    }
 }

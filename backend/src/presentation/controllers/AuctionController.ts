@@ -12,7 +12,7 @@ import { IAdminAuctionManagamentUseCase } from "../../application/use-cases/Usec
 import { IStartLiveAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/IStartLiveAuctionUseCase";
 import { IEndLiveAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/IEndLiveAuctionUseCase";
 import { ICancelLiveAuctionUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/ICancelLiveAuctionUseCase";
-
+import { IRequestCancellationUseCase } from "../../application/use-cases/Usecase Interfaces/live-Auctions/IRequestCancellationUseCase";
 
 
 @injectable()
@@ -29,7 +29,7 @@ export class AuctionController {
         @inject(TYPES.StartLiveAuctionUseCase)private _startLiveAuctionuseCase:IStartLiveAuctionUseCase,
         @inject(TYPES.EndLiveAuctionUseCase) private _endLiveAuctionUseCase:IEndLiveAuctionUseCase,
         @inject(TYPES.CancelLiveAuctionUseCase) private _cancelLiveAuctionUseCase:ICancelLiveAuctionUseCase,
-
+        @inject(TYPES.RequestCancellationUseCase) private _requestCancellationUseCase:IRequestCancellationUseCase
     ) { }
     create = async (req: Request, res: Response, next: NextFunction) => {
         try {
@@ -112,8 +112,8 @@ export class AuctionController {
     updateStatus = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { id } = req.params;
-            const { status } = req.body;
-            await this._approveAuctionsUseCase.execute(id, status);
+            const { status,reason } = req.body;
+            await this._approveAuctionsUseCase.execute(id, status,reason);
             res.status(HttpStatus.OK).json({ success: true, message: `Auction marked as ${status}` })
         } catch (error) {
             next(error);
@@ -143,12 +143,25 @@ export class AuctionController {
     cancelLiveAuction=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             const {id} =req.params;
+            const {reason}=req.body;
             const requesterId=req.user!.id;
             const isAdmin=req.user!.role==='admin';
-            await this._cancelLiveAuctionUseCase.execute(id,requesterId,isAdmin);
+            await this._cancelLiveAuctionUseCase.execute(id,requesterId,isAdmin,reason);
             res.status(HttpStatus.OK).json({success:true,message:"Auction cancelled"});
         }catch(error){
             next(error);
+        }
+    }
+    requestCancellation=async(req:Request,res:Response,next:NextFunction)=>{
+        try{
+            const {id}=req.params;
+            const {reason}=req.body;
+            const sellerId=req.user!.id;
+
+            await this._requestCancellationUseCase.execute(id,sellerId,reason);
+            res.status(HttpStatus.OK).json({success:true,message:'Cancellation request submitted'})
+        }catch(error){
+            next(error)
         }
     }
 

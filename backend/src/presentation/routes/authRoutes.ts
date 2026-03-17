@@ -17,7 +17,7 @@ const authLimiter = rateLimit(100, 15 * 60);
 
 router.post(ROUTES.AUTH.SIGNUP, authLimiter, validate(signupSchema), authController.signup);
 router.post(ROUTES.AUTH.LOGIN, authLimiter, validate(loginSchema), authController.login);
-router.post(ROUTES.AUTH.GOOGLE,authController.googleAuth);
+router.post(ROUTES.AUTH.GOOGLE, authController.googleAuth);
 // router.get(
 //     "/auth/google",
 //     passport.authenticate("google", { scope: ["profile", "email"] })

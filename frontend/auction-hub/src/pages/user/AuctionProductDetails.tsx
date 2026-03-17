@@ -80,6 +80,22 @@ export default function AuctionProductDetails() {
         return () => clearInterval(timer);
     }, [calculateTimeLeft]);
 
+    const fetchAuction = useCallback(async () => {
+        if (!id) return;
+        try {
+            const res = await getAuctionProductDetails(id);
+            const data = res.data.data || res.data;
+            setAuction(data);
+            if (data.images?.length > 0) setSelectedImage(data.images[0]);
+            else setSelectedImage(data.image || "");
+        } catch (error) {
+            console.error(error);
+
+        } finally {
+            setLoading(false);
+        }
+    },[id]);
+
     useEffect(() => {
         if (id) {
             socket.emit("join_auction", id);
@@ -93,9 +109,15 @@ export default function AuctionProductDetails() {
                     }
                 });
             });
+            socket.on("auction_ended",()=>{
+                fetchAuction();
+            })
         }
-        return () => { socket.off('bid_update'); };
-    }, [id]);
+        return () => { 
+            socket.off('bid_update');
+            socket.off("auction_ended");
+        };
+    }, [id,fetchAuction]);
 
     const handleWatchlistToggle = async () => {
         try {
@@ -113,22 +135,7 @@ export default function AuctionProductDetails() {
         }
     };
 
-    const fetchAuction = useCallback(async () => {
-        if (!id) return;
-        try {
-            const res = await getAuctionProductDetails(id);
-            const data = res.data.data || res.data;
-            setAuction(data);
-            if (data.images?.length > 0) setSelectedImage(data.images[0]);
-            else setSelectedImage(data.image || "");
-        } catch (error) {
-            console.error(error);
-
-        } finally {
-            setLoading(false);
-        }
-    },[id]);
-
+    
     useEffect(() => { fetchAuction(); }, [fetchAuction]);
 
     const handlePlaceBid = async () => {

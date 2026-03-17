@@ -102,7 +102,7 @@ export default function SubscriptionPlans() {
 
             toast.success(`Successfully subscribed to ${paymentSession.planName}!`);
             setPaymentSession(null);
-            // fetchUserSubscription(); // Refresh their status!
+            fetchUserSubscription(); // Refresh their status!
         } catch (error: unknown) {
             const err=error as AxiosError<{message:string}>
             toast.error(err.response?.data?.message || "Subscription activation failed");
@@ -125,6 +125,9 @@ export default function SubscriptionPlans() {
                     {plans.map((plan) => {
                         const isActive = activeSubscription?.planId === plan.id && activeSubscription?.status === 'active';
                         const isPremium = plan.name.toLowerCase() === 'premium';
+                        const currentActivePlan=plans.find(p=>p.id === activeSubscription?.planId);
+                        const isLowerPlan=currentActivePlan && plan.price <= currentActivePlan.price && plan.id !== currentActivePlan.id;
+                        const upgradePrice=currentActivePlan? plan.price-currentActivePlan.price :plan.price;
                         return (
                             <div
                                 key={plan.id}
@@ -143,10 +146,19 @@ export default function SubscriptionPlans() {
                                     <h2 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h2>
                                     {/* <p className="text-gray-500 text-sm h-10">{plan.description}</p> */}
                                 </div>
-                                <div className="mb-8 flex items-baseline gap-2">
+                                {/* <div className="mb-8 flex items-baseline gap-2">
                                     <span className="text-5xl font-extrabold text-gray-900">₹{plan.price}</span>
                                     <span className="text-gray-500 font-medium">/mo</span>
-                                </div>
+                                </div> */}
+                                <div className="mb-8 flex items-baseline gap-2">
+    <span className="text-5xl font-extrabold text-gray-900">
+        ₹{currentActivePlan && plan.id !== currentActivePlan.id && plan.price > currentActivePlan.price 
+            ? upgradePrice 
+            : plan.price}
+    </span>
+    <span className="text-gray-500 font-medium">/mo</span>
+</div>
+
                                 <ul className="flex-grow space-y-4 mb-8">
                                     {getPlanFeatures(plan).map((feature, i) => (
                                         <li key={i} className="flex items-start text-gray-600">
@@ -173,9 +185,12 @@ export default function SubscriptionPlans() {
                                                 : "bg-gray-900 hover:bg-gray-800 text-white"
                                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                                         onClick={() => handleSubscribe(plan.id, plan.name)}
-                                        disabled={initiating===plan.id}
+                                        disabled={initiating===plan.id || isLowerPlan}
                                     >
-                                        {initiating===plan.id ? 'Preparing...' : `Subscribe to ${plan.name}`}
+                                        {/* {initiating===plan.id ? 'Preparing...' : `Subscribe to ${plan.name}`} */}
+                                        {initiating === plan.id ? 'Preparing...' : isLowerPlan ? 'Lower Plan' : currentActivePlan 
+                                    ? `Upgrade to ${plan.name}` 
+                                    : `Subscribe to ${plan.name}`}
                                     </button>
                                 )}
                             </div>

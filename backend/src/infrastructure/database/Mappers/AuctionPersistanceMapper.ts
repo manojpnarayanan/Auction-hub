@@ -24,7 +24,9 @@ export class AuctionPersistanceMapper{
                 time:b.time
             })):[],
             doc.createdAt,
-            doc.paymentStatus || 'pending'
+            doc.paymentStatus || 'pending',
+            doc.rejectionReason,
+            doc.cancellationReason
         )
     }
 }

@@ -49,4 +49,7 @@ export const cancelLiveAuction=(id:string)=>{
     return API.post(`/auctions/${id}/cancel`);
 }
 
+export const requestCancellation=async (id:string,reason:string)=>{
+    return API.post(`/auctions/${id}/request-cancel`,{reason});
+}
 

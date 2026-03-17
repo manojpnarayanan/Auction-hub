@@ -5,9 +5,9 @@ import { injectable } from 'inversify';
 @injectable()
 
 export class EmailService implements IEmailService {
-    private transporter;
+    private _transporter;
     constructor() {
-        this.transporter = nodemailer.createTransport({
+        this._transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
                 user: process.env.EMAIL_USER,
@@ -22,6 +22,6 @@ export class EmailService implements IEmailService {
             subject: 'Your Verification OTP',
             text: `Your otp for Auction Hub is:${otp}, It expires in 1 minute`
         };
-        await this.transporter.sendMail(mailOptions)
+        await this._transporter.sendMail(mailOptions)
     }
 }

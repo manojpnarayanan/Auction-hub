@@ -1,49 +1,73 @@
-import { useState,useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { getMyAuctions } from "../../api/auctions";
+import { getMyAuctions, requestCancellation } from "../../api/auctions";
 import CreateAuctionModal from "../../components/CreateAuctionModal";
-import { useNavigate,useLocation } from "react-router-dom";
+import ReasonModal from "../../components/ReasonModal";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { AuctionItem } from "../../types/auction";
 import Pagination from "../../components/Pagination";
 import type { AxiosError } from "axios";
 import toast from "react-hot-toast";
+import InfoModal from "../../components/InfoModal";
 
 
-export default function MyListings(){
-    const navigate=useNavigate();
-    const location=useLocation();
-    const [myAuctions,setMyAuctions]=useState<AuctionItem[]>([]);
-    const [loading,setLoading]=useState(true);
-    const [isModalOpen,setIsModalOpen]=useState(false);
-    const [selectedAuction,setSelectedAuction]=useState<AuctionItem| null>(null);
-    const [currentPage,setCurrentPage]=useState(1);
-    const [totalPages,setTotalPages]=useState(1);
-    const limit=6;
+export default function MyListings() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [myAuctions, setMyAuctions] = useState<AuctionItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedAuction, setSelectedAuction] = useState<AuctionItem | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const limit = 6;
+    const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+    const [auctionToCancel, setAuctionToCancel] = useState<string | null>(null);
+    const [viewReason,setViewReason]=useState(false);
+    const [selectedReason,setSelectedReason]=useState<string>('');
 
 
-    useEffect(()=>{
+    useEffect(() => {
         setIsModalOpen(false);
         setSelectedAuction(null);
-    },[location]);
+    }, [location]);
 
-    const fetchMyListings= useCallback(async()=>{
-        try{
+    const fetchMyListings = useCallback(async () => {
+        try {
             setLoading(true);
-            const res=await getMyAuctions(currentPage,limit);
-            setMyAuctions(res.data.data || [] );
+            const res = await getMyAuctions(currentPage, limit);
+            setMyAuctions(res.data.data || []);
             setTotalPages(res.data.totalPages);
-        }catch(error:unknown){
-            const err=error as AxiosError<{message:string}>
+        } catch (error: unknown) {
+            const err = error as AxiosError<{ message: string }>
             console.error("Failed to fetch my listings");
             toast.error(err?.response?.data?.message || "Failed to fetch my listings")
-        }finally{
+        } finally {
             setLoading(false);
         }
-    },[currentPage,limit])
-    useEffect(()=>{
+    }, [currentPage, limit])
+    useEffect(() => {
         fetchMyListings();
-    },[currentPage,fetchMyListings]);
+    }, [currentPage, fetchMyListings]);
+
+    const handleRequestCancellation = (id: string) => {
+        setAuctionToCancel(id);
+        setIsReasonModalOpen(true);
+    };
+
+    const handleCancelConfirm = async (reason: string) => {
+        if (!auctionToCancel) return;
+        try {
+            await requestCancellation(auctionToCancel, reason);
+            toast.success("Cancellation request sent to admin");
+            setIsReasonModalOpen(false);
+            fetchMyListings();
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err.response?.data?.message || "Failed to send request");
+        }
+    };
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
             <Navbar />
@@ -91,16 +115,82 @@ export default function MyListings(){
                                         <div className="text-xs text-gray-500">
                                             {auction.type === 'live' ? '📡 Live Auction' : '⏳ Timed Auction'}
                                         </div>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSelectedAuction(auction);
-                                                setIsModalOpen(true);
-                                            }}
-                                            className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
-                                        >
-                                            Edit
-                                        </button>
+                                        {/* <div className="flex gap-2">
+                                            {(auction.status === 'active' || auction.status === 'approved') && (
+                                                 <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRequestCancellation(auction.id);
+                                                }}
+                                                className="text-sm bg-red-100 hover:bg-red-200 text-red-700 px-4 py-1.5 rounded-lg transition font-medium"
+                                            >
+                                                Request Cancel
+                                            </button>
+                                            )}
+                                            {auction.status === 'rejected' && (
+                                                <span title={auction.rejectionReason} className="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold cursor-help"
+                                                    onClick={(e)=>{
+                                                        e.stopPropagation();
+                                                        alert(`Rejection Reason:${auction.rejectionReason}`)
+                                                    }}
+                                                >
+                                                    View Reason
+                                                </span>
+                                            )}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedAuction(auction);
+                                                    setIsModalOpen(true);
+                                                }}
+                                                className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
+                                            >
+                                                Edit
+                                            </button>
+                                           
+                                        </div> */}
+                                        <div className="flex gap-2">
+                                            {/* 1. Request Cancel: Only for Active/Approved auctions */}
+                                            {(auction.status === 'active' || auction.status === 'approved') && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRequestCancellation(auction.id);
+                                                    }}
+                                                    className="text-sm bg-red-100 hover:bg-red-200 text-red-700 px-4 py-1.5 rounded-lg transition font-medium"
+                                                >
+                                                    Request Cancel
+                                                </button>
+                                            )}
+
+                                            {/* 2. View Reason: Only for Rejected auctions */}
+                                            {(auction.status === 'rejected' || auction.status ==='cancelled') && (
+                                                <span
+                                                    title={auction.rejectionReason}
+                                                    className="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold cursor-help flex items-center gap-1"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedReason(auction.cancellationReason || auction.rejectionReason || "No reason attached")  
+                                                         setViewReason(true);
+                                                    }}
+                                                >
+                                                    View Reason ⚠️
+                                                </span>
+                                            )}
+
+                                            {/* 3. The existing Edit button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedAuction(auction);
+                                                    setIsModalOpen(true);
+                                                }}
+                                                className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
+                                            >
+                                                Edit
+                                            </button>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -110,16 +200,29 @@ export default function MyListings(){
             </main>
             {isModalOpen && (
                 <CreateAuctionModal onClose={() => setIsModalOpen(false)}
-                onSuccess={fetchMyListings} // Refresh list after create/edit
-                initialData={selectedAuction || undefined}
+                    onSuccess={fetchMyListings} // Refresh list after create/edit
+                    initialData={selectedAuction || undefined}
                 />
             )}
-            <Pagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
+            <ReasonModal
+                isOpen={isReasonModalOpen}
+                onClose={() => setIsReasonModalOpen(false)}
+                onConfirm={handleCancelConfirm}
+                title="Reason for Cancellation"
+                options={["High Shipping Cost", "Item Damaged", "Found Better Buyer", "Mistake in Listing", "Others"]}
             />
-                <Footer />
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
+            <InfoModal
+            isOpen={viewReason}
+            onClose={()=>setViewReason(false)}
+            title="Auction Rejected"
+            message={selectedReason}
+            />
+            <Footer />
         </div>
     );
 }

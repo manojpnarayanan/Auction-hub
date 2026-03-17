@@ -10,15 +10,16 @@ export class Auction{
         public endDate:Date,
         public sellerId:string,
         public images:string[],
-        public status:'active' | 'sold' |'expired'| 'pending' | 'rejected'= 'pending',
+        public status:'active' | 'sold' |'expired'| 'pending' | 'rejected' | 'cancelled' | 'pending_cancellation'= 'pending',
         public id?:string,
         public type:"live" | "timed"="timed",
         public startTime?:Date,
         public winnerId?:string,
         public bids:{bidderId:string,amount:number,time:Date}[]=[],
         public createdAt?:Date,
-        public paymentStatus:'pending'|'completed'='pending'
-
+        public paymentStatus:'pending'|'completed'='pending',
+        public rejectionReason?:string,
+        public cancellationReason?:string
     ){ }
 
     isLive():boolean{

@@ -12,4 +12,6 @@ export interface AuctionItem{
     endDate:Date | string;
     startTime?:Date |string;
     image?:string;
+    rejectionReason?:string;
+    cancellationReason?:string;
 }

@@ -97,6 +97,8 @@ import { ICloseExpiredAuctionUseCase } from "../application/use-cases/Usecase In
 import { CloseExpiredAuctionUseCase } from "../application/use-cases/auction/CloseExpiredAuctionsUseCase";
 import { IGetUserBidsUseCase } from "../application/use-cases/Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
 import { GetUserBidUseCase } from "../application/use-cases/Bid/GetUserBidUseCase";
+import { BidListener } from "../application/Listeners/BidListener";
+
 
 // user-Profile UseCases
 
@@ -183,6 +185,10 @@ import { CheckWatchlistUseCase } from "../application/use-cases/User/Watchlist/C
 import { IAddToWatchlistUseCase } from "../application/use-cases/Usecase Interfaces/Watchlist-Interface/IAddToWatchlistUseCase";
 import { AddToWatchlistUseCase } from "../application/use-cases/User/Watchlist/AddToWatchlistUseCase";
 import { WatchlistController } from "../presentation/controllers/user/WatchlistController";
+import { IEventEmitter } from "../domain/interfaces/IEventEmitter";
+import { DomainEventEmitter } from "../infrastructure/events/DomainEventEmitter";
+import { IRequestCancellationUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/IRequestCancellationUseCase";
+import { RequestCancellationUseCase } from "../application/use-cases/User/Live-Auctions/RequestCancellationUseCase";
 
 
 
@@ -214,7 +220,7 @@ container.bind<ICloseExpiredAuctionUseCase>(TYPES.CloseExpiredAuctionsUseCase).t
 container.bind<IStartLiveAuctionUseCase>(TYPES.StartLiveAuctionUseCase).to(StartLiveAuctionUseCase);
 container.bind<IEndLiveAuctionUseCase>(TYPES.EndLiveAuctionUseCase).to(EndLiveAuctionUseCase);
 container.bind<ICancelLiveAuctionUseCase>(TYPES.CancelLiveAuctionUseCase).to(CancelLiveAuctionUseCase);
-
+container.bind<IRequestCancellationUseCase>(TYPES.RequestCancellationUseCase).to(RequestCancellationUseCase);
 
 
 // Admin-UseCases
@@ -236,7 +242,9 @@ container.bind<IBidRepository>(TYPES.BidRepository).to(MongoBidRepository);
 container.bind<IPlaceBidUseCase>(TYPES.PlaceBidUseCase).to(PlaceBidUseCase);
 container.bind<IGetAuctionBidsUseCase>(TYPES.GetAuctionBidsUseCase).to(GetAuctionBidsUseCase);
 container.bind<ISocketService>(TYPES.SocketService).to(SocketService).inSingletonScope();
-container.bind<IGetUserBidsUseCase>(TYPES.GetUserBidUseCase).to(GetUserBidUseCase)
+container.bind<IGetUserBidsUseCase>(TYPES.GetUserBidUseCase).to(GetUserBidUseCase);
+container.bind<BidListener>(TYPES.BidListener).to(BidListener).inSingletonScope();
+container.bind<IEventEmitter>(TYPES.EventEmitter).to(DomainEventEmitter).inSingletonScope();
 
 // user-ProfileSection
 container.bind<IGetprofileUseCase>(TYPES.GetProfileUseCase).to(GetprofileUseCase);

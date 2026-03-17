@@ -22,7 +22,8 @@ export const ROUTES={
         UPDATE:'/:id',
         START_LIVE:'/:id/start',
         END_LIVE:'/:id/end',
-        CANCEL_LIVE:'/:id/cancel'
+        CANCEL_LIVE:'/:id/cancel',
+        REQUEST_CANCELLATION:'/:id/request-cancel',
     },
     USER:{
         //Profile

@@ -7,23 +7,26 @@ import { Wallet } from "../../../../domain/entities/Wallet.entity";
 import { ISubscriptionPlanRepository } from "../../../../domain/interfaces/ISubscriptionPlanRepository";
 import { releasePaymentDTO } from "../../../dtos/WalletDTO";
 import { IReleasePaymentUseCase } from "../../Usecase Interfaces/Wallet-interfaces/IReleasePaymentUseCase";
+import { IEventEmitter } from "../../../../domain/interfaces/IEventEmitter";
+import { PaymentReleaseEvent } from "../../../../domain/events/PaymentEvents";
+
 
 @injectable()
 export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
     constructor(
         @inject(TYPES.WalletRepository) private _walletRepository: IWalletRepository,
-        // --- ADD THESE TWO NEW INJECTIONS ---
+        @inject(TYPES.EventEmitter)private _eventEmitter:IEventEmitter,
         @inject(TYPES.SubscriptionRepository) private _subscriptionRepository: ISubscriptionRepository,
         @inject(TYPES.SubscriptionPlanRepository) private _subscriptionPlanRepository: ISubscriptionPlanRepository
     ) { }
 
     async execute(data: releasePaymentDTO): Promise<void> {
-        logger.info(data,"Execute start");
+        logger.info(data, "Execute start");
 
         // 1. Fetch REAL commission from seller's active plan (The Security Step)
         const sub = await this._subscriptionRepository.findActiveByUSerId(data.sellerId);
         let plan = sub ? await this._subscriptionPlanRepository.findById(sub.planId) : null;
-        
+
         // If they have no active sub, find the "0 rs" Default Plan
         if (!plan) {
             plan = await this._subscriptionPlanRepository.findDefaultPlan();
@@ -45,16 +48,14 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         if (!adminId) throw new Error("ADMIN_WALLET_USER_ID is missing from .env");
         let adminWallet = await this._walletRepository.findByUserId(adminId);
         if (!adminWallet) {
-            const newAdminWallet=new Wallet("",adminId,0,'inr',new Date(),new Date())
+            const newAdminWallet = new Wallet("", adminId, 0, 'inr', new Date(), new Date())
             adminWallet = await this._walletRepository.create(newAdminWallet);
         }
 
         const sellerWallet = await this._walletRepository.findByUserId(data.sellerId);
         if (!sellerWallet) throw new Error("Seller wallet not found!");
 
-        // --- TRANSACTION LOGIC ---
 
-        // A. Debit Admin for the Full Amount
         await this._walletRepository.debit(adminId, data.amount);
         await this._walletRepository.createTransactions({
             userId: adminId,
@@ -68,7 +69,6 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             isReleased: true // Mark payout as released immediately
         });
 
-        // B. Credit Admin for the Commission (Using dynamic 'percent')
         await this._walletRepository.credit(adminId, commission);
         await this._walletRepository.createTransactions({
             userId: adminId,
@@ -81,7 +81,6 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             description: `Commission (${percent}%) kept from auction ${data.auctionId}`
         });
 
-        // C. Credit Seller for their share
         await this._walletRepository.credit(data.sellerId, sellerAmount);
         await this._walletRepository.createTransactions({
             userId: data.sellerId,
@@ -97,5 +96,11 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         // logger.info("2. Calling markTransactions", data.transactionId);
         // 3. Mark the original Escrow as Released
         await this._walletRepository.markTransactionAsReleased(data.transactionId);
+        this._eventEmitter.dispatch(new PaymentReleaseEvent(
+            data.auctionId!,
+            data.sellerId,
+            data.amount,
+            commission
+        ));
     }
 }

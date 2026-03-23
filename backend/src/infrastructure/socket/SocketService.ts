@@ -29,6 +29,14 @@ export class SocketService implements ISocketService{
                     auctionId,count:viewerCount
                 });
             });
+            socket.on('join_user',(userId:string)=>{
+                socket.join(userId);
+                logger.info(`Socket ${socket.id} joined personal Room ${userId}`)
+            });
+            socket.on("join_admin",()=>{
+                socket.join("admin");
+                logger.info(`Socket ${socket.id} joined admin Room`)
+            })
             socket.on('disconnecting',()=>{
                 socket.rooms.forEach((room)=>{
                     if(room !== socket.id){

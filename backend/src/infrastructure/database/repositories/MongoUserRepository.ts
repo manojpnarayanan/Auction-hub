@@ -77,4 +77,8 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     async updateGoogleId(userId: string, googleId: string): Promise<void> {
         await UserModel.updateOne({_id:userId},{googleId});
     }
+    async findAdmin(): Promise<User | null> {
+        const adminDoc=await UserModel.findOne({role :'admin'});
+        return adminDoc? UserPersistanceMapper.toEntity(adminDoc):null;
+    }
 }

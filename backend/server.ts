@@ -31,6 +31,7 @@ import watchlistRoutes from './src/presentation/routes/user/watchlistRoutes.js';
 import { pinoHttp } from "pino-http";
 import logger from './src/infrastructure/Global/Logger.js';
 import { pinoerrorHandler } from './src/presentation/middleware/ErrorHandler.js'
+import NotificationRoutes from './src/presentation/routes/user/NotificationRoutes.js'
 
 const app = express();
 const httpServer = createServer(app);
@@ -61,6 +62,7 @@ app.use('/admin', AdminPaymentRoutes);
 app.use('/admin', SubscriptionPlanRoutes);
 app.use('/user', SubscriptionRoutes);
 app.use('/user', watchlistRoutes)
+app.use('/user',NotificationRoutes)
 
 app.use(errorHandler);
 app.use(pinoerrorHandler);
@@ -73,6 +75,7 @@ startPaymentTimeoutJob();
 const socketService = container.get<ISocketService>(TYPES.SocketService);
 socketService.init(httpServer)
 container.get(TYPES.BidListener);
+container.get(TYPES.NotificationListener);
 
 const PORT = config.port;
 httpServer.listen(PORT, () => {

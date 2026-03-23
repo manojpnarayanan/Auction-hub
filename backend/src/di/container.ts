@@ -190,6 +190,22 @@ import { DomainEventEmitter } from "../infrastructure/events/DomainEventEmitter"
 import { IRequestCancellationUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/IRequestCancellationUseCase";
 import { RequestCancellationUseCase } from "../application/use-cases/User/Live-Auctions/RequestCancellationUseCase";
 
+// Notification Section
+
+import { INotificationRepository } from "../domain/interfaces/INotificationRepository";
+import { MongoNotificationRepository } from "../infrastructure/database/repositories/MongoNotificationRepository";
+import { INotificationService } from "../domain/interfaces/INotificationService";
+import { SocketNotificationService } from "../infrastructure/socket/SocketNotificationService";
+import { IGetNotificationUseCase } from "../application/use-cases/Usecase Interfaces/Notification-Interface/IGetNotificationUseCase";
+import { GetNotificationUseCase } from "../application/use-cases/User/Notification/GetNotificationUseCase";
+import { IMarkNotificationReadUseCase } from "../application/use-cases/Usecase Interfaces/Notification-Interface/IMarkNotificationReadUseCase";
+import { MarkNotificationReadUseCase } from "../application/use-cases/User/Notification/MarkNotificationsReadUseCase";
+import { NotificationController } from "../presentation/controllers/user/NotificationController";
+import { NotificationListener } from "../application/Listeners/NotificationListener";
+import { ICreateNotificationUseCase } from "../application/use-cases/Usecase Interfaces/Notification-Interface/ICreateNotificationUseCase";
+import { CreateNotificationUseCase } from "../application/use-cases/User/Notification/CreateNotificationUseCase";
+
+
 
 
 const container = new Container();
@@ -294,8 +310,13 @@ container.bind<ICheckWatchlistUseCase>(TYPES.CheckWatchlistUseCase).to(CheckWatc
 container.bind<IAddToWatchlistUseCase>(TYPES.AddToWatchlistUseCase).to(AddToWatchlistUseCase);
 
 
-
-
+// Notification-Service
+container.bind<ICreateNotificationUseCase>(TYPES.CreateNotificationUseCase).to(CreateNotificationUseCase)
+container.bind<INotificationRepository>(TYPES.NotificationRepository).to(MongoNotificationRepository);
+container.bind<INotificationService>(TYPES.NotificationService).to(SocketNotificationService);
+container.bind<IGetNotificationUseCase>(TYPES.GetNotificationUseCase).to(GetNotificationUseCase);
+container.bind<IMarkNotificationReadUseCase>(TYPES.MarkNotificationReadUseCase).to(MarkNotificationReadUseCase);
+container.bind<NotificationListener>(TYPES.NotificationListener).to(NotificationListener).inSingletonScope();
 
 // Bind Contoller
 container.bind<AuthController>(TYPES.AuthController).to(AuthController);
@@ -311,7 +332,7 @@ container.bind<WebhookController>(TYPES.WebhookController).to(WebhookController)
 container.bind<SubscriptionController>(TYPES.SubscriptionController).to(SubscriptionController);
 container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController)
 container.bind<WatchlistController>(TYPES.WatchlistController).to(WatchlistController);
-
+container.bind<NotificationController>(TYPES.NotificationController).to(NotificationController)
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

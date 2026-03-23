@@ -85,3 +85,30 @@ export class AuctionCancellationRequestEvent implements IDomainEvent{
         return this.auctionId
     }
 }
+
+export class AuctionApprovedEvent implements IDomainEvent{
+    public dateTimeOccurred:Date;
+    constructor(
+        public readonly auctionId:string,
+        public readonly sellerId:string,
+    ){
+        this.dateTimeOccurred=new Date();
+    }
+    getAggregateId(): string {
+        return this.auctionId
+    }
+}
+
+export class AuctionCreatedEvent implements IDomainEvent{
+    public dateTimeOccurred: Date;
+    constructor(
+        public readonly auctionId:string,
+        public readonly sellerId:string,
+        public readonly title:string
+    ){
+        this.dateTimeOccurred=new Date()
+    }
+    getAggregateId(): string {
+        return this.auctionId
+    }
+}

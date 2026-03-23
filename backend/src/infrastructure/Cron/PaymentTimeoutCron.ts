@@ -1,10 +1,17 @@
 import cron from 'node-cron';
 import logger from '../Global/Logger';
 import { AuctionModel } from '../database/models/AuctionModel';
+import container from '../../di/container';
+import { TYPES } from '../../di/types';
+import { IEventEmitter } from '../../domain/interfaces/IEventEmitter';
+import { AuctionEndedEvent } from '../../domain/events/AuctionEvents';
+
+
 
 export function startPaymentTimeoutJob() {
     cron.schedule('*/5 * * * *', async () => {
         try {
+            const eventEmitter=container.get<IEventEmitter>(TYPES.EventEmitter);
             logger.info("Running payment Timeout Check..");
             const oneHourAgo = new Date();
             oneHourAgo.setHours(oneHourAgo.getHours() - 1);
@@ -42,6 +49,7 @@ export function startPaymentTimeoutJob() {
                         auction.endDate = new Date(); 
                         await auction.save();
                         logger.info(`Auction ${auction._id} shifted to next winner: ${nextBidder.bidderId}`);
+                        eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'sold',nextBidder.bidderId,nextBidder.amount))
                     } else {
                         // Nobody left to shift to!
                         auction.status = 'expired';
@@ -51,6 +59,8 @@ export function startPaymentTimeoutJob() {
                 } else {
                     auction.status = 'expired';
                     await auction.save();
+                    logger.info(`Auction ${auction._id} fully expired`);
+                    eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'expired',undefined,auction.currentPrice));
                 }
             }
         } catch (error) {

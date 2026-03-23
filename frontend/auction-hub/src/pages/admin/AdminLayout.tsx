@@ -2,6 +2,7 @@ import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import LogoutButton from "../../components/LogoutButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
+import NotificationBell from "../../components/Notification";
 
 
 export function AdminLayout() {
@@ -59,6 +60,7 @@ export function AdminLayout() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
+          <NotificationBell/>
           {user && <span className="text-sm text-gray-400 hidden md:block">Hi, {user.name}</span>}
           <div className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-500 text-xs font-bold py-2 px-4 rounded-md transition cursor-pointer">
             <LogoutButton />

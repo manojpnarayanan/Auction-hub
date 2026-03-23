@@ -9,14 +9,17 @@ import { AuctionResponseDTO } from "../../dtos/AuctionDTO";
 import { ISubscriptionRepository } from "../../../domain/interfaces/ISubscriptionRepository";
 import { ValidationError } from "../../../domain/errors/errors";
 import { ISubscriptionPlanRepository } from "../../../domain/interfaces/ISubscriptionPlanRepository";
+import { IEventEmitter } from "../../../domain/interfaces/IEventEmitter";
+import { AuctionCreatedEvent } from "../../../domain/events/AuctionEvents";
+
 
 @injectable()
-
 export class CreateAuctionUseCase implements ICreateAuctionUseCase {
     constructor(
         @inject(TYPES.AuctionRepository) private _auctionRepository: IAuctionRepository,
         @inject(TYPES.SubscriptionRepository) private _subscriptionRepository:ISubscriptionRepository,
-        @inject (TYPES.SubscriptionPlanRepository)private _subscriptionPlanRepository:ISubscriptionPlanRepository
+        @inject (TYPES.SubscriptionPlanRepository)private _subscriptionPlanRepository:ISubscriptionPlanRepository,
+        @inject(TYPES.EventEmitter) private _eventEmitter:IEventEmitter
     ) { }
     async execute(data: CreateAuctionDTO): Promise<AuctionResponseDTO> {
         const subscription=await this._subscriptionRepository.findActiveByUSerId(data.sellerId);
@@ -67,6 +70,7 @@ export class CreateAuctionUseCase implements ICreateAuctionUseCase {
             data.startTime ? new Date(data.startTime) : undefined,
         );
         const createdAuction = await this._auctionRepository.create(newAuction);
+        this._eventEmitter.dispatch(new AuctionCreatedEvent(createdAuction.id!,data.sellerId,data.title));
         return AuctionDTOMapper.toResponseDTO(createdAuction);
 
 

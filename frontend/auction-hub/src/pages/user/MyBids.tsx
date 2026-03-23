@@ -19,7 +19,7 @@ export default function MyBids() {
     const [loading, setLoading] = useState(true);
     const [currentPage,setCurrentPage]=useState(1);
     const [totalPages,setTotalPages]=useState(1);
-    const limit=6;
+    const limit=4;
 
     useEffect(() => {
         const fetchBids = async () => {

@@ -28,7 +28,7 @@ export interface AuctionSummaryDTO {
     currentPrice: number,
     startingPrice: number,
     endDate: Date,
-    status: 'active' | 'sold' | 'expired' | 'pending' | 'rejected',
+    status: 'active' | 'sold' | 'expired' | 'pending' | 'rejected' | 'cancelled' | 'pending_cancellation',
     images: string[];
     type: 'live' | 'timed'
 }

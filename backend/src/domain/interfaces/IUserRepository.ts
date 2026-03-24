@@ -24,4 +24,6 @@ export interface IUserRepository {
     updateProfile(userId:string,data:updateUserProfileDTO):Promise<User>;
     updateGoogleId(userId:string,googleId:string):Promise<void>;
     findAdmin():Promise<User | null>;
+    getUserGrowth(period:'daily'|'monthly'|'yearly'):Promise<{timeline:{label:string;count:number}[]}>
+    getTotalUserCount():Promise<number>;
 }

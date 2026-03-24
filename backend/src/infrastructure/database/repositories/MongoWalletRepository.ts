@@ -8,8 +8,8 @@ import { Transactions } from "../../../domain/entities/Transaction.entity";
 import { TransactionModel } from "../models/TransactionModel";
 import { TransactionPersistanceMapper } from "../Mappers/TransactionPersistanceMapper";
 import { BaseRepository } from "./BaseRepository";
-
-
+import { DashboardPeriod } from "../../../domain/Types/DashboardTypes";
+import { getDateConfig } from "../../../domain/utils/dateConfig";
 
 
 
@@ -88,5 +88,22 @@ export class MongoWalletRepository extends BaseRepository<Wallet,IWalletDocumet>
             logger.info("Could not find transction");
         }
     
+    }
+    async getTotalRevenue(period: "daily" | "monthly" | "yearly"): Promise<{ total: number; timeline: { label: string; amount: number; }[]; }> {
+        const {from,format}=getDateConfig(period);
+        const [totals,timeline] = await Promise.all([TransactionModel.aggregate([
+            {$match:{status:'completed',type:'credit',purpose:{$in:['commission','subscription_payment']}}},
+            {$group:{_id:null,total:{$sum:'$amount'}}}
+        ]),
+        TransactionModel.aggregate([
+            {$match:{status:'completed',type:'credit',purpose:{$in:['commission','subscription_payment']},createdAt:{$gte:from}}},
+            {$group:{_id:{$dateToString:{format,date:'$createdAt'}},amount:{$sum:'$amount'}}},
+            {$sort:{_id:1}}
+        ])
+    ]);
+    return{
+        total:totals[0]?.total ?? 0,
+        timeline:timeline.map(t=>({label:t._id,amount:t.amount}))
+    };
     }
 }

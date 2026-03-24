@@ -8,6 +8,9 @@ import { BaseRepository } from "./BaseRepository";
 import { UserPersistanceMapper } from "../Mappers/UserPersistanceMapper";
 import { NotFoundError } from "../../../domain/errors/errors";
 import { FilterQuery } from "mongoose";
+import { DashboardPeriod } from "../../../domain/Types/DashboardTypes";
+import { getDateConfig } from "../../../domain/utils/dateConfig";
+
 
 @injectable()
 export class MongoUserRepository extends BaseRepository<User,IUserDocument> implements IUserRepository {
@@ -80,5 +83,20 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     async findAdmin(): Promise<User | null> {
         const adminDoc=await UserModel.findOne({role :'admin'});
         return adminDoc? UserPersistanceMapper.toEntity(adminDoc):null;
+    }
+    
+    async getUserGrowth(period: "daily" | "monthly" | "yearly"): Promise<{ timeline: { label: string; count: number; }[]; }> {
+        const {from,format}=getDateConfig(period);
+        const result=await UserModel.aggregate([
+            {$match:{role:'user',createdAt:{$gte:from}}},
+            {$group:{_id:{$dateToString:{format,date:'$createdAt'}},count:{$sum:1}}},{$sort:{_id:1}}
+        ]);
+        return {
+            timeline:result.map(r=>({label:r._id,count:r.count}))
+        };
+    }
+
+    getTotalUserCount(): Promise<number> {
+        return UserModel.countDocuments({role:'user'})
     }
 }

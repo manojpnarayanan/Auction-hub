@@ -206,6 +206,10 @@ import { ICreateNotificationUseCase } from "../application/use-cases/Usecase Int
 import { CreateNotificationUseCase } from "../application/use-cases/User/Notification/CreateNotificationUseCase";
 
 
+// Admin-Dashboard
+import { IGetDashboardStatsUseCase } from "../application/use-cases/Usecase Interfaces/Admin/DashboardStats/IGetDashboardStatsUseCase";
+import { GetDashboardUseCase } from "../application/use-cases/Admin/GetDashboardUseCase";
+
 
 
 const container = new Container();
@@ -333,6 +337,11 @@ container.bind<SubscriptionController>(TYPES.SubscriptionController).to(Subscrip
 container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController)
 container.bind<WatchlistController>(TYPES.WatchlistController).to(WatchlistController);
 container.bind<NotificationController>(TYPES.NotificationController).to(NotificationController)
+
+
+
+// Admin-Dashboard
+container.bind<IGetDashboardStatsUseCase>(TYPES.GetDashboardUseCase).to(GetDashboardUseCase)
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

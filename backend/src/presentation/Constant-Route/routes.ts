@@ -56,6 +56,7 @@ export const ROUTES={
         DELETE_AUCTION:'/auctions/:id',
         UPDATE_AUCTION_STATUS:'/auctions/:id/status',
 
+        ADMIN_PENDING_RELEASE:'/pending-release',
         ADMIN_RELEASE_PAYMENT:'/release/payments',
 
 
@@ -63,6 +64,8 @@ export const ROUTES={
         CATEGORY_GET_ALL:'/',
         CATEGORY_UPDATE:'/:id',
         CATEGORY_DELETE:'/:id',
+
+        GET_ADMINDASHBOARD:'/stats'
     },
     SUBSCRIPTION:{
         // PLAN OF ADMIN

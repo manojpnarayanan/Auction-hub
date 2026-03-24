@@ -10,6 +10,6 @@ const router=Router();
 const adminPaymentController=container.get<AdminPaymentController>(TYPES.AdminPaymentController);
 
 router.post(ROUTES.ADMIN.ADMIN_RELEASE_PAYMENT,authenticate,adminPaymentController.releasePayment);
-router.get('/pending-release',authenticate,adminPaymentController.getPendingRelease);
+router.get(ROUTES.ADMIN.ADMIN_PENDING_RELEASE,authenticate,adminPaymentController.getPendingRelease);
 
 export default router;

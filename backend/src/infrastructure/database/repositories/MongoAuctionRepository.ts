@@ -110,4 +110,14 @@ export class MongoAuctionRepository extends BaseRepository<Auction,IAuctionDocum
         const auctions=await AuctionModel.find({status:'approved',startTime:{$lte:now}});
         return auctions.map(AuctionPersistanceMapper.toEntity);
     }
+    async getAuctionStats(): Promise<{ sold: number; expired: number; pending: number; approved: number; active: number; }> {
+        const [sold,expired,pending,approved,active]= await Promise.all([
+            AuctionModel.countDocuments({status:'sold'}),
+            AuctionModel.countDocuments({status:'expired'}),
+            AuctionModel.countDocuments({status:'pending'}),
+            AuctionModel.countDocuments({status:'approved'}),
+            AuctionModel.countDocuments({status:'active'})
+        ])
+        return {sold,expired,pending,approved,active};
+    }
 }

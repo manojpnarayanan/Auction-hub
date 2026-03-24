@@ -125,4 +125,7 @@ export const TYPES = {
     MarkNotificationReadUseCase:Symbol.for("MarkNotificationReadUseCase"),
     NotificationController:Symbol.for("NotificationController"),
     NotificationListener:Symbol.for("NotificationListener"),
+
+    // AdminDashboard
+    GetDashboardUseCase:Symbol.for("GetDashboardUseCase")
 }

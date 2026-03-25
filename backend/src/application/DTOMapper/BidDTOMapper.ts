@@ -14,7 +14,9 @@ export class BidDTOMapper{
             endDate:auction.endDate,
             status:auction.status,
             images:auction.images,
-            type:auction.type
+            type:auction.type,
+            paymentStatus:auction.paymentStatus,
+            deliveryStatus:auction.deliveryStatus
         }
     }
 

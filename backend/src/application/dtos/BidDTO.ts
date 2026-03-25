@@ -30,7 +30,9 @@ export interface AuctionSummaryDTO {
     endDate: Date,
     status: 'active' | 'sold' | 'expired' | 'pending' | 'rejected' | 'cancelled' | 'pending_cancellation',
     images: string[];
-    type: 'live' | 'timed'
+    type: 'live' | 'timed',
+    paymentStatus?:string;
+    deliveryStatus?:string;
 }
 
 export interface UserBidResponseDTO {

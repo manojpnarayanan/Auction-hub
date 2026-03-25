@@ -18,7 +18,8 @@ export interface IAuctionDocument extends Document{
     createdAt:Date,
     paymentStatus:'pending'|'completed'|'pending',
     rejectionReason?:string,
-    cancellationReason?:string
+    cancellationReason?:string;
+    deliveryStatus?:'pending_delivery'|'delivered'|'disputed'
 }
 
 const AuctionSchema:Schema=new Schema({
@@ -43,7 +44,8 @@ const AuctionSchema:Schema=new Schema({
     ],
     paymentStatus:{type:String, enum:['pending','completed'],default:'pending'},
     rejectionReason:{type:String,default:null},
-    cancellationReason:{type:String,default:null}
+    cancellationReason:{type:String,default:null},
+    deliveryStatus:{type:String,enum:['pending_delivery','delivered','disputed'],default:'pending_delivery'}
 },{timestamps:true});
 
 export const AuctionModel=mongoose.model<IAuctionDocument>("Auction",AuctionSchema);

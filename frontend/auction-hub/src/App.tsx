@@ -26,7 +26,7 @@ import AdminSubscriptionPlan from './pages/admin/AdminSubscriptionPlan';
 import SubscriptionPlans from './pages/user/SubscriptionPlans';
 import LiveAuctionRoom from './pages/user/LiveAuctionRoom';
 import Watchlist from './pages/user/Watchlist';
-
+import AdminDisputes from './pages/admin/AdminDispute';
 
 
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
@@ -121,6 +121,11 @@ function App() {
             <Route path='subscription-plans' element={
               <AdminRoute><AdminSubscriptionPlan /></AdminRoute>
             } />
+            <Route path='disputes' element={
+              <AdminRoute><AdminDisputes/></AdminRoute>
+            } >
+
+            </Route>
 
           </Route>
         </Routes>

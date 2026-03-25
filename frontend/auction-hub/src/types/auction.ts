@@ -14,4 +14,6 @@ export interface AuctionItem{
     image?:string;
     rejectionReason?:string;
     cancellationReason?:string;
+    paymentStatus?:'pending' | 'completed';
+    deliveryStatus?:'pending_delivery'| 'delivered'|'disputed';
 }

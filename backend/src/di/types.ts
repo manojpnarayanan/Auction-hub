@@ -88,6 +88,15 @@ export const TYPES = {
     AdminPaymentController: Symbol.for('AdminPaymentController'),
     WebhookController: Symbol.for('WebhookController'),
     GetPendingReleaseUseCase: Symbol.for("GetPendingReleaseUseCase"),
+    
+    
+    // Dispute-Section
+    DisputeRepository:Symbol.for("DisputeRepository"),
+    RaiseDisputeUseCase:Symbol.for("RaiseDisputeUseCase"),
+    ResolveDisputeUseCase:Symbol.for("ResolveDisputeUseCase"),
+    GetDisputeUseCase:Symbol.for("GetDisputeUseCase"),
+    ConfirmDeliveryUseCase:Symbol.for("ConfirmDeliveryUseCase"),
+    DisputeController:Symbol.for("Disputecontroller"),
 
     // Subscription 
     SubscriptionRepository: Symbol.for('SubscriptionRepository'),

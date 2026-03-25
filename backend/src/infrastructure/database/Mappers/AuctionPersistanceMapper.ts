@@ -26,7 +26,8 @@ export class AuctionPersistanceMapper{
             doc.createdAt,
             doc.paymentStatus || 'pending',
             doc.rejectionReason,
-            doc.cancellationReason
+            doc.cancellationReason,
+            doc.deliveryStatus || 'pending_delivery'
         )
     }
 }

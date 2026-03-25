@@ -210,6 +210,20 @@ import { CreateNotificationUseCase } from "../application/use-cases/User/Notific
 import { IGetDashboardStatsUseCase } from "../application/use-cases/Usecase Interfaces/Admin/DashboardStats/IGetDashboardStatsUseCase";
 import { GetDashboardUseCase } from "../application/use-cases/Admin/GetDashboardUseCase";
 
+// Dispute_section
+
+import { IDisputeRepository } from "../domain/interfaces/IDisputeRepository";
+import { MongoDisputeRepository } from "../infrastructure/database/repositories/MongoDisputeRepository";
+import { IRaiseDisputeUseCase } from "../application/use-cases/Usecase Interfaces/Dispute-Interface/IRaiseDisputeUseCase";
+import { RaiseDisputeUseCase } from "../application/use-cases/Dispute/RaiseDisputeUseCase";
+import { IResolveDisputeUseCase } from "../application/use-cases/Usecase Interfaces/Dispute-Interface/IResolveDisputeUseCase";
+import { ResolveDisputeUseCase } from "../application/use-cases/Dispute/ResolveDisputeUseCase";
+import { IGetDisputeUseCase } from "../application/use-cases/Usecase Interfaces/Dispute-Interface/IGetDisputeUseCase";
+import { GetDisputeUseCase } from "../application/use-cases/Dispute/GetDisputeUseCase";
+import { IConfirmDeliveryUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IConfirmDeliveryUseCase";
+import { ConfirmDeliveryUseCase } from "../application/use-cases/auction/ConfirmDeliveryUseCase";
+import { Disputecontroller } from "../presentation/controllers/user/DisputeController";
+
 
 
 const container = new Container();
@@ -337,7 +351,14 @@ container.bind<SubscriptionController>(TYPES.SubscriptionController).to(Subscrip
 container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController)
 container.bind<WatchlistController>(TYPES.WatchlistController).to(WatchlistController);
 container.bind<NotificationController>(TYPES.NotificationController).to(NotificationController)
+container.bind<Disputecontroller>(TYPES.DisputeController).to(Disputecontroller);
 
+// Dispute-Section
+container.bind<IDisputeRepository>(TYPES.DisputeRepository).to(MongoDisputeRepository);
+container.bind<IRaiseDisputeUseCase>(TYPES.RaiseDisputeUseCase).to(RaiseDisputeUseCase);
+container.bind<IResolveDisputeUseCase>(TYPES.ResolveDisputeUseCase).to(ResolveDisputeUseCase);
+container.bind<IGetDisputeUseCase>(TYPES.GetDisputeUseCase).to(GetDisputeUseCase);
+container.bind<IConfirmDeliveryUseCase>(TYPES.ConfirmDeliveryUseCase).to(ConfirmDeliveryUseCase);
 
 
 // Admin-Dashboard

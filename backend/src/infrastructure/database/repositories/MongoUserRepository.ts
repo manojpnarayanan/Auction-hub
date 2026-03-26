@@ -8,7 +8,6 @@ import { BaseRepository } from "./BaseRepository";
 import { UserPersistanceMapper } from "../Mappers/UserPersistanceMapper";
 import { NotFoundError } from "../../../domain/errors/errors";
 import { FilterQuery } from "mongoose";
-import { DashboardPeriod } from "../../../domain/Types/DashboardTypes";
 import { getDateConfig } from "../../../domain/utils/dateConfig";
 
 

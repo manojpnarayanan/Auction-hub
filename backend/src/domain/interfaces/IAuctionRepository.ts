@@ -3,23 +3,23 @@ import { Auction } from "../entities/Auction.entity";
 
 export interface IAuctionRepository {
     create(auction: Auction): Promise<Auction>;
-    findAll(filters?: { 
-        category?: string, 
-        search?: string, 
-        type?: string, 
+    findAll(filters?: {
+        category?: string,
+        search?: string,
+        type?: string,
         status?: string,
-        page?:number,
-        limit?:number, 
-    }): Promise<{auction:Auction[],total:number}>;
-    findBySellerId(sellerId: string,page?:number,limit?:number): Promise<{auctions:Auction[],total:number}>;
+        page?: number,
+        limit?: number,
+    }): Promise<{ auction: Auction[], total: number }>;
+    findBySellerId(sellerId: string, page?: number, limit?: number): Promise<{ auctions: Auction[], total: number }>;
     findById(id: string): Promise<Auction | null>;
     update(id: string, data: Partial<Auction>): Promise<Auction | null>;
     findByCategory(category: string): Promise<Auction[]>;
     addBid(auctionId: string, bid: { bidderId: string, amount: number, time: Date }): Promise<boolean>;
     delete(id: string): Promise<boolean>;
     findExpiredActiveAuctions(): Promise<Auction[]>;
-    updateAuctionStatus(id: string, status: string, winnerId?: string,rejectionReason?:string,cancellationReason?:string): Promise<void>;
-    updatePaymentStatus(id:string,status:string):Promise<void>;
-    findAuctionstoStart():Promise<Auction[]>;
-    getAuctionStats():Promise<{sold:number; expired:number; pending:number; approved:number;active:number}>
+    updateAuctionStatus(id: string, status: string, winnerId?: string, rejectionReason?: string, cancellationReason?: string): Promise<void>;
+    updatePaymentStatus(id: string, status: string): Promise<void>;
+    findAuctionstoStart(): Promise<Auction[]>;
+    getAuctionStats(): Promise<{ sold: number; expired: number; pending: number; approved: number; active: number }>
 }

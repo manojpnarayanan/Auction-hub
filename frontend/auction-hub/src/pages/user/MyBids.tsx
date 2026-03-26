@@ -6,6 +6,10 @@ import { confirmDeliveryAPI, raiseDisputeAPI } from '../../api/User/dispute'
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import type { AuctionItem } from "../../types/auction";
+import ReviewModal from "../../components/ReviewModal";
+import toast from "react-hot-toast";
+import type { AxiosError } from "axios";
+
 
 interface MyBidItem {
     auction: AuctionItem;
@@ -21,6 +25,8 @@ export default function MyBids() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const limit = 4;
+    const [reviewModalOpen,setReviewModalOpen]=useState(false);
+    const [reviewAuctionId,setReviewAuctionId]=useState('');
 
     // Escrow States
     const [confirmId, setConfirmId] = useState<string | null>(null);
@@ -44,6 +50,7 @@ export default function MyBids() {
 
     useEffect(() => {
         fetchBids();
+        //  eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage]);
 
     const handleConfirmDelivery = async () => {
@@ -51,11 +58,12 @@ export default function MyBids() {
         try {
             setActionLoading(true);
             await confirmDeliveryAPI(confirmId);
-            alert("Delivery confirmed! Funds have been released to the seller.");
+            toast.success("Delivery confirmed! Funds have been released to the seller.");
             setConfirmId(null);
-            fetchBids(); // Refresh to update status UI
-        } catch (error: any) {
-            alert(error?.response?.data?.message || "Failed to confirm delivery");
+            fetchBids();
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err?.response?.data?.message || "Failed to confirm delivery");
         } finally {
             setActionLoading(false);
         }
@@ -66,12 +74,13 @@ export default function MyBids() {
         try {
             setActionLoading(true);
             await raiseDisputeAPI(disputeId, disputeReason);
-            alert("Dispute raised. Staff will review the issue and contact you.");
+            toast.success("Dispute raised. Staff will review the issue and contact you.");
             setDisputeId(null);
             setDisputeReason('');
-            fetchBids(); // Refresh to update status UI
-        } catch (error: any) {
-            alert(error?.response?.data?.message || "Failed to raise dispute");
+            fetchBids();
+        } catch (error: unknown) {
+            const err=error as AxiosError<{message:string}>
+            toast.error(err?.response?.data?.message || "Failed to raise dispute");
         } finally {
             setActionLoading(false);
         }
@@ -152,20 +161,39 @@ export default function MyBids() {
                                         </div>
                                     </div>
                                 )}
-                                {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
+                                {/* {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
                                     <div className="mt-2 pt-4 border-t border-gray-100">
                                         <div className="bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">
                                             Delivery Confirmed & Funds Released
                                         </div>
                                     </div>
-                                )}
+                                )} */}
+                                        {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
+            <div className="mt-2 pt-4 border-t border-gray-100 flex gap-3 items-center">
+                <div className="flex-1 bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">
+                    Delivery Confirmed & Funds Released
+                </div>
+                {/* Leave Review Button */}
+                <button 
+                    onClick={(e) => { e.stopPropagation(); setReviewAuctionId(item.auction.id); setReviewModalOpen(true); }}
+                    className="px-4 py-2 bg-yellow-500 text-white text-sm font-bold rounded-lg hover:bg-yellow-400 transition shadow-sm"
+                >
+                    ★ Leave Review
+                </button>
+            </div>
+        )}
+
                             </div>
                         ))}
                     </div>
                 )}
             </main>
 
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            <Pagination 
+            currentPage={currentPage} 
+            totalPages={totalPages} 
+            onPageChange={setCurrentPage} 
+            />
             <Footer />
 
             {/* CONFIRM DELIVERY MODAL */}
@@ -209,6 +237,12 @@ export default function MyBids() {
                     </div>
                 </div>
             )}
+            <ReviewModal
+            isOpen={reviewModalOpen}
+            onClose={()=>setReviewModalOpen(false)}
+            auctionId={reviewAuctionId}
+            onSuccess={()=>toast.success("Review posted successfully")}
+            />
         </div>
     );
 }

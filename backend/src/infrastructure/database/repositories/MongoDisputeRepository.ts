@@ -4,7 +4,7 @@ import { IDisputeRepository } from "../../../domain/interfaces/IDisputeRepositor
 import { Dispute } from "../../../domain/entities/Dispute.entity";
 import { DisputeModel,IDisputeDocument } from "../models/DisputeModel";
 import { DisputePersistanceMapper } from "../Mappers/DisputePersistanceMapper";
-import { FilterQuery,UpdateQuery } from "mongoose";
+import { FilterQuery } from "mongoose";
 
 @injectable()
 export class MongoDisputeRepository extends BaseRepository<Dispute,IDisputeDocument> implements IDisputeRepository{

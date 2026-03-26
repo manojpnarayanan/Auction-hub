@@ -12,7 +12,9 @@ import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
 import { checkWatchlist, addToWatchlist, removeFromWatchlist } from "../../api/User/watchlist";
 import type { RootState } from "../../redux/store";
+import type { Review } from "../../types/review";
 import { AxiosError } from "axios";
+import { getSellerReviews } from "../../api/User/Review";
 // import type { BidItem } from "../../types/Bid";
 
 interface Auction {
@@ -33,6 +35,7 @@ interface Auction {
         time: Date;
     }>;
     paymentStatus: string;
+    sellerId:string;
 }
 
 export default function AuctionProductDetails() {
@@ -46,6 +49,7 @@ export default function AuctionProductDetails() {
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const { paymentSession, initiating, initiatePayment, closePayment } = usePayment();
     const [isWatchlisted, setIsWatchlisted] = useState(false);
+    const [sellerReviews,setSellerReviews]=useState({reviews:[],averageRating:0,total:0});
 
     const calculateTimeLeft = useCallback(() => {
         if (!auction?.endDate) return { h: "00", m: "00", s: "00", ended: true };
@@ -95,6 +99,20 @@ export default function AuctionProductDetails() {
             setLoading(false);
         }
     },[id]);
+
+    useEffect(()=>{
+        const fetchReviews=async()=>{
+            if(auction?.sellerId){
+                try{
+                    const res=await getSellerReviews(auction.sellerId,1,5);
+                    setSellerReviews(res.data)
+                }catch(error){
+                    console.error("Failed to fetch seller reviews",error);
+                }
+            }
+        };
+        fetchReviews();
+    },[auction?.sellerId]);
 
     useEffect(() => {
         if (id) {
@@ -211,6 +229,29 @@ export default function AuctionProductDetails() {
                                     </button>
                                 </div>
 
+                                
+                                {/* Rating Section */}
+                                                               {sellerReviews.total > 0 && (
+                                    <div className="mb-8 bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm inline-flex items-center gap-6">
+                                        <div className="flex flex-col">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Seller Rating</span>
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-3xl font-black text-slate-800 leading-none">{sellerReviews.averageRating}</span>
+                                                <div className="flex items-center text-yellow-500 text-xl tracking-widest drop-shadow-sm">
+                                                    {'★'.repeat(Math.round(sellerReviews.averageRating || 0))}
+                                                    <span className="text-slate-200">{'★'.repeat(Math.max(0, 5 - Math.round(sellerReviews.averageRating || 0)))}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="w-[2px] h-10 bg-slate-200/80 rounded-full"></div>
+                                        <div className="flex flex-col justify-center">
+                                            <span className="text-xl font-black text-slate-700 leading-none mb-1">{sellerReviews.total}</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Reviews</span>
+                                        </div>
+                                    </div>
+                                )}
+
+
                                 {/* Timer Component */}
                                 <div className="mb-8 p-5 bg-slate-900 rounded-2xl text-white flex justify-between items-center shadow-inner">
                                     <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Ends In</span>
@@ -290,9 +331,36 @@ export default function AuctionProductDetails() {
                         <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
                             <span className="w-1.5 h-8 bg-blue-600 rounded-full"></span> Description
                         </h2>
-                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 leading-relaxed text-slate-600 whitespace-pre-line text-lg">
+                        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 leading-relaxed text-slate-600 whitespace-pre-line text-lg mb-10">
                             {auction.description}
                         </div>
+
+                        {/* SELLER REVIEWS SECTION */}
+                        <h2 className="text-2xl font-black text-slate-800 mb-6 flex items-center gap-3">
+                            <span className="w-1.5 h-8 bg-yellow-400 rounded-full"></span> Seller Reviews
+                        </h2>
+                        {sellerReviews.reviews.length > 0 ? (
+                            <div className="space-y-4">
+                                {sellerReviews.reviews.map((review: Review) => (
+                                    <div key={review.id || review._id} className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <div className="flex items-center text-yellow-400 text-lg">
+                                                {'★'.repeat(Math.round(review.rating))}
+                                                <span className="text-slate-200">{'★'.repeat(Math.max(0, 5 - Math.round(review.rating)))}</span>
+                                            </div>
+                                            <span className="text-xs text-slate-400 font-bold">
+                                                {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                            </span>
+                                        </div>
+                                        <p className="text-slate-700 font-medium italic">"{review.comment}"</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 text-center text-slate-400 italic font-bold">
+                                This seller has no reviews yet.
+                            </div>
+                        )}
                     </div>
 
                     <div>

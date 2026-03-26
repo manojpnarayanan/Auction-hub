@@ -65,7 +65,10 @@ export const ROUTES={
         CATEGORY_UPDATE:'/:id',
         CATEGORY_DELETE:'/:id',
 
-        GET_ADMINDASHBOARD:'/stats'
+        GET_ADMINDASHBOARD:'/stats',
+
+        GET_ALLDISPUTES:"/getdisputes",
+        RESOLVE_DISPUTES:'/:disputedId/resolve'
     },
     SUBSCRIPTION:{
         // PLAN OF ADMIN
@@ -90,6 +93,19 @@ export const ROUTES={
         WATCHLIST_ADD:'/watchlist/:auctionId',
         WATCHLIST_REMOVE:'/watchlist/:auctionId',
         WATCHLIST_CHECK:'/watchlist/:auctionId/check'
+    },
+    rating:{
+        ADD_REVIEW:'/add',
+        GETSELLER_REVIEW:'/:sellerId'
+    },
+    DISPUTE:{
+        CONFIRM_DELIVERY:"/dispute/confirm-delivery",
+        RAISE_DISPUTE:"/dispute/raise",
+        BUYER_DISPUTE:"/dispute"
+    },
+    NOTIFICATION:{
+        GET_NOTIFICATION:"/notifications",
+        MARK_READ:"/notifications/:id"
     }
 
 }

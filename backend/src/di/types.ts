@@ -135,6 +135,13 @@ export const TYPES = {
     NotificationController:Symbol.for("NotificationController"),
     NotificationListener:Symbol.for("NotificationListener"),
 
+
+    // Rating-Section
+    ReviewRepository:Symbol.for("ReviewRepository"),
+    CreateReviewUseCase:Symbol.for("CreateReviewUseCase"),
+    GetSellerReviewUseCase:Symbol.for("GetSellerReviewUseCase"),
+    ReviewController:Symbol.for("ReviewController"),
+
     // AdminDashboard
     GetDashboardUseCase:Symbol.for("GetDashboardUseCase")
 }

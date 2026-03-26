@@ -11,6 +11,9 @@ import PaymentModal from "../../components/paymentModal";
 import { confirmPayment } from "../../api/User/wallet";
 import type { RootState } from "../../redux/store";
 import { AxiosError } from "axios";
+import { getSellerReviews } from "../../api/User/Review";
+import type { Review } from "../../types/review";
+
 
 interface Bid {
     bidderId: string;
@@ -25,13 +28,13 @@ interface Auction {
     description: string;
     currentPrice: number;
     startingPrice: number;
-    startTime:string;
+    startTime: string;
     endDate: string;
     status: string;
     type: string;
     sellerId: string;
     winnerId: string;
-    paymentStatus?:string;
+    paymentStatus?: string;
     images?: string[];
     bids: Bid[];
 }
@@ -44,9 +47,10 @@ export default function LiveAuctionRoom() {
     const [viewerCount, setViewerCount] = useState(1);
     const [liveFeed, setLiveFeed] = useState<Bid[]>([]);
     const [auctionStatus, setAuctionStatus] = useState("");
+    const [sellerReviews,setSellerReviews]=useState({reviews:[],averageRating:0,total:0});
     const [timeLeft, setTimeLeft] = useState("");
     const [selectedImage, setSelectedImage] = useState<string>("");
-    const {paymentSession,initiating,initiatePayment,closePayment}=usePayment();
+    const { paymentSession, initiating, initiatePayment, closePayment } = usePayment();
 
     const { id } = useParams();
     const currentUser = useSelector((state: RootState) => state.auth.user);
@@ -59,12 +63,14 @@ export default function LiveAuctionRoom() {
     }, [auction]);
 
     useEffect(() => {
-        if (!auction?.endDate || auctionStatus!=='active') return;
+        if (!auction?.endDate || auctionStatus !== 'active') return;
         const timer = setInterval(() => {
             const diff = +new Date(auction!.endDate) - +new Date();
-            if (diff <= 0) { setTimeLeft("Ended");
+            if (diff <= 0) {
+                setTimeLeft("Ended");
                 clearInterval(timer);
-                return; }
+                return;
+            }
             const h = Math.floor(diff / (1000 * 60 * 60));
             const m = Math.floor((diff / 1000 / 60) % 60);
             const s = Math.floor((diff / 1000) % 60);
@@ -72,7 +78,7 @@ export default function LiveAuctionRoom() {
             setTimeLeft(`${String(h).padStart(2, '0')} : ${String(m).padStart(2, '0')} : ${String(s).padStart(2, '0')}`);
         }, 1000);
         return () => clearInterval(timer);
-    }, [auction,auctionStatus]);
+    }, [auction, auctionStatus]);
 
     // Socket
     useEffect(() => {
@@ -82,7 +88,7 @@ export default function LiveAuctionRoom() {
         socket.on('viewer_count', (data) => setViewerCount(data.count));
         socket.on("bid_update", (data) => {
             setAuction(prev => prev ? { ...prev, currentPrice: data.newPrice } : prev);
-            if(data.bid){
+            if (data.bid) {
                 setLiveFeed(prev => [data.bid, ...prev].slice(0, 50));
             }
         });
@@ -92,7 +98,7 @@ export default function LiveAuctionRoom() {
         });
         socket.on("auction_ended", (data) => {
             setAuctionStatus(data.status || 'sold');
-            setAuction(prev=>prev? {...prev,winnerId:data.winnerId,status:data.status || 'sold',currentPrice:data.finalPrice || prev.currentPrice}:prev);
+            setAuction(prev => prev ? { ...prev, winnerId: data.winnerId, status: data.status || 'sold', currentPrice: data.finalPrice || prev.currentPrice } : prev);
             toast.success("Auction ended");
         });
         socket.on("auction_cancelled", (data) => {
@@ -119,18 +125,32 @@ export default function LiveAuctionRoom() {
             .catch(console.error)
             .finally(() => setLoading(false));
 
-            const poll=setInterval(async ()=>{
+        const poll = setInterval(async () => {
+            try {
+                const res = await getAuctionProductDetails(id);
+                const d = res.data.data || res.data;
+                if (d.status !== auctionStatus) {
+                    setAuctionStatus(d.status);
+                    setAuction(d);
+                }
+            } catch (r) { console.error(r) }
+        }, 30000);
+        return () => clearInterval(poll)
+    }, [id, auctionStatus]);
+
+    useEffect(()=>{
+        const fetchReviews=async()=>{
+            if(auction?.sellerId){
                 try{
-                    const res=await getAuctionProductDetails(id);
-                    const d=res.data.data || res.data;
-                    if(d.status !==auctionStatus){
-                        setAuctionStatus(d.status);
-                        setAuction(d);
-                    }
-                }catch(r){console.error(r)}
-            },30000);
-            return()=>clearInterval(poll)
-    }, [id,auctionStatus]);
+                    const res=await getSellerReviews(auction.sellerId,1,5);
+                    setSellerReviews(res.data);
+                }catch(error){
+                    console.error("Failed to fetch seller reviews",error);
+                }
+            }
+        }
+        fetchReviews();
+    },[auction?.sellerId]);
 
     const handleBid = async () => {
         if (!auction || !bidAmount) return;
@@ -145,7 +165,7 @@ export default function LiveAuctionRoom() {
             setBidAmount("");
             toast.success("Bid placed");
         } catch (error: unknown) {
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             toast.error(err.response?.data?.message || "Failed");
         } finally {
             setBidding(false);
@@ -154,7 +174,7 @@ export default function LiveAuctionRoom() {
 
     // const isSeller = currentUser?.id === auction?.sellerId;
     const isActive = auctionStatus === 'active';
-    const isPending = auctionStatus === 'pending' || auctionStatus==='approved';
+    const isPending = auctionStatus === 'pending' || auctionStatus === 'approved';
 
     if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>
     if (!auction) return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Not found</div>
@@ -162,7 +182,7 @@ export default function LiveAuctionRoom() {
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col">
             <Navbar />
-            
+
             {/* Header */}
             <div className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
@@ -177,21 +197,21 @@ export default function LiveAuctionRoom() {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                         {viewerCount} watching
                     </span>
-{isActive && <span className="font-mono text-white bg-gray-700 px-2 py-1 rounded opacity-90">⏱ {timeLeft}</span>}
-{isPending && (
-    <span className="text-yellow-400 text-sm font-semibold">
-        🗓 Starts at {auction.startTime? new Date(auction.startTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }):new Date(auction.endDate).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'})}
-    </span>
-)}
+                    {isActive && <span className="font-mono text-white bg-gray-700 px-2 py-1 rounded opacity-90">⏱ {timeLeft}</span>}
+                    {isPending && (
+                        <span className="text-yellow-400 text-sm font-semibold">
+                            🗓 Starts at {auction.startTime ? new Date(auction.startTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : new Date(auction.endDate).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                        </span>
+                    )}
                 </div>
             </div>
 
             {/* Body */}
             <div className="flex flex-col lg:flex-row flex-1">
-                
+
                 {/* Left Side: Images & Details */}
                 <div className="lg:w-1/2 bg-gray-950 p-6 flex flex-col items-center overflow-y-auto">
-                    
+
                     {/* Main Image */}
                     <div className="w-full h-80 bg-[#111827] rounded-xl flex items-center justify-center overflow-hidden mb-5 border border-gray-800 shadow-md">
                         {selectedImage ? (
@@ -205,20 +225,41 @@ export default function LiveAuctionRoom() {
                     {auction.images && auction.images.length > 1 && (
                         <div className="w-full flex gap-3 overflow-x-auto pb-3 justify-center mb-6 overflow-y-hidden">
                             {auction.images.map((img, idx) => (
-                                <img 
-                                    key={idx} 
-                                    src={img} 
+                                <img
+                                    key={idx}
+                                    src={img}
                                     alt={`Thumbnail ${idx + 1}`}
                                     onClick={() => setSelectedImage(img)}
-                                    className={`w-20 h-14 object-cover rounded-lg cursor-pointer border-2 transition-all duration-200 flex-shrink-0 ${
-                                        selectedImage === img 
-                                            ? 'border-blue-500 scale-105 shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
+                                    className={`w-20 h-14 object-cover rounded-lg cursor-pointer border-2 transition-all duration-200 flex-shrink-0 ${selectedImage === img
+                                            ? 'border-blue-500 scale-105 shadow-[0_0_10px_rgba(59,130,246,0.5)]'
                                             : 'border-transparent opacity-50 hover:opacity-100'
-                                    }`} 
+                                        }`}
                                 />
                             ))}
                         </div>
                     )}
+
+                                        {/* Seller Rating Section */}
+                    {sellerReviews.total > 0 && (
+                        <div className="w-full bg-[#111827] rounded-xl p-6 border border-gray-800 text-left mb-6 shadow-sm flex items-center justify-start gap-6">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">Seller Rating</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-3xl font-black text-white leading-none">{sellerReviews.averageRating}</span>
+                                    <div className="flex items-center text-yellow-500 text-xl tracking-widest drop-shadow-sm">
+                                        {'★'.repeat(Math.round(sellerReviews.averageRating || 0))}
+                                        <span className="text-gray-700">{'★'.repeat(Math.max(0, 5 - Math.round(sellerReviews.averageRating || 0)))}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="w-[2px] h-10 bg-gray-700/80 rounded-full"></div>
+                            <div className="flex flex-col justify-center">
+                                <span className="text-xl font-black text-gray-300 leading-none mb-1">{sellerReviews.total}</span>
+                                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Reviews</span>
+                            </div>
+                        </div>
+                    )}
+
 
                     {/* About This Item Description */}
                     <div className="w-full bg-[#111827] rounded-xl p-6 border border-gray-800 text-left mt-2 shadow-sm">
@@ -232,11 +273,44 @@ export default function LiveAuctionRoom() {
                         </p>
                     </div>
 
+                                        {/* SELLER REVIEWS SECTION */}
+                    <div className="w-full bg-[#111827] rounded-xl p-6 border border-gray-800 text-left mt-5 shadow-sm">
+                        <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span className="text-yellow-500">★</span>
+                            Recent Reviews
+                        </h2>
+                        <div className="w-16 h-1 bg-yellow-500 mb-4 rounded-full"></div>
+                        
+                        {sellerReviews.reviews.length > 0 ? (
+                            <div className="space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar pr-2">
+                                {sellerReviews.reviews.map((review: Review) => (
+                                    <div key={review.id || review._id} className="bg-gray-900 rounded-lg p-4 border border-gray-800">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <div className="flex items-center text-yellow-500 text-sm">
+                                                {'★'.repeat(Math.round(review.rating))}
+                                                <span className="text-gray-700">{'★'.repeat(Math.max(0, 5 - Math.round(review.rating)))}</span>
+                                            </div>
+                                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                                                {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-300 text-sm italic leading-relaxed">"{review.comment}"</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500 italic text-sm border border-dashed border-gray-800 rounded-lg bg-gray-900/50">
+                                No reviews yet!
+                            </div>
+                        )}
+                    </div>
+
+
                 </div>
 
                 {/* Right Side: Bid Panel & Feed */}
                 <div className="lg:w-1/2 flex flex-col border-l border-gray-800 bg-gray-900 shadow-xl z-10 w-full">
-                    
+
                     <div className="bg-gray-800 p-8 border-b border-gray-700 shadow-sm relative">
                         <p className="text-xs text-gray-400 mb-1 uppercase tracking-wider font-semibold">Current Highest Bid</p>
                         <p className="text-5xl font-extrabold text-green-400 tracking-tight drop-shadow-sm">₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}</p>
@@ -247,12 +321,12 @@ export default function LiveAuctionRoom() {
                             <div className="flex gap-4">
                                 <div className="relative flex-1">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
-                                    <input 
-                                        type="number" 
-                                        placeholder={`Min ${(auction.currentPrice + 1).toLocaleString('en-IN')}`} 
+                                    <input
+                                        type="number"
+                                        placeholder={`Min ${(auction.currentPrice + 1).toLocaleString('en-IN')}`}
                                         value={bidAmount}
                                         onChange={e => setBidAmount(e.target.value)}
-                                        className="w-full bg-gray-950 border border-gray-700 text-white pl-10 pr-4 py-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium text-lg shadow-inner" 
+                                        className="w-full bg-gray-950 border border-gray-700 text-white pl-10 pr-4 py-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium text-lg shadow-inner"
                                     />
                                 </div>
                                 <button onClick={handleBid} disabled={bidding}
@@ -265,32 +339,32 @@ export default function LiveAuctionRoom() {
                                 {isPending && "⏳ Auction starting soon..."}
                                 {/* {auctionStatus === "sold" && <span className="text-yellow-400">🏆 Auction successfully sold!</span>} */}
                                 {auctionStatus === "sold" && (
-    <div className="space-y-3 w-full mt-2">
-        {auction?.winnerId === currentUser?.id ? (
-            <div className="bg-green-900/40 text-green-400 p-4 rounded-lg font-bold border border-green-800/50 shadow-inner">
-                🏆 You won this auction!
-            </div>
-        ) : (
-            <span className="text-yellow-400 block mb-2 font-bold p-3 bg-yellow-900/20 rounded-lg border border-yellow-800/30">🏆 Auction successfully sold!</span>
-        )}
-        
-        {/* Pay button — only visible to the winner if payment is pending */}
-        {currentUser?.id === auction?.winnerId && auction?.paymentStatus !== 'completed' && (
-            <button
-                onClick={() => initiatePayment(auction.id, (auction.currentPrice || auction.startingPrice) * 100)}
-                disabled={initiating}
-                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition-all shadow-lg disabled:opacity-50 text-lg uppercase tracking-wide"
-            >
-                {initiating ? 'Preparing payment...' : 'Pay Now'}
-            </button>
-        )}
-        {currentUser?.id === auction?.winnerId && auction?.paymentStatus === 'completed' && (
-            <div className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-center shadow-lg uppercase tracking-wide">
-                ✅ Payment Completed
-            </div>
-        )}
-    </div>
-)}
+                                    <div className="space-y-3 w-full mt-2">
+                                        {auction?.winnerId === currentUser?.id ? (
+                                            <div className="bg-green-900/40 text-green-400 p-4 rounded-lg font-bold border border-green-800/50 shadow-inner">
+                                                🏆 You won this auction!
+                                            </div>
+                                        ) : (
+                                            <span className="text-yellow-400 block mb-2 font-bold p-3 bg-yellow-900/20 rounded-lg border border-yellow-800/30">🏆 Auction successfully sold!</span>
+                                        )}
+
+                                        {/* Pay button — only visible to the winner if payment is pending */}
+                                        {currentUser?.id === auction?.winnerId && auction?.paymentStatus !== 'completed' && (
+                                            <button
+                                                onClick={() => initiatePayment(auction.id, (auction.currentPrice || auction.startingPrice) * 100)}
+                                                disabled={initiating}
+                                                className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition-all shadow-lg disabled:opacity-50 text-lg uppercase tracking-wide"
+                                            >
+                                                {initiating ? 'Preparing payment...' : 'Pay Now'}
+                                            </button>
+                                        )}
+                                        {currentUser?.id === auction?.winnerId && auction?.paymentStatus === 'completed' && (
+                                            <div className="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-center shadow-lg uppercase tracking-wide">
+                                                ✅ Payment Completed
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {auctionStatus === "cancelled" && <span className="text-red-400">❌ Auction was cancelled by admin</span>}
                                 {auctionStatus === "expired" && "⛔ Auction expired without bids"}
@@ -333,7 +407,7 @@ export default function LiveAuctionRoom() {
                                     <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${i === 0 ? 'bg-blue-900/20 border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'bg-gray-800 border-gray-700'}`}>
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${i === 0 ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}>
-                                                {bid?.bidderName ? bid.bidderName.substring(0,2).toUpperCase() : 'AN'}
+                                                {bid?.bidderName ? bid.bidderName.substring(0, 2).toUpperCase() : 'AN'}
                                             </div>
                                             <span className={`text-sm ${i === 0 ? 'text-white font-semibold' : 'text-gray-300'}`}>
                                                 {bid?.bidderName || "Anonymous"}
@@ -355,17 +429,18 @@ export default function LiveAuctionRoom() {
 
                 </div>
             </div>
-            {paymentSession &&(
+            {paymentSession && (
                 <PaymentModal
-                isOpen={true}
-                clientSecret={paymentSession.clientSecret}
-                amount={(auction.currentPrice || auction.startingPrice)*100}
-                title="Complete Auction Payment"
-                onSuccess={async()=>{await confirmPayment({paymentIntentId:paymentSession.paymentIntentId,auctionId:auction!.id});
-                closePayment();
-                setAuction((prev)=>prev? {...prev,paymentStatus:'completed'}:prev)
-                }}
-                onClose={()=>closePayment()}
+                    isOpen={true}
+                    clientSecret={paymentSession.clientSecret}
+                    amount={(auction.currentPrice || auction.startingPrice) * 100}
+                    title="Complete Auction Payment"
+                    onSuccess={async () => {
+                        await confirmPayment({ paymentIntentId: paymentSession.paymentIntentId, auctionId: auction!.id });
+                        closePayment();
+                        setAuction((prev) => prev ? { ...prev, paymentStatus: 'completed' } : prev)
+                    }}
+                    onClose={() => closePayment()}
                 />
             )}
         </div>

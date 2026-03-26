@@ -36,6 +36,7 @@ export default function NotificationBell(){
             socket.off('admin_notification');
             document.removeEventListener('mousedown',handleClickOutside)
         }
+                // eslint-disable-next-line react-hooks/exhaustive-deps
     },[dispatch]);
 
     const handleMarkRead=(id:string,isRead:boolean)=>{
@@ -71,7 +72,7 @@ export default function NotificationBell(){
                         {notifications?.length === 0 ? (
                             <div className="p-4 text-center text-gray-500 text-sm">No new notifications</div>
                         ) : (
-                            notifications?.map((notif: any) => (
+                            notifications?.map((notif) => (
                                 <div 
                                     key={notif.id} 
                                     className={`p-3 border-b hover:bg-gray-50 transition cursor-pointer ${notif.isRead ? 'opacity-70' : 'bg-blue-50/20'}`}

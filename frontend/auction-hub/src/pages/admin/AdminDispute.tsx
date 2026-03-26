@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { getAllDisputesAPI, resolveDisputesAPI } from "../../api/Admin/adminDisputes";
 import Pagination from "../../components/Pagination";
 import InfoModal from "../../components/InfoModal";
+import type { AxiosError } from "axios";
 
 
 interface UserRef {
@@ -53,6 +54,7 @@ export default function AdminDisputes() {
 
     useEffect(() => {
         fetchDisputes();
+                // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, filterStatus]);
 
     const handleResolve = async () => {
@@ -67,8 +69,9 @@ export default function AdminDisputes() {
             setResolvingId(null);
             setAdminNote("");
             fetchDisputes();
-        } catch (error: any) {
-            setInfoModalContent({ title: "Resolution Failed", message: error.response?.data?.message || "Failed to resolve dispute" });
+        } catch (error:unknown) {
+            const err=error as AxiosError<{message:string}>
+            setInfoModalContent({ title: "Resolution Failed", message: err.response?.data?.message || "Failed to resolve dispute" });
             setInfoModalOpen(true);
         } finally {
             setActionLoading(false);

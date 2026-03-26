@@ -10,8 +10,8 @@ const router=Router();
 const adminDisputeController=container.get<Disputecontroller>(TYPES.DisputeController);
 
 
-router.get('/getdisputes',authenticate,adminDisputeController.getAllDisputes);
-router.post('/:disputedId/resolve',authenticate,adminDisputeController.resolveDispute);
+router.get(ROUTES.ADMIN.GET_ALLDISPUTES,authenticate,adminDisputeController.getAllDisputes);
+router.post(ROUTES.ADMIN.RESOLVE_DISPUTES,authenticate,adminDisputeController.resolveDispute);
 
 
 

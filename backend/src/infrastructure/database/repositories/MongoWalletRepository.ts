@@ -8,7 +8,6 @@ import { Transactions } from "../../../domain/entities/Transaction.entity";
 import { TransactionModel } from "../models/TransactionModel";
 import { TransactionPersistanceMapper } from "../Mappers/TransactionPersistanceMapper";
 import { BaseRepository } from "./BaseRepository";
-import { DashboardPeriod } from "../../../domain/Types/DashboardTypes";
 import { getDateConfig } from "../../../domain/utils/dateConfig";
 
 

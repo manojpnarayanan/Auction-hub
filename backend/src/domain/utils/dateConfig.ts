@@ -14,3 +14,11 @@ export function getDateConfig(period: DashboardPeriod) {
         return { from, format: '%Y-%m' };
     }
 }
+
+export function getCustomDateConfig(startDate: string, endDate: string) {
+    const from = new Date(startDate);
+    const to = new Date(endDate);
+    to.setHours(23, 59, 59, 999); // include the full end day
+    return { from, to, format: '%Y-%m-%d' };
+}
+

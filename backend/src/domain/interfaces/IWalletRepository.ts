@@ -11,8 +11,8 @@ export interface IWalletRepository {
     createTransactions(data: Partial<Transactions>): Promise<Transactions>;
     updateTransactions(transactionId: string, status: string): Promise<void>;
     findTransactionByIntentId(stripePaymentIntentId: string): Promise<Transactions | null>;
-    getPendingRelease(adminId:string):Promise<Transactions[]>;
-    markTransactionAsReleased(transactionId:string):Promise<void>;
-    getTotalRevenue(period:'daily' | 'monthly' |'yearly'):Promise<{total:number;timeline:{label:string;amount:number}[]}>;
-    isTransactionReleased(transactionId:string):Promise<boolean>;
+    getPendingRelease(adminId: string): Promise<Transactions[]>;
+    markTransactionAsReleased(transactionId: string): Promise<void>;
+    getTotalRevenue(period: 'daily' | 'monthly' | 'yearly', customRange?: { from: Date; to: Date }): Promise<{ total: number; timeline: { label: string; amount: number }[] }>;
+    isTransactionReleased(transactionId: string): Promise<boolean>;
 }

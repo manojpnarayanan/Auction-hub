@@ -5,6 +5,7 @@ import { IWalletRepository } from "../../../domain/interfaces/IWalletRepository"
 import { IUserRepository } from "../../../domain/interfaces/IUserRepository";
 import { IGetDashboardStatsUseCase } from "../Usecase Interfaces/Admin/DashboardStats/IGetDashboardStatsUseCase";
 import { DashboardStatsDTO, DashboardPeriod } from "../../dtos/DashboardStatsDTO";
+import { getCustomDateConfig } from "../../../domain/utils/dateConfig";
 
 
 @injectable()
@@ -14,11 +15,19 @@ export class GetDashboardUseCase implements IGetDashboardStatsUseCase {
         @inject(TYPES.WalletRepository) private _walletRepo: IWalletRepository,
         @inject(TYPES.UserRepository) private _userRepo: IUserRepository
     ) { }
-    async execute(period: DashboardPeriod): Promise<DashboardStatsDTO> {
+
+    async execute(period: DashboardPeriod, startDate?: string, endDate?: string): Promise<DashboardStatsDTO> {
+        // Build custom range only when both bounds are present
+        let customRange: { from: Date; to: Date } | undefined;
+        if (startDate && endDate) {
+            const cfg = getCustomDateConfig(startDate, endDate);
+            customRange = { from: cfg.from, to: cfg.to };
+        }
+
         const [auctionStats, revenueData, userGrowthData] = await Promise.all([
             this._auctionRepo.getAuctionStats(),
-            this._walletRepo.getTotalRevenue(period),
-            this._userRepo.getUserGrowth(period),
+            this._walletRepo.getTotalRevenue(period, customRange),  // KPI total unchanged
+            this._userRepo.getUserGrowth(period, customRange),       // timeline scoped
             this._userRepo.getTotalUserCount(),
         ]);
         const totalClosed = auctionStats.sold + auctionStats.expired;
@@ -36,6 +45,6 @@ export class GetDashboardUseCase implements IGetDashboardStatsUseCase {
             totalUsers,
             revenueTimeline: revenueData.timeline,
             userGrowthTimeline: userGrowthData.timeline,
-        }
+        };
     }
-}
+}

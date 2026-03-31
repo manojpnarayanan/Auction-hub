@@ -83,7 +83,7 @@ function App() {
           </Route>
 
           <Route path="auction/:id" element={
-            <PrivateRoute><AuctionProductDetails /></PrivateRoute>
+            <AuctionProductDetails />
           } />
           <Route path='/watchlist' element={
             <PrivateRoute><Watchlist/></PrivateRoute>

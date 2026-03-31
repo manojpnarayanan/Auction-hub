@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { getMyBids } from "../../api/User/Bidding";
-import { confirmDeliveryAPI, raiseDisputeAPI } from '../../api/User/dispute'
+import { confirmDeliveryAPI, raiseDisputeAPI, uploadEvidence } from '../../api/User/dispute'
 import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import type { AuctionItem } from "../../types/auction";
@@ -25,14 +25,16 @@ export default function MyBids() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const limit = 4;
-    const [reviewModalOpen,setReviewModalOpen]=useState(false);
-    const [reviewAuctionId,setReviewAuctionId]=useState('');
+    const [reviewModalOpen, setReviewModalOpen] = useState(false);
+    const [reviewAuctionId, setReviewAuctionId] = useState('');
 
     // Escrow States
     const [confirmId, setConfirmId] = useState<string | null>(null);
     const [disputeId, setDisputeId] = useState<string | null>(null);
     const [disputeReason, setDisputeReason] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [disputeImage, setDisputeImage] = useState<File | null>(null);
 
     const fetchBids = async () => {
         try {
@@ -62,29 +64,57 @@ export default function MyBids() {
             setConfirmId(null);
             fetchBids();
         } catch (error: unknown) {
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             toast.error(err?.response?.data?.message || "Failed to confirm delivery");
         } finally {
             setActionLoading(false);
         }
     };
 
+    // const handleRaiseDispute = async () => {
+    //     if (!disputeId || !disputeReason.trim()) return;
+    //     try {
+    //         setActionLoading(true);
+    //         await raiseDisputeAPI(disputeId, disputeReason);
+    //         toast.success("Dispute raised. Staff will review the issue and contact you.");
+    //         setDisputeId(null);
+    //         setDisputeReason('');
+    //         fetchBids();
+    //     } catch (error: unknown) {
+    //         const err=error as AxiosError<{message:string}>
+    //         toast.error(err?.response?.data?.message || "Failed to raise dispute");
+    //     } finally {
+    //         setActionLoading(false);
+    //     }
+    // };
+
     const handleRaiseDispute = async () => {
         if (!disputeId || !disputeReason.trim()) return;
         try {
             setActionLoading(true);
-            await raiseDisputeAPI(disputeId, disputeReason);
-            toast.success("Dispute raised. Staff will review the issue and contact you.");
+            let evidenceUrl = ''
+            if (disputeImage) {
+                setIsUploading(true);
+                const formData = new FormData();
+                formData.append('images', disputeImage);
+                const uploadRes = await uploadEvidence(formData);
+                evidenceUrl = uploadRes.data.images[0].url || uploadRes.data.secure_url;
+                setIsUploading(false);
+            };
+            await raiseDisputeAPI(disputeId, disputeReason, evidenceUrl);
+            toast.success("Dispute raised with evidence.We Will review it soon");
             setDisputeId(null);
             setDisputeReason('');
+            setDisputeImage(null);
             fetchBids();
         } catch (error: unknown) {
-            const err=error as AxiosError<{message:string}>
-            toast.error(err?.response?.data?.message || "Failed to raise dispute");
+            toast.error("Failed to submit dispute, Please try again");
         } finally {
             setActionLoading(false);
+            setIsUploading(false);
         }
-    };
+    }
+
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
@@ -92,7 +122,8 @@ export default function MyBids() {
 
             <main className="max-w-7xl mx-auto px-6 py-12 w-full flex-grow">
                 <h2 className="text-3xl font-bold text-gray-800 mb-8">My Bids</h2>
-                
+
+
                 {loading ? (
                     <div className="text-center py-20">Loading...</div>
                 ) : myBids.length === 0 ? (
@@ -124,6 +155,7 @@ export default function MyBids() {
                                                 </span>
                                             </div>
                                             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.auction.description}</p>
+                                            {/* <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.auction.endDate.()}</p> */}
                                         </div>
 
                                         <div className="flex justify-between items-end mt-4">
@@ -142,13 +174,13 @@ export default function MyBids() {
                                 {/* --- ESCROW ACTIONS SECTION --- */}
                                 {item.status === 'won' && item.auction.paymentStatus === 'completed' && item.auction.deliveryStatus === 'pending_delivery' && (
                                     <div className="mt-2 pt-4 border-t border-gray-100 flex gap-3">
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); setConfirmId(item.auction.id); }} 
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setConfirmId(item.auction.id); }}
                                             className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold text-sm transition">
                                             Confirm Receipt
                                         </button>
-                                        <button 
-                                            onClick={(e) => { e.stopPropagation(); setDisputeId(item.auction.id); }} 
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setDisputeId(item.auction.id); }}
                                             className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2 rounded-lg font-semibold text-sm transition">
                                             Report Problem
                                         </button>
@@ -168,20 +200,20 @@ export default function MyBids() {
                                         </div>
                                     </div>
                                 )} */}
-                                        {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
-            <div className="mt-2 pt-4 border-t border-gray-100 flex gap-3 items-center">
-                <div className="flex-1 bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">
-                    Delivery Confirmed & Funds Released
-                </div>
-                {/* Leave Review Button */}
-                <button 
-                    onClick={(e) => { e.stopPropagation(); setReviewAuctionId(item.auction.id); setReviewModalOpen(true); }}
-                    className="px-4 py-2 bg-yellow-500 text-white text-sm font-bold rounded-lg hover:bg-yellow-400 transition shadow-sm"
-                >
-                    ★ Leave Review
-                </button>
-            </div>
-        )}
+                                {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
+                                    <div className="mt-2 pt-4 border-t border-gray-100 flex gap-3 items-center">
+                                        <div className="flex-1 bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">
+                                            Delivery Confirmed & Funds Released
+                                        </div>
+                                        {/* Leave Review Button */}
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setReviewAuctionId(item.auction.id); setReviewModalOpen(true); }}
+                                            className="px-4 py-2 bg-yellow-500 text-white text-sm font-bold rounded-lg hover:bg-yellow-400 transition shadow-sm"
+                                        >
+                                            ★ Leave Review
+                                        </button>
+                                    </div>
+                                )}
 
                             </div>
                         ))}
@@ -189,10 +221,11 @@ export default function MyBids() {
                 )}
             </main>
 
-            <Pagination 
-            currentPage={currentPage} 
-            totalPages={totalPages} 
-            onPageChange={setCurrentPage} 
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                variant='light'
             />
             <Footer />
 
@@ -228,20 +261,45 @@ export default function MyBids() {
                             placeholder="Please explain the issue in detail..."
                             className="w-full border border-gray-300 rounded-lg p-3 text-sm min-h-[100px] mb-4 focus:ring-2 focus:ring-red-500 focus:outline-none"
                         />
+                        <div className="mb-4">
+                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                                Attach Evidence (Photo)
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setDisputeImage(e.target.files?.[0] || null)}
+                                className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer"
+                            />
+                            {disputeImage && (
+                                <p className="mt-2 text-[10px] text-green-600 font-bold italic">
+                                    📷 {disputeImage.name} selected
+                                </p>
+                            )}
+                        </div>
                         <div className="flex gap-3">
-                            <button onClick={() => { setDisputeId(null); setDisputeReason(''); }} className="flex-1 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-semibold" disabled={actionLoading}>Cancel</button>
-                            <button onClick={handleRaiseDispute} className="flex-1 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-semibold opacity-disabled" disabled={!disputeReason.trim() || actionLoading}>
-                                {actionLoading ? 'Submitting...' : 'Submit Dispute'}
+                            <button onClick={() => {
+                                setDisputeId(null);
+                                setDisputeReason('');
+                            }}
+                                className="flex-1 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 font-semibold"
+                                disabled={actionLoading}>Cancel</button>
+                            <button
+                                onClick={handleRaiseDispute}
+                                className="flex-1 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-semibold disabled:opacity-50"
+                                disabled={!disputeReason.trim() || actionLoading || isUploading}
+                            >
+                                {isUploading ? 'Uploading Image...' : actionLoading ? 'Submitting...' : 'Submit Dispute'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
             <ReviewModal
-            isOpen={reviewModalOpen}
-            onClose={()=>setReviewModalOpen(false)}
-            auctionId={reviewAuctionId}
-            onSuccess={()=>toast.success("Review posted successfully")}
+                isOpen={reviewModalOpen}
+                onClose={() => setReviewModalOpen(false)}
+                auctionId={reviewAuctionId}
+                onSuccess={() => toast.success("Review posted successfully")}
             />
         </div>
     );

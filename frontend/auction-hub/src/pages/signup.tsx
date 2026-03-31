@@ -42,7 +42,7 @@ export default function Signup() {
         );
 
         toast.success("Account created securely with Google!");
-        // navigate("/user/dashboard");
+        navigate("/user/dashboard");
       } catch (error: unknown) {
         console.error("Google signup failed", error);
         const err = error as AxiosError<{ message: string }>;

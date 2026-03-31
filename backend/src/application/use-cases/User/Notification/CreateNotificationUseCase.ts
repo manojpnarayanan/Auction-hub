@@ -24,6 +24,7 @@ export class CreateNotificationUseCase implements ICreateNotificationUseCase {
             false,
             new Date(),
             data.link,
+            data.isAdmin || false
         )
 
         const saved = await this._notificationRepository.create(notification);

@@ -6,7 +6,7 @@ import { ICloseExpiredAuctionUseCase } from "../../application/use-cases/Usecase
 import { ISubscriptionRepository } from "../../domain/interfaces/ISubscriptionRepository";
 import { IAuctionRepository } from "../../domain/interfaces/IAuctionRepository";
 import { ISocketService } from "../../domain/interfaces/ISocketService";
-
+import { IAutomatedEscrowReleaseUseCase } from "../../application/use-cases/Usecase Interfaces/Auction-Interface/IAutomatedEscrowReleaseUseCase";
 
 
 export function startCronJobs():void{
@@ -48,6 +48,15 @@ export function startCronJobs():void{
             logger.info('[Cron] expired old subscription plans')
         }catch(error){
             logger.error({ error }, '[Cron] error expiring susbcription plans:');
+        }
+    });
+    cron.schedule("* */6 * * *",async()=>{
+        try{
+           const autoReleaseUseCase=container.get<IAutomatedEscrowReleaseUseCase>(TYPES.AutomatedEscrowUseCase);
+           await autoReleaseUseCase.execute();
+           logger.info("Completed check for Automated Escrow Release"); 
+        }catch(error){
+            logger.error({error},"Errorn in Automated Release Funds");
         }
     })
 }

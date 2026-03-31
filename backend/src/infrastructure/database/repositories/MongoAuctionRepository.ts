@@ -1,15 +1,18 @@
-import { injectable } from "inversify";
+import { injectable,inject } from "inversify";
 import { IAuctionRepository } from "../../../domain/interfaces/IAuctionRepository";
 import { Auction } from "../../../domain/entities/Auction.entity";
 import { AuctionModel, IAuctionDocument } from "../models/AuctionModel";
 import { AuctionPersistanceMapper } from "../Mappers/AuctionPersistanceMapper";
 import { BaseRepository } from "./BaseRepository";
+import { TYPES } from "../../../di/types";
 
 @injectable()
 
 export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocument> implements IAuctionRepository {
-    constructor() {
-        super(AuctionModel, AuctionPersistanceMapper.toEntity)
+    constructor(
+        @inject(TYPES.AuctionPersistanceMapper) private _auctionMapper:AuctionPersistanceMapper
+    ) {
+        super(AuctionModel, _auctionMapper.toEntity.bind(_auctionMapper))
     }
     async findAll(filters?: {
         category?: string,
@@ -49,7 +52,7 @@ export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocu
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-        return { auction: auctions.map(AuctionPersistanceMapper.toEntity), total }
+        return { auction: auctions.map(doc=>this._auctionMapper.toEntity(doc)), total }
     }
     async findBySellerId(sellerId: string, page: number, limit: number): Promise<{ auctions: Auction[], total: number }> {
         const skip = (page - 1) * limit;
@@ -60,12 +63,12 @@ export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocu
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-        return { auctions: auctions.map(AuctionPersistanceMapper.toEntity), total };
+        return { auctions: auctions.map(doc=>this._auctionMapper.toEntity(doc)), total };
     }
 
     async findByCategory(category: string): Promise<Auction[]> {
         const auctions = await AuctionModel.find({ category: category });
-        return auctions.map(AuctionPersistanceMapper.toEntity);
+        return auctions.map(doc=>this._auctionMapper.toEntity(doc));
     }
 
     async addBid(auctionId: string, bid: { bidderId: string; amount: number; time: Date; }): Promise<boolean> {
@@ -82,7 +85,7 @@ export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocu
     async findExpiredActiveAuctions(): Promise<Auction[]> {
         const now = new Date();
         const expiredAuctions = await AuctionModel.find({ status: "active", endDate: { $lt: now } });
-        return expiredAuctions.map(AuctionPersistanceMapper.toEntity)
+        return expiredAuctions.map(doc=>this._auctionMapper.toEntity(doc))
     }
 
     async updateAuctionStatus(id: string, status: string, winnerId?: string, rejectionReason?: string, cancellationReason?: string): Promise<void> {
@@ -96,7 +99,11 @@ export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocu
     }
 
     async updatePaymentStatus(auctionId: string, status: string): Promise<void> {
-        await AuctionModel.findByIdAndUpdate(auctionId, { paymentStatus: status })
+        const updateData:{paymentStatus:string;paidAt?:Date} = {paymentStatus:status};
+        if(status === 'completed'){
+            updateData.paidAt=new Date;
+        }
+        await AuctionModel.findByIdAndUpdate(auctionId, updateData);
     }
 
     async recalculateCurrentPrice(auctionId: string): Promise<void> {
@@ -108,7 +115,7 @@ export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocu
     async findAuctionstoStart(): Promise<Auction[]> {
         const now = new Date();
         const auctions = await AuctionModel.find({ status: 'approved', startTime: { $lte: now } });
-        return auctions.map(AuctionPersistanceMapper.toEntity);
+        return auctions.map(doc=>this._auctionMapper.toEntity(doc));
     }
     async getAuctionStats(): Promise<{ sold: number; expired: number; pending: number; approved: number; active: number; }> {
         const [sold, expired, pending, approved, active] = await Promise.all([
@@ -119,5 +126,13 @@ export class MongoAuctionRepository extends BaseRepository<Auction, IAuctionDocu
             AuctionModel.countDocuments({ status: 'active' })
         ])
         return { sold, expired, pending, approved, active };
+    }
+    async findPaidAuctions(thresholdDate: Date): Promise<Auction[] | null> {
+        const auctions=await AuctionModel.find({
+            paymentStatus:'completed',
+            deliveryStatus:'pending_delivery',
+            paidAt:{$lte:thresholdDate}
+        });
+        return auctions.map(doc=>this._auctionMapper.toEntity(doc))
     }
 }

@@ -7,18 +7,23 @@ import type { AxiosError } from "axios";
 
 interface UserRef {
     _id: string;
-    name?: string;
+    name: string;
     email?: string;
+}
+interface AuctionRef{
+    _id:string;
+    title:string;
 }
 
 interface DisputeItem {
     id: string;
-    auctionid: string;
-    buyerId: UserRef | string;
-    sellerId: UserRef | string;
+    auctionId: AuctionRef;
+    buyerId: UserRef;
+    sellerId: UserRef;
     reason: string;
     status: 'open' | 'under_review' | 'resolved_refunded' | 'resolved_rejected';
     adminNote?: string;
+    evidence?:string;
     createdAt: string;
 }
 
@@ -28,16 +33,13 @@ export default function AdminDisputes() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [filterStatus, setFilterStatus] = useState('all');
-
-    // Resolution Custom Modal State
     const [resolvingId, setResolvingId] = useState<string | null>(null);
     const [resolutionAction, setResolutionAction] = useState<'refund' | 'reject'>('refund');
     const [adminNote, setAdminNote] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
-
-    // InfoModal State (replacing alerts)
     const [infoModalOpen, setInfoModalOpen] = useState(false);
     const [infoModalContent, setInfoModalContent] = useState({ title: "", message: "" });
+    const [previewImage,setPreviewImage]=useState<string | null>(null);
 
     const fetchDisputes = async () => {
         try {
@@ -54,7 +56,7 @@ export default function AdminDisputes() {
 
     useEffect(() => {
         fetchDisputes();
-                // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, filterStatus]);
 
     const handleResolve = async () => {
@@ -69,8 +71,8 @@ export default function AdminDisputes() {
             setResolvingId(null);
             setAdminNote("");
             fetchDisputes();
-        } catch (error:unknown) {
-            const err=error as AxiosError<{message:string}>
+        } catch (error: unknown) {
+            const err = error as AxiosError<{ message: string }>
             setInfoModalContent({ title: "Resolution Failed", message: err.response?.data?.message || "Failed to resolve dispute" });
             setInfoModalOpen(true);
         } finally {
@@ -78,7 +80,7 @@ export default function AdminDisputes() {
         }
     };
 
-    const getBuyerName = (buyer: UserRef | string) => typeof buyer === 'string' ? buyer : buyer.name || buyer._id;
+    // const getBuyerName = (buyer: UserRef | string) => typeof buyer === 'string' ? buyer : buyer.name || buyer._id;
 
     return (
         <div className="text-white min-h-[80vh]">
@@ -113,14 +115,16 @@ export default function AdminDisputes() {
                         <div key={dispute.id} className="bg-[#1c2128] p-6 rounded-xl border border-gray-800">
                             <div className="flex justify-between mb-4">
                                 <div>
-                                    <h3 className="font-bold text-lg text-white">Auction ID: {dispute.auctionid}</h3>
-                                    <p className="text-sm text-gray-400 mt-1">User Name: {getBuyerName(dispute.buyerId)}</p>
+                                    {/* <h3 className="font-bold text-lg text-white">Auction ID: {dispute.auctionid}</h3>
+                                    <p className="text-sm text-gray-400 mt-1">User Name: {getBuyerName(dispute.buyerId)}</p> */}
                                     {/* <p className="text-sm text-gray-400 mt-1">Raised by: {getBuyerName(dispute.buyerId)} • on {new Date(dispute.createdAt).toLocaleDateString()}</p> */}
+                                    <h3 className="font-bold text-lg text-white">Item: {dispute.auctionId?.title || 'Unknown Item'}</h3>
+                                     <p className="text-sm text-gray-400 mt-1">Claim by: <span className="text-blue-400 font-semibold">{dispute.buyerId?.name}</span></p>
                                 </div>
                                 <span className={`px-3 py-1 text-xs font-bold rounded-full h-min ${dispute.status === 'open' ? 'bg-red-500/20 text-red-500 border border-red-500/30' :
-                                        dispute.status === 'resolved_refunded' ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30' :
-                                            dispute.status === 'resolved_rejected' ? 'bg-gray-700 text-gray-300' :
-                                                'bg-orange-500/20 text-orange-500 border border-orange-500/30'
+                                    dispute.status === 'resolved_refunded' ? 'bg-blue-500/20 text-blue-500 border border-blue-500/30' :
+                                        dispute.status === 'resolved_rejected' ? 'bg-gray-700 text-gray-300' :
+                                            'bg-orange-500/20 text-orange-500 border border-orange-500/30'
                                     }`}>
                                     {dispute.status.replace('_', ' ').toUpperCase()}
                                 </span>
@@ -131,6 +135,16 @@ export default function AdminDisputes() {
                                 <p className="text-sm text-gray-300">{dispute.reason}</p>
                             </div>
 
+                            {dispute.evidence && (
+    <div className="mb-4">
+        <button 
+            onClick={() => setPreviewImage(dispute.evidence!)}
+            className="flex items-center gap-2 text-xs font-bold text-blue-500 hover:text-blue-400 transition uppercase tracking-widest"
+        >
+            🖼️ View Evidence Photo
+        </button>
+    </div>
+)}
                             {dispute.status === 'open' ? (
                                 <div className="flex gap-4">
                                     <button
@@ -190,6 +204,25 @@ export default function AdminDisputes() {
                     </div>
                 </div>
             )}
+            {/* --- PHOTO PREVIEW MODAL --- */}
+{previewImage && (
+    <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-8" onClick={() => setPreviewImage(null)}>
+        <div className="relative max-w-4xl max-h-full">
+            <button 
+                className="absolute -top-10 right-0 text-white text-xl font-bold hover:text-gray-300"
+                onClick={() => setPreviewImage(null)}
+            >
+                ✕ Close
+            </button>
+            <img 
+                src={previewImage} 
+                alt="Evidence" 
+                className="rounded-lg shadow-2xl max-w-full max-h-[85vh] object-contain border-4 border-[#1c2128]" 
+            />
+        </div>
+    </div>
+)}
+
 
             {/* INFO MODAL REPLACING ALERTS */}
             <InfoModal

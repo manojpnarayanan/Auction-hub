@@ -22,8 +22,10 @@ export class PaymentReleaseEvent implements IDomainEvent{
     constructor(
         public readonly auctionId:string,
         public readonly sellerId:string,
+        public readonly buyerId:string,
         public readonly amount:number,
         public readonly commission:number,
+        public readonly isAutomatic:boolean
     ){
         this.dateTimeOccurred=new Date();
     }

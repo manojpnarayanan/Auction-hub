@@ -1,4 +1,4 @@
-import { useEffect, useState ,useCallback} from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getAuctionProductDetails } from "../../api/auctions";
 import { placeBid } from "../../api/User/Bidding";
@@ -16,6 +16,7 @@ import type { Review } from "../../types/review";
 import { AxiosError } from "axios";
 import { getSellerReviews } from "../../api/User/Review";
 // import type { BidItem } from "../../types/Bid";
+import { useNavigate } from "react-router-dom";
 
 interface Auction {
     id: string;
@@ -35,7 +36,7 @@ interface Auction {
         time: Date;
     }>;
     paymentStatus: string;
-    sellerId:string;
+    sellerId: string;
 }
 
 export default function AuctionProductDetails() {
@@ -49,8 +50,9 @@ export default function AuctionProductDetails() {
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const { paymentSession, initiating, initiatePayment, closePayment } = usePayment();
     const [isWatchlisted, setIsWatchlisted] = useState(false);
-    const [sellerReviews,setSellerReviews]=useState({reviews:[],averageRating:0,total:0});
+    const [sellerReviews, setSellerReviews] = useState({ reviews: [], averageRating: 0, total: 0 });
 
+    const navigate = useNavigate();
     const calculateTimeLeft = useCallback(() => {
         if (!auction?.endDate) return { h: "00", m: "00", s: "00", ended: true };
         const difference = +new Date(auction.endDate) - +new Date();
@@ -62,20 +64,20 @@ export default function AuctionProductDetails() {
             s: String(Math.floor((difference / 1000) % 60)).padStart(2, '0'),
             ended: false
         };
-    },[auction?.endDate]);
+    }, [auction?.endDate]);
 
     useEffect(() => {
         const checkStatus = async () => {
             try {
                 const res = await checkWatchlist(id!);
                 setIsWatchlisted(res.data.data.isWatchlisted);
-            } catch(error) {
+            } catch (error) {
                 console.error(error)
 
-             }
+            }
         }
-        if (id) checkStatus();
-    }, [id]);
+        if (id && currentUser) checkStatus();
+    }, [id, currentUser]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -98,21 +100,21 @@ export default function AuctionProductDetails() {
         } finally {
             setLoading(false);
         }
-    },[id]);
+    }, [id]);
 
-    useEffect(()=>{
-        const fetchReviews=async()=>{
-            if(auction?.sellerId){
-                try{
-                    const res=await getSellerReviews(auction.sellerId,1,5);
+    useEffect(() => {
+        const fetchReviews = async () => {
+            if (auction?.sellerId) {
+                try {
+                    const res = await getSellerReviews(auction.sellerId, 1, 5);
                     setSellerReviews(res.data)
-                }catch(error){
-                    console.error("Failed to fetch seller reviews",error);
+                } catch (error) {
+                    console.error("Failed to fetch seller reviews", error);
                 }
             }
         };
         fetchReviews();
-    },[auction?.sellerId]);
+    }, [auction?.sellerId]);
 
     useEffect(() => {
         if (id) {
@@ -127,17 +129,21 @@ export default function AuctionProductDetails() {
                     }
                 });
             });
-            socket.on("auction_ended",()=>{
+            socket.on("auction_ended", () => {
                 fetchAuction();
             })
         }
-        return () => { 
+        return () => {
             socket.off('bid_update');
             socket.off("auction_ended");
         };
-    }, [id,fetchAuction]);
+    }, [id, fetchAuction]);
 
     const handleWatchlistToggle = async () => {
+        if(!currentUser){
+            toast.error("Please login or signup to add items to Watchlist");
+            return;
+        }
         try {
             if (isWatchlisted) {
                 await removeFromWatchlist(id!);
@@ -153,7 +159,7 @@ export default function AuctionProductDetails() {
         }
     };
 
-    
+
     useEffect(() => { fetchAuction(); }, [fetchAuction]);
 
     const handlePlaceBid = async () => {
@@ -187,7 +193,7 @@ export default function AuctionProductDetails() {
             <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
                 {/* 2-Column Hero Section */}
                 <div className="flex flex-col lg:flex-row gap-8 items-start mb-12">
-                    
+
                     {/* Left Side: Image Gallery */}
                     <div className="w-full lg:w-3/5 space-y-4">
                         <div className="relative group aspect-square sm:aspect-video bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
@@ -203,8 +209,8 @@ export default function AuctionProductDetails() {
                         {auction.images && auction.images.length > 1 && (
                             <div className="flex gap-4 overflow-x-auto py-2 px-1 scrollbar-hide">
                                 {auction.images.map((img, idx) => (
-                                    <button 
-                                        key={idx} 
+                                    <button
+                                        key={idx}
                                         onClick={() => setSelectedImage(img)}
                                         className={`w-24 h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${selectedImage === img ? 'border-blue-600 scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                     >
@@ -220,7 +226,7 @@ export default function AuctionProductDetails() {
                         <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 relative overflow-hidden">
                             {/* Decorative Background Element */}
                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
-                            
+
                             <div className="relative">
                                 <div className="flex justify-between items-start mb-4">
                                     <h1 className="text-3xl font-black text-slate-800 leading-tight">{auction.title}</h1>
@@ -229,9 +235,9 @@ export default function AuctionProductDetails() {
                                     </button>
                                 </div>
 
-                                
+
                                 {/* Rating Section */}
-                                                               {sellerReviews.total > 0 && (
+                                {sellerReviews.total > 0 && (
                                     <div className="mb-8 bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm inline-flex items-center gap-6">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Seller Rating</span>
@@ -276,6 +282,7 @@ export default function AuctionProductDetails() {
                                 {/* Action Area */}
                                 <div className="space-y-4">
                                     {auction.status === 'sold' && auction.winnerId ? (
+                                        /* 1. AUCTION IS SOLD */
                                         <div className="space-y-4">
                                             <div className="bg-green-50 text-green-700 p-4 rounded-2xl font-bold border border-green-100 flex items-center gap-3">
                                                 <span className="text-2xl">🏆</span>
@@ -297,21 +304,42 @@ export default function AuctionProductDetails() {
                                             )}
                                         </div>
                                     ) : !isActive ? (
-                                        <div className="bg-slate-100 text-slate-500 p-5 rounded-2xl text-center font-bold">Auction has concluded</div>
+                                        /* 2. AUCTION NOT ACTIVE */
+                                        <div className="bg-slate-100 text-slate-500 p-5 rounded-2xl text-center font-bold">
+                                            Auction has concluded
+                                        </div>
+                                    ) : !currentUser ? (
+                                        /* 3. GUEST USER (Conversion Banner) */
+                                        <div className="bg-blue-50 border-2 border-blue-100 p-8 rounded-3xl shadow-sm text-center">
+                                            <h3 className="text-blue-900 font-black text-2xl mb-2 tracking-tight text-center">Join the Auction!</h3>
+                                            <p className="text-blue-600 mb-8 text-sm leading-relaxed max-w-[240px] mx-auto text-center">
+                                                You must be a registered member to place bids and track this item.
+                                            </p>
+                                            <button
+                                                onClick={() => navigate('/signup')}
+                                                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-lg transition shadow-lg shadow-blue-200 active:scale-95"
+                                            >
+                                                GET STARTED FOR FREE
+                                            </button>
+                                            <p className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">
+                                                Already a member? <span onClick={() => navigate('/login')} className="text-blue-500 cursor-pointer hover:underline font-bold">Log in</span>
+                                            </p>
+                                        </div>
                                     ) : (
+                                        /* 4. LOGGED-IN MEMBER (Show Bidding Input) */
                                         <div className="space-y-3">
                                             <div className="relative">
                                                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
-                                                <input 
-                                                    type="number" 
-                                                    placeholder={`Min 1 + Current Price`} 
+                                                <input
+                                                    type="number"
+                                                    placeholder={`Min 1 + Current Price`}
                                                     value={bidAmount}
                                                     onChange={(e) => setBidAmount(e.target.value)}
                                                     className="w-full bg-slate-50 border-2 border-slate-100 p-4 pl-10 rounded-2xl outline-none focus:border-blue-500 focus:bg-white transition-all font-bold text-lg"
                                                 />
                                             </div>
-                                            <button 
-                                                onClick={handlePlaceBid} 
+                                            <button
+                                                onClick={handlePlaceBid}
                                                 disabled={biddingLoading}
                                                 className="w-full bg-slate-900 hover:bg-black text-white py-4 rounded-2xl font-black text-lg transition-all shadow-xl active:scale-95 disabled:opacity-50"
                                             >
@@ -320,6 +348,7 @@ export default function AuctionProductDetails() {
                                         </div>
                                     )}
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -401,11 +430,13 @@ export default function AuctionProductDetails() {
                     clientSecret={paymentSession.clientSecret}
                     amount={(auction.currentPrice || auction.startingPrice) * 100}
                     title="Complete Auction Payment"
-                    onSuccess={async () => { 
-                        await confirmPayment({ 
-                            paymentIntentId: paymentSession.paymentIntentId, 
-                            auctionId: auction.id 
+                    onSuccess={async () => {
+                        await confirmPayment({
+                            paymentIntentId: paymentSession.paymentIntentId,
+                            auctionId: auction.id
                         });
+                        closePayment();
+                        fetchAuction();
                     }}
                     onClose={() => { closePayment(); fetchAuction(); }}
                 />

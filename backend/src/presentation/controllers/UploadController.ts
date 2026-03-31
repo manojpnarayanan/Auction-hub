@@ -18,7 +18,9 @@ export class UploadController {
             };
             const uploadPromises=files.map(file=>{
                 return cloudinary.uploader.upload(file.path,{
-                    folder:"auction-hub"
+                    folder:"auction-hub",
+                    type:"authenticated",
+                    access_mode:"authenticated"
                 }).then(result=>{
                     fs.unlinkSync(file.path);
                     return {

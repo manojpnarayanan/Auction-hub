@@ -38,7 +38,7 @@ export default function AdminLogin() {
                 })
             );
 
-            // navigate("/admin/dashboard");
+            navigate("/admin/dashboard");
         } catch (error: unknown) {
             console.error("Admin login failed", error);
             const err = error as AxiosError<{ message: string }>

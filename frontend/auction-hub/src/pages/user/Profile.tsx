@@ -13,6 +13,7 @@ import { getWallet } from "../../api/User/wallet";
 import type { WalletWithTransactions } from "../../types/wallet";
 import { AxiosError } from "axios";
 import type { TransactionItem } from "../../types/transaction";
+import Pagination from "../../components/Pagination";
 
 
 type Section = "profile" | "password" | "address" | "wallet";
@@ -55,6 +56,9 @@ export default function Profile() {
     });
     const [walletData, setWalletData] = useState<WalletWithTransactions | null>(null);
     const [walletLoading, setWalletLoading] = useState(false);
+    const [walletPage, setWalletPage] = useState(1);
+    const walletLimit = 5;
+
 
     useEffect(() => {
         const fetchAddresses = async () => {
@@ -62,8 +66,8 @@ export default function Profile() {
                 const res = await getAddress();
                 setAddresses(res.data);
             } catch (error) {
-                const err=error as AxiosError<{message:string}>
-                toast.error(err.response?.data?.message ||"Failed to load Addresses");
+                const err = error as AxiosError<{ message: string }>
+                toast.error(err.response?.data?.message || "Failed to load Addresses");
             }
         }
         fetchAddresses();
@@ -166,8 +170,8 @@ export default function Profile() {
                     phone: res.data.phone || "",
                     profileImage: res.data.profileImage || "",
                 });
-            } catch (error){
-                const err=error as AxiosError<{message:string}>
+            } catch (error) {
+                const err = error as AxiosError<{ message: string }>
                 toast.error(err.response?.data?.message || "Failed to load profile");
             }
         };
@@ -178,17 +182,17 @@ export default function Profile() {
         const fetchWallet = async () => {
             setWalletLoading(true);
             try {
-                const res = await getWallet();
+                const res = await getWallet(walletPage, walletLimit);
                 setWalletData(res.data);
             } catch (error) {
-                const err=error as AxiosError<{message:string}>
+                const err = error as AxiosError<{ message: string }>
                 toast.error(err.response?.data?.message || 'Failed to load Wallet');
             } finally {
                 setWalletLoading(false);
             }
         }
         fetchWallet();
-    }, [activeSection]);
+    }, [activeSection, walletPage]);
 
     const handleProfileSave = async () => {
         setLoading(true);
@@ -200,8 +204,8 @@ export default function Profile() {
             });
             toast.success("Profile updated successfully!");
         } catch (error) {
-            const err=error as AxiosError<{message:string}>
-            toast.error(err.response?.data?.message ||"Failed to update profile");
+            const err = error as AxiosError<{ message: string }>
+            toast.error(err.response?.data?.message || "Failed to update profile");
         } finally {
             setLoading(false);
         }
@@ -237,7 +241,7 @@ export default function Profile() {
             toast.success("Password changed successfully!");
             setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
         } catch (error: unknown) {
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             toast.error(err?.response?.data?.message || "Failed to change password");
         } finally {
             setLoading(false);
@@ -266,7 +270,7 @@ export default function Profile() {
             setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
             toast.success("Profile updated successfully");
         } catch (error) {
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             toast.error(err.response?.data?.message || "Failed to upload photo");
         }
 
@@ -619,23 +623,59 @@ export default function Profile() {
                         {/* Wallet-Section  */}
 
                         {activeSection === "wallet" && (
-                            <div className="space-y-4">
-                                {/* Balance Card */}
-                                <div className="bg-gradient-to-r from-[#1da1f2] to-[#0d8ddc] rounded-2xl p-6 text-white shadow-md">
-                                    <p className="text-sm text-white/80 font-medium">Available Balance</p>
-                                    <p className="text-4xl font-bold mt-1">
-                                        ₹{walletData?.wallet?.balance?.toFixed(2) || "0.00"}
-                                    </p>
-                                </div>
+                            <>
+                                <div className="space-y-4">
+                                    {/* Balance Card */}
+                                    <div className="bg-gradient-to-r from-[#1da1f2] to-[#0d8ddc] rounded-2xl p-6 text-white shadow-md">
+                                        <p className="text-sm text-white/80 font-medium">Available Balance</p>
+                                        <p className="text-4xl font-bold mt-1">
+                                            ₹{walletData?.wallet?.balance?.toFixed(2) || "0.00"}
+                                        </p>
+                                    </div>
 
-                                {/* Transactions */}
-                                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                                    <h3 className="font-bold text-gray-800 mb-4">Recent Transactions</h3>
-                                    {walletLoading ? (
+                                    {/* Transactions */}
+                                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                                        <h3 className="font-bold text-gray-800 mb-4">Recent Transactions</h3>
+                                        {walletLoading ? (
+                                            <p className="text-center text-gray-400 py-8">Loading...</p>
+                                        ) : walletData?.transactions && walletData.transactions.length > 0 ? (
+                                            <>
+                                                <div className="space-y-3">
+                                                    {walletData.transactions.map((tx: TransactionItem) => (
+                                                        <div key={tx.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                                            <div>
+                                                                <p className="font-semibold text-gray-700 text-sm capitalize">{tx.purpose?.replace('_', ' ')}</p>
+                                                                <p className="text-xs text-gray-400">{new Date(tx.createdAt).toLocaleDateString()}</p>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className={`font-bold ${tx.type === 'credit' ? 'text-green-600' : 'text-red-500'}`}>
+                                                                    {tx.type === 'credit' ? '+' : '-'}₹{tx.amount}
+                                                                </p>
+                                                                <p className="text-xs text-gray-400 uppercase">{tx.status}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <Pagination
+                                                    currentPage={walletPage}
+                                                    totalPages={Math.ceil((walletData?.total || 0) / walletLimit)}
+                                                    onPageChange={(page) => setWalletPage(page)}
+                                                    variant ='light'
+                                                />
+                                            </>
+                                        ) : (
+                                            <div className="text-center py-12 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                                                <div className="text-5xl mb-3">💸</div>
+                                                <p className="text-gray-600 font-semibold">No transactions yet</p>
+                                                <p className="text-sm text-gray-400 mt-1">Your payment history will appear here</p>
+                                            </div>
+                                        )}
+
+                                        {/* {walletLoading ? (
                                         <p className="text-center text-gray-400 py-8">Loading...</p>
-                                    ) : walletData?.transactions && walletData.transactions.filter((tx: TransactionItem) => tx.status === 'completed').length > 0 ? (
+                                    ) : walletData?.transactions && walletData.transactions.map((tx: TransactionItem) => tx.status === 'completed').length > 0 ? (
                                         <div className="space-y-3">
-                                            {walletData.transactions.filter((tx:TransactionItem)=>tx.status==='completed').map((tx: TransactionItem) => (
+                                            {walletData.transactions.filter((tx: TransactionItem) => tx.status === 'completed').map((tx: TransactionItem) => (
                                                 <div key={tx.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
                                                     <div>
                                                         <p className="font-semibold text-gray-700 text-sm capitalize">{tx.purpose?.replace('_', ' ')}</p>
@@ -656,16 +696,23 @@ export default function Profile() {
                                             <p className="text-gray-600 font-semibold">No transactions yet</p>
                                             <p className="text-sm text-gray-400 mt-1">Your payment history will appear here</p>
                                         </div>
-                                    )}
+                                    )} */}
+                                    </div>
                                 </div>
-                            </div>
+
+                                {/* <Pagination
+                                    currentPage={walletPage}
+                                    totalPages={Math.ceil(walletData?.total || 0) / walletLimit}
+                                    onPageChange={(page) => setWalletPage(page)}
+                                /> */}
+                            </>
                         )}
 
                     </main>
                 </div>
             </div>
 
-            <Footer />
+
             <ConfirmModal
                 isOpen={!!confirmDeletedId}
                 title="Delete Address"
@@ -673,6 +720,7 @@ export default function Profile() {
                 onConfirm={handleDeleteAddress}
                 onClose={() => setConfirmDeltedId(null)}
             />
+            <Footer />
 
         </div>
     );

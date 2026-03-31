@@ -1,73 +1,178 @@
-import { useEffect } from "react";
-import { getAllAuctions ,getAllCategories } from "../../api/auctions";
+import { useEffect, useState, useCallback } from "react";
+import { getAllAuctions } from "../../api/auctions";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import type { AuctionItem } from "../../types/auction";
 import type { CategoryItem } from "../../types/category";
+import Navbar from "../../components/Navbar"; // 1. Added Navbar
+import Footer from "../../components/Footer"; // 2. Added Footer
+import { getCategories } from "../../api/Admin/Category";
+import toast from "react-hot-toast";
 
 
-const Home=()=>{
-    const [categories,setCategories]=useState<CategoryItem[]>([]);
-    const [auctions,setAuctions]=useState<AuctionItem[]>([]);
-    const navigate=useNavigate();
-    useEffect(()=>{
-        getAllCategories().then(res=>setCategories(res.data)).catch(console.error);
+const Home = () => {
+    const [categories, setCategories] = useState<CategoryItem[]>([]);
+    const [auctions, setAuctions] = useState<AuctionItem[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [searchText, setSearchText] = useState("");
+    const navigate = useNavigate();
 
-        getAllAuctions({}).then(res=>setAuctions(res.data.data || res.data)).catch(console.error);
-    },[]);
+    // Replicate Categories with Icons logic from Dashboard
+    const getCategoryIcon = (name: string) => {
+        switch (name.toLowerCase()) {
+            case "vehicles": return '🚗';
+            case 'electronics': return '💻';
+            case 'real estate': return '🏠';
+            case 'art': return '🎨';
+            case 'others': return '📦';
+            default: return '✨';
+        }
+    }
+
+    const fetchAll = useCallback(async () => {
+        try {
+            const res = await getAllAuctions({ category: selectedCategory, search: searchText });
+            setAuctions(res.data.data || res.data);
+        } catch (error) {
+            console.error("Failed to load auctions", error);
+        }
+    }, [selectedCategory, searchText]);
+
+    useEffect(() => {
+        const loadCats=async()=>{
+            try{
+                const data=await getCategories(1,100,searchText);
+                setCategories([{_id:'all',name:"All"},...data.categories]);
+            }catch(error){
+                toast.error(("Failed to load categories"));
+                
+            }
+        }
+        loadCats();
+    }, [searchText]);
+
+    useEffect(() => {
+        fetchAll();
+    }, [fetchAll]);
+
+    const liveAuctions = auctions.filter(a => a.type === 'live' || a.type === 'approved');
+    const timedAuctions = auctions.filter(a => a.type === 'timed');
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Hero Section */}
-            <section className="bg-blue-600 text-white py-20">
-                <div className="container mx-auto text-center">
-                    <h1 className="text-5xl font-bold mb-4">Find Your Treasure</h1>
-                    <p className="text-xl mb-8">Join active auctions and bid on exclusive items.</p>
+        <div className="min-h-screen bg-gray-50 font-sans">
+            {/* 1. Navbar */}
+            <Navbar searchText={searchText} setSearchText={setSearchText} />
 
-                    <button 
-            onClick={() => navigate('/auctions')}
-            className="bg-white text-blue-600 px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
-            Browse All Auctions
-        </button>
+            {/* 2. Hero Section (Mirrors Dashboard) */}
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[21/9]">
+                    <img
+                        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2600"
+                        alt="Hero"
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 md:p-12 pointer-events-none">
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">Find Your Next Treasure</h2>
+                        <p className="text-white/90 text-sm md:text-base max-w-xl">
+                            Explore a wide range of items, from vintage collectibles to cutting-edge tech. Start bidding now and discover deals.
+                        </p>
+                    </div>
                 </div>
-            </section>
-            {/* Categories Section */}
-            <section className="container mx-auto py-12 px-4">
-                <h2 className="text-3xl font-bold mb-8">Explore Categories</h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {categories.map((cat: CategoryItem) => (
-                        <div key={cat._id} 
-                             onClick={() => navigate('/auctions?category=' + cat.name)}
-                             className="bg-white p-6 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition">
-                            <h3 className="text-lg font-semibold text-center">{cat.name}</h3>
-                        </div>
-                    ))}
-                </div>
-            </section>
-            {/* Featured Auctions Section */}
-            <section className="container mx-auto py-12 px-4">
-                <h2 className="text-3xl font-bold mb-8">Live & Trending Auctions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {auctions.slice(0, 6).map((auction: AuctionItem) => (
-                        <div key={auction.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                             {/* You can use your existing AuctionCard component if you have one, or build a simple one here */}
-                            <img src={auction.images?.[0] || 'https://via.placeholder.com/300'} alt={auction.title} className="w-full h-48 object-cover" />
-                            <div className="p-4">
-                                <span className={`inline-block px-2 py-1 text-xs font-semibold rounded mb-2 ${auction.type === 'live' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
-                                    {auction.type === 'live' ? 'LIVE' : 'TIMED'}
+            </div>
+
+            <main className="max-w-7xl mx-auto px-6 pb-12 space-y-12">
+                {/* 3. Categories (Mirrors Dashboard) */}
+                <section>
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Categories</h3>
+                    <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+                        {categories.map((cat) => (
+                            <div
+                                key={cat.name}
+                                onClick={() => setSelectedCategory(cat.name)}
+                                className={`flex flex-col items-center gap-2 cursor-pointer group flex-shrink-0 ${selectedCategory === cat.name ? "opacity-100" : "opacity-60 hover:opacity-100"}`}
+                            >
+                                <div className={`w-16 h-16 rounded-2xl shadow-sm border flex items-center justify-center text-3xl transition-all ${selectedCategory === cat.name ? "bg-blue-50 border-blue-500 scale-110" : "bg-white border-gray-100"}`}>
+                                    {getCategoryIcon(cat.name)}
+                                </div>
+                                <span className={`text-xs font-semibold ${selectedCategory === cat.name ? "text-blue-600" : "text-gray-600"}`}>
+                                    {cat.name}
                                 </span>
-                                <h3 className="text-xl font-bold">{auction.title}</h3>
-                                <p className="text-gray-600">Current Bid: ₹{auction.currentPrice}</p>
-                                <button 
-                                    onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
-                                    className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-                                    View Details
-                                </button>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
+                        ))}
+                    </div>
+                </section>
+
+                {/* 4. Live Auctions (Mirrors Dashboard Card style) */}
+                <section>
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Live Auctions</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {liveAuctions.length === 0 ? (
+                            <div className="col-span-3 text-center py-10 bg-white rounded-xl border border-gray-100 italic text-gray-400">
+                                No live auctions available.
+                            </div>
+                        ) : (
+                            liveAuctions.map((auction) => (
+                                <div key={auction.id}
+                                    onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
+                                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
+                                    <div className="h-40 overflow-hidden bg-gray-200">
+                                        {auction.images?.[0] ? 
+                                            <img src={auction.images[0]} alt={auction.title} className="w-full h-full object-cover" /> : 
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                                        }
+                                    </div>
+                                    <div className="p-4">
+                                        <h4 className="font-bold text-gray-900 truncate">{auction.title}</h4>
+                                        <p className="text-sm text-blue-600 font-bold mt-1">
+                                            Current Price: ₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}
+                                        </p>
+                                        <div className="flex justify-between items-center mt-2">
+                                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{auction.category}</span>
+                                            <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 capitalize">{auction.status}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </section>
+
+                {/* 5. Timed Auctions (Mirrors Dashboard Card style) */}
+                <section>
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Timed Auctions</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {timedAuctions.length === 0 ? (
+                            <div className="col-span-3 text-center py-10 bg-white rounded-xl border border-gray-100 italic text-gray-400">
+                                No timed auctions available.
+                            </div>
+                        ) : (
+                            timedAuctions.map((auction) => (
+                                <div key={auction.id}
+                                    onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
+                                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
+                                    <div className="h-40 overflow-hidden bg-gray-200">
+                                        {auction.images?.[0] ? 
+                                            <img src={auction.images[0]} alt={auction.title} className="w-full h-full object-cover" /> : 
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                                        }
+                                    </div>
+                                    <div className="p-4">
+                                        <h4 className="font-bold text-gray-900 truncate">{auction.title}</h4>
+                                        <p className="text-sm text-blue-600 font-bold mt-1">
+                                            Current Bid: ₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}
+                                        </p>
+                                        <div className="flex justify-between items-center mt-2">
+                                            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">{auction.category}</span>
+                                            <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-bold">{auction.status.toUpperCase()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </section>
+            </main>
+            
+            <Footer />
         </div>
     );
 }

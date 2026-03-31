@@ -38,6 +38,7 @@ import { IResendOtpUseCase } from "../application/use-cases/Usecase Interfaces/I
 import { ResendOtpUseCase } from "../application/use-cases/auth/ResendOtpUseCase";
 import { ILogoutUseCase } from "../application/use-cases/Usecase Interfaces/ILogoutUseCase";
 import { LogoutUseCase } from "../application/use-cases/auth/LogoutUseCase";
+
 //  Auction-useCases
 import { ICreateAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IAuctionUseCase";
 import { CreateAuctionUseCase } from "../application/use-cases/auction/CreateAuctionUseCase";
@@ -57,7 +58,8 @@ import { IEndLiveAuctionUseCase } from "../application/use-cases/Usecase Interfa
 import { EndLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/EndLiveAuctionUseCase";
 import { ICancelLiveAuctionUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/ICancelLiveAuctionUseCase";
 import { CancelLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/CancelLiveAuctionUseCase";
-
+import { IAutomatedEscrowReleaseUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IAutomatedEscrowReleaseUseCase";
+import { AutomatedEscrowUseCase } from "../application/use-cases/auction/AutomatedEscrowUseCase";
 
 
 // Admin-useCases
@@ -233,6 +235,10 @@ import { IReviewRepository } from "../domain/interfaces/IReviewRepository";
 import { MongoReviewRepository } from "../infrastructure/database/repositories/MongoReviewRepository";
 import { ReviewController } from "../presentation/controllers/user/ReviewController";
 
+// Cloudinary
+import { CloudinaryService } from "../infrastructure/Service/CloudinaryService";
+import { AuctionPersistanceMapper } from "../infrastructure/database/Mappers/AuctionPersistanceMapper";
+import { UserPersistanceMapper } from "../infrastructure/database/Mappers/UserPersistanceMapper";
 
 
 
@@ -240,6 +246,12 @@ const container = new Container();
 // Repositories
 container.bind<IUserRepository>(TYPES.UserRepository).to(MongoUserRepository);
 container.bind<IAuctionRepository>(TYPES.AuctionRepository).to(MongoAuctionRepository);
+
+// Cloudinary-Service
+container.bind<CloudinaryService>(TYPES.CloudinaryService).to(CloudinaryService).inSingletonScope();
+container.bind<AuctionPersistanceMapper>(TYPES.AuctionPersistanceMapper).to(AuctionPersistanceMapper);
+container.bind<UserPersistanceMapper>(TYPES.UserPersistanceMapper).to(UserPersistanceMapper);
+
 
 //  Auth useCases
 container.bind<ISignupUseCase>(TYPES.SignupUseCase).to(SignupUseCase);
@@ -265,6 +277,7 @@ container.bind<IStartLiveAuctionUseCase>(TYPES.StartLiveAuctionUseCase).to(Start
 container.bind<IEndLiveAuctionUseCase>(TYPES.EndLiveAuctionUseCase).to(EndLiveAuctionUseCase);
 container.bind<ICancelLiveAuctionUseCase>(TYPES.CancelLiveAuctionUseCase).to(CancelLiveAuctionUseCase);
 container.bind<IRequestCancellationUseCase>(TYPES.RequestCancellationUseCase).to(RequestCancellationUseCase);
+container.bind<IAutomatedEscrowReleaseUseCase>(TYPES.AutomatedEscrowUseCase).to(AutomatedEscrowUseCase);
 
 
 // Admin-UseCases

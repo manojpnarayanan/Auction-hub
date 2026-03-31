@@ -35,10 +35,12 @@ export class ConfirmDeliveryUseCase implements IConfirmDeliveryUseCase{
         await this._releasePaymentUseCase.execute({
             auctionId:auctionId,
             sellerId:auction.sellerId,
+            buyerId:buyerId,
             amount:escrowTX.amount,
             transactionId:escrowTX.id!,
             commissionPercent:0,
-            sellerAmount:0
+            sellerAmount:0,
+            isAutomatic:false
         })
 
     }

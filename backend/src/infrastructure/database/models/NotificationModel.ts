@@ -8,6 +8,7 @@ export interface INotificationDocument extends Document{
     type:'info'| 'success' | 'warning' | 'error';
     isRead:boolean;
     link?:string;
+    isAdmin:boolean;
     createdAt:Date;
 }
 
@@ -18,6 +19,7 @@ const NotificationSchema:Schema=new Schema({
     type:{type:String, enum:['info','success','warning','error'],default:'info'},
     isRead:{type:Boolean,default:false},
     link:{type:String},
+    isAdmin:{type:Boolean,default:false},
     createdAt:{type:Date,default:Date.now},
 });
 

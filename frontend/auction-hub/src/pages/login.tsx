@@ -74,7 +74,7 @@ export default function Login() {
                 })
             );
 
-            // await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 100));
             // navigate("/user/dashboard");
         } catch (error: unknown) {
             console.error("login failed", error);

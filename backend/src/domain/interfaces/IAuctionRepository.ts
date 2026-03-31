@@ -21,5 +21,6 @@ export interface IAuctionRepository {
     updateAuctionStatus(id: string, status: string, winnerId?: string, rejectionReason?: string, cancellationReason?: string): Promise<void>;
     updatePaymentStatus(id: string, status: string): Promise<void>;
     findAuctionstoStart(): Promise<Auction[]>;
-    getAuctionStats(): Promise<{ sold: number; expired: number; pending: number; approved: number; active: number }>
+    getAuctionStats(): Promise<{ sold: number; expired: number; pending: number; approved: number; active: number }>;
+    findPaidAuctions(thresholdDate:Date):Promise<Auction[] | null>;
 }

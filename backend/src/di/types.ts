@@ -29,6 +29,7 @@ export const TYPES = {
     EndLiveAuctionUseCase: Symbol.for("EndLiveAuctionUseCase"),
     CancelLiveAuctionUseCase: Symbol.for("CancelLiveAuctionUseCase"),
     RequestCancellationUseCase: Symbol.for("RequestCancellationUseCase"),
+    AutomatedEscrowUseCase:Symbol.for("AutomatedEscrowUseCase"),
 
 
     // Admin 
@@ -143,5 +144,10 @@ export const TYPES = {
     ReviewController:Symbol.for("ReviewController"),
 
     // AdminDashboard
-    GetDashboardUseCase:Symbol.for("GetDashboardUseCase")
+    GetDashboardUseCase:Symbol.for("GetDashboardUseCase"),
+
+    // Cloudinary
+    CloudinaryService:Symbol.for("CloudinaryService"),
+    AuctionPersistanceMapper:Symbol.for("AuctionPersistanceMapper"),
+    UserPersistanceMapper:Symbol.for("UserPersistanceMapper"),
 }

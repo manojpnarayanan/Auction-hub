@@ -13,5 +13,6 @@ export interface IWalletRepository {
     findTransactionByIntentId(stripePaymentIntentId: string): Promise<Transactions | null>;
     getPendingRelease(adminId:string):Promise<Transactions[]>;
     markTransactionAsReleased(transactionId:string):Promise<void>;
-    getTotalRevenue(period:'daily' | 'monthly' |'yearly'):Promise<{total:number;timeline:{label:string;amount:number}[]}>
+    getTotalRevenue(period:'daily' | 'monthly' |'yearly'):Promise<{total:number;timeline:{label:string;amount:number}[]}>;
+    isTransactionReleased(transactionId:string):Promise<boolean>;
 }

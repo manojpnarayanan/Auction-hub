@@ -21,6 +21,7 @@ export class Auction{
         public rejectionReason?:string,
         public cancellationReason?:string,
         public deliveryStatus:'pending_delivery' | 'delivered' | 'disputed' = 'pending_delivery',
+        public paidAt?:Date
     ){ }
 
     isLive():boolean{

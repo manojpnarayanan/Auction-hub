@@ -27,7 +27,9 @@ export class RaiseDisputeUseCase implements IRaiseDisputeUseCase {
             data.buyerId,
             auction.sellerId,
             data.reason,
-            'open'
+            'open',
+            undefined,
+            data.evidence
         );
         await this._disputeRepo.create(newDispute);
         await this._auctionRepo.update(data.auctionId, { deliveryStatus: 'disputed' });

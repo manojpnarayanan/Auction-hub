@@ -33,6 +33,9 @@ import logger from './src/infrastructure/Global/Logger.js';
 import { pinoerrorHandler } from './src/presentation/middleware/ErrorHandler.js'
 import NotificationRoutes from './src/presentation/routes/user/NotificationRoutes.js'
 import AdminDasboardRoutes from './src/presentation/routes/admin/AdminDashboardRoutes.js'
+import disputeRoutes from './src/presentation/routes/user/DisputeRoutes.js'
+import adminDisputeRoutes from './src/presentation/routes/admin/disputeAdminRoutes.js'
+import ReviewRoutes from './src/presentation/routes/user/ReviewRoutes.js'
 
 
 const app = express();
@@ -66,6 +69,10 @@ app.use('/user', SubscriptionRoutes);
 app.use('/user', watchlistRoutes);
 app.use('/user',NotificationRoutes);
 app.use('/admin',AdminDasboardRoutes);
+app.use('/user-dispute',disputeRoutes)
+app.use('/admin-dispute',adminDisputeRoutes)
+app.use('/reviews',ReviewRoutes)
+
 
 app.use(errorHandler);
 app.use(pinoerrorHandler);

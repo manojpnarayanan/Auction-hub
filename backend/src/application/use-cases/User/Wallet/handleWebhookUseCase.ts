@@ -5,6 +5,8 @@ import { IPaymentService } from "../../../../domain/interfaces/IPaymentService";
 import { IAuctionRepository } from "../../../../domain/interfaces/IAuctionRepository";
 import { IHandleWebhookUseCase } from "../../Usecase Interfaces/Wallet-interfaces/IHandleWebhookUseCase";
 import { config } from "../../../../infrastructure/config/environment";
+import logger from "../../../../infrastructure/Global/Logger";
+
 
 @injectable()
 export class HandleWebhookUseCase implements IHandleWebhookUseCase {

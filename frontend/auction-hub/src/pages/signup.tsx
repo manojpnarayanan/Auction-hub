@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { signup } from "../api/auth";
 import OTPModal from "../components/OTPModal";
 import { useNavigate } from "react-router-dom";
-import  type { SignupCredentials } from "../types/auth";
+import type { SignupCredentials } from "../types/auth";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../api/auth";
 import { useDispatch } from "react-redux";
@@ -12,11 +12,11 @@ import type { AxiosError } from "axios";
 
 export default function Signup() {
   // const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
-  const [form,setForm]=useState<SignupCredentials &{confirmPassword:string} >({
-    name:"",
-    email:"",
-    password:"",
-    confirmPassword:"",
+  const [form, setForm] = useState<SignupCredentials & { confirmPassword: string }>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [msg, setMsg] = useState("");
   const [showOTP, setShowOTP] = useState(false);
@@ -29,33 +29,33 @@ export default function Signup() {
   const dispatch = useDispatch();
 
   const signupWithGoogle = useGoogleLogin({
-      onSuccess: async (codeResponse) => {
-          try {
-              setLoading(true);
-              const res = await googleAuth()(codeResponse.code);
-              
-              dispatch(
-                  setCredentials({
-                      user: res.data.user,
-                      token: res.data.token,
-                  })
-              );
-              
-              toast.success("Account created securely with Google!");
-              navigate("/user/dashboard");
-          } catch (error: unknown) {
-              console.error("Google signup failed", error);
-              const err = error as AxiosError<{message:string}>;
-              setMsg(err.response?.data?.message || "Google Authentication Failed");
-          } finally {
-              setLoading(false);
-          }
-      },
-      onError: error => {
-          console.log('Signup Failed:', error);
-          setMsg("Google Authentication Failed");
-      },
-      flow: 'auth-code',
+    onSuccess: async (codeResponse) => {
+      try {
+        setLoading(true);
+        const res = await googleAuth()(codeResponse.code);
+
+        dispatch(
+          setCredentials({
+            user: res.data.user,
+            token: res.data.token,
+          })
+        );
+
+        toast.success("Account created securely with Google!");
+        navigate("/user/dashboard");
+      } catch (error: unknown) {
+        console.error("Google signup failed", error);
+        const err = error as AxiosError<{ message: string }>;
+        setMsg(err.response?.data?.message || "Google Authentication Failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: error => {
+      console.log('Signup Failed:', error);
+      setMsg("Google Authentication Failed");
+    },
+    flow: 'auth-code',
   });
 
 
@@ -80,7 +80,7 @@ export default function Signup() {
     setMsg("");
 
     // console.log("Validation form",form);
-    if (!form.name || !form.email || !form.password || !form.confirmPassword){
+    if (!form.name || !form.email || !form.password || !form.confirmPassword) {
       setMsg("Please fill all Fields");
       setLoading(false);
       return;
@@ -103,7 +103,7 @@ export default function Signup() {
       setLoading(false);
       return;
     }
-    const nameRegex=/^[a-zA-Z]+$/
+    const nameRegex = /^[a-zA-Z]+$/
     if (!nameRegex.test(form.name.trim())) {
       setMsg("Name must contain only alphabets (No spaces or numbers)");
       setLoading(false);
@@ -116,7 +116,7 @@ export default function Signup() {
       setEmailForOTP(form.email);
       setShowOTP(true);
     } catch (error: unknown) {
-      const err=error as AxiosError<{message:string}>
+      const err = error as AxiosError<{ message: string }>
       setMsg(err.response?.data?.message || "Error during signup");
     } finally {
       setLoading(false);
@@ -181,7 +181,7 @@ export default function Signup() {
                 <input
                   type="email" placeholder="Email Address"
                   value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-[#1da1f2] outline-none" 
+                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-1 focus:ring-[#1da1f2] outline-none"
                 />
 
                 {[{ key: "password", val: form.password, show: showPassword, set: setShowPassword, ph: "Password" },

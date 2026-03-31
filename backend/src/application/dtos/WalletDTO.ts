@@ -28,7 +28,9 @@ export interface releasePaymentDTO{
     transactionId:string;
     auctionId?:string;
     sellerId:string;
+    buyerId:string;
     amount:number;
     commissionPercent:number;
     sellerAmount:number;
+    isAutomatic?:boolean;
 }

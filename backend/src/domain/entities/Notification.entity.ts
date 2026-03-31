@@ -11,5 +11,6 @@ export class Notification {
         public readonly isRead: boolean,
         public readonly createdAt: Date,
         public readonly link?: string,
+        public readonly isAdmin:boolean=false
     ) { }
 }

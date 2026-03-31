@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../redux/slices/authSlices";
 import { login } from "../api/auth";
 import { useNavigate } from "react-router-dom";
-import  type { LoginCredentials } from "../types/auth";
+import type { LoginCredentials } from "../types/auth";
 import { AxiosError } from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../api/auth";
@@ -19,25 +19,25 @@ export default function Login() {
     const [showPassword, setShowPassword] = useState(false);
 
 
-        const loginWithGoogle = useGoogleLogin({
+    const loginWithGoogle = useGoogleLogin({
         onSuccess: async (codeResponse) => {
             try {
                 setLoading(true);
                 // Send the code to your backend using your updated API function
                 const res = await googleAuth()(codeResponse.code);
-                
+
                 dispatch(
                     setCredentials({
                         user: res.data.user,
                         token: res.data.token,
                     })
                 );
-                
+
                 toast.success("Google Login Successful!");
-                navigate("/user/dashboard");
+                // navigate("/user/dashboard");
             } catch (error: unknown) {
                 console.error("Google login failed", error);
-                const err = error as AxiosError<{message:string}>;
+                const err = error as AxiosError<{ message: string }>;
                 setMsg(err.response?.data?.message || "Google Authentication Failed");
             } finally {
                 setLoading(false);
@@ -58,7 +58,7 @@ export default function Login() {
         e.preventDefault();
         setLoading(true);
         setMsg("");
-        if(!form.email || !form.password){
+        if (!form.email || !form.password) {
             setMsg("Fill all the fields");
             setLoading(false);
             return;
@@ -73,12 +73,12 @@ export default function Login() {
                     token: res.data.token,
                 })
             );
-            
+
             await new Promise(resolve => setTimeout(resolve, 100));
-            navigate("/user/dashboard");
+            // navigate("/user/dashboard");
         } catch (error: unknown) {
             console.error("login failed", error);
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             setMsg(err.response?.data?.message || "Login Failed -Please check Credentials")
         } finally {
             setLoading(false);

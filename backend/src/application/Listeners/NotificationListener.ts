@@ -74,6 +74,26 @@ export class NotificationListener{
             type:'success',
             link:'/user/wallet'
         })
+        await this._createNotificationUseCase.execute({
+            userId:event.buyerId,
+            title:event.isAutomatic ? "Automatic Fund Release" :"Payment released",
+            message:event.isAutomatic ? `The Funds for Auction have been automatically released after 3 days` :
+            `You have confirmed delivery, and funds for auction were released to the seller`,
+            type:"info",
+            link:'user/my-bids'
+        });
+        const admin=await this._userRepository.findAdmin();
+        if(admin){
+
+            await this._createNotificationUseCase.execute({
+                userId:admin.id,
+                title:`Escrow funds released (${event.isAutomatic ? "Auto":"Manual"})`,
+                message:`Auction ${event.auctionId} :${event.amount} released to seller`,
+                type:'info',
+                link:'/admin',
+                isAdmin:true
+            })
+        }
     }
     private async handleSubscriptionActivated(event:SubscriptionActivateEvent){
         await this._createNotificationUseCase.execute({

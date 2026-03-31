@@ -5,8 +5,7 @@ import { IAdminAuctionManagamentUseCase } from "../Usecase Interfaces/Admin/IAdm
 import { IEventEmitter } from "../../../domain/interfaces/IEventEmitter";
 import { AuctionApprovedEvent, AuctionRejectedEvent } from "../../../domain/events/AuctionEvents";
 import { NotFoundError } from "../../../domain/errors/errors";
-import { INotificationRepository } from "../../../domain/interfaces/INotificationRepository";
-import { INotificationService } from "../../../domain/interfaces/INotificationService";
+
 
 
 @injectable()

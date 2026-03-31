@@ -38,6 +38,7 @@ import { IResendOtpUseCase } from "../application/use-cases/Usecase Interfaces/I
 import { ResendOtpUseCase } from "../application/use-cases/auth/ResendOtpUseCase";
 import { ILogoutUseCase } from "../application/use-cases/Usecase Interfaces/ILogoutUseCase";
 import { LogoutUseCase } from "../application/use-cases/auth/LogoutUseCase";
+
 //  Auction-useCases
 import { ICreateAuctionUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IAuctionUseCase";
 import { CreateAuctionUseCase } from "../application/use-cases/auction/CreateAuctionUseCase";
@@ -57,7 +58,8 @@ import { IEndLiveAuctionUseCase } from "../application/use-cases/Usecase Interfa
 import { EndLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/EndLiveAuctionUseCase";
 import { ICancelLiveAuctionUseCase } from "../application/use-cases/Usecase Interfaces/live-Auctions/ICancelLiveAuctionUseCase";
 import { CancelLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/CancelLiveAuctionUseCase";
-
+import { IAutomatedEscrowReleaseUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IAutomatedEscrowReleaseUseCase";
+import { AutomatedEscrowUseCase } from "../application/use-cases/auction/AutomatedEscrowUseCase";
 
 
 // Admin-useCases
@@ -210,12 +212,46 @@ import { CreateNotificationUseCase } from "../application/use-cases/User/Notific
 import { IGetDashboardStatsUseCase } from "../application/use-cases/Usecase Interfaces/Admin/DashboardStats/IGetDashboardStatsUseCase";
 import { GetDashboardUseCase } from "../application/use-cases/Admin/GetDashboardUseCase";
 
+// Dispute_section
+
+import { IDisputeRepository } from "../domain/interfaces/IDisputeRepository";
+import { MongoDisputeRepository } from "../infrastructure/database/repositories/MongoDisputeRepository";
+import { IRaiseDisputeUseCase } from "../application/use-cases/Usecase Interfaces/Dispute-Interface/IRaiseDisputeUseCase";
+import { RaiseDisputeUseCase } from "../application/use-cases/Dispute/RaiseDisputeUseCase";
+import { IResolveDisputeUseCase } from "../application/use-cases/Usecase Interfaces/Dispute-Interface/IResolveDisputeUseCase";
+import { ResolveDisputeUseCase } from "../application/use-cases/Dispute/ResolveDisputeUseCase";
+import { IGetDisputeUseCase } from "../application/use-cases/Usecase Interfaces/Dispute-Interface/IGetDisputeUseCase";
+import { GetDisputeUseCase } from "../application/use-cases/Dispute/GetDisputeUseCase";
+import { IConfirmDeliveryUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IConfirmDeliveryUseCase";
+import { ConfirmDeliveryUseCase } from "../application/use-cases/auction/ConfirmDeliveryUseCase";
+import { Disputecontroller } from "../presentation/controllers/user/DisputeController";
+
+// RatingSection
+import { ICreateReviewUseCase } from "../application/use-cases/Usecase Interfaces/Review-Interface/ICreateReviewUseCase";
+import { CreateReviewUseCase } from "../application/use-cases/User/Reviews/CreateReviewUseCase";
+import { IGetSellerReviewUseCase } from "../application/use-cases/Usecase Interfaces/Review-Interface/IGetSellerReviewUseCase";
+import { GetSellerReviewUseCase } from "../application/use-cases/User/Reviews/GetSellerReviewUseCase";
+import { IReviewRepository } from "../domain/interfaces/IReviewRepository";
+import { MongoReviewRepository } from "../infrastructure/database/repositories/MongoReviewRepository";
+import { ReviewController } from "../presentation/controllers/user/ReviewController";
+
+// Cloudinary
+import { CloudinaryService } from "../infrastructure/Service/CloudinaryService";
+import { AuctionPersistanceMapper } from "../infrastructure/database/Mappers/AuctionPersistanceMapper";
+import { UserPersistanceMapper } from "../infrastructure/database/Mappers/UserPersistanceMapper";
+
 
 
 const container = new Container();
 // Repositories
 container.bind<IUserRepository>(TYPES.UserRepository).to(MongoUserRepository);
 container.bind<IAuctionRepository>(TYPES.AuctionRepository).to(MongoAuctionRepository);
+
+// Cloudinary-Service
+container.bind<CloudinaryService>(TYPES.CloudinaryService).to(CloudinaryService).inSingletonScope();
+container.bind<AuctionPersistanceMapper>(TYPES.AuctionPersistanceMapper).to(AuctionPersistanceMapper);
+container.bind<UserPersistanceMapper>(TYPES.UserPersistanceMapper).to(UserPersistanceMapper);
+
 
 //  Auth useCases
 container.bind<ISignupUseCase>(TYPES.SignupUseCase).to(SignupUseCase);
@@ -241,6 +277,7 @@ container.bind<IStartLiveAuctionUseCase>(TYPES.StartLiveAuctionUseCase).to(Start
 container.bind<IEndLiveAuctionUseCase>(TYPES.EndLiveAuctionUseCase).to(EndLiveAuctionUseCase);
 container.bind<ICancelLiveAuctionUseCase>(TYPES.CancelLiveAuctionUseCase).to(CancelLiveAuctionUseCase);
 container.bind<IRequestCancellationUseCase>(TYPES.RequestCancellationUseCase).to(RequestCancellationUseCase);
+container.bind<IAutomatedEscrowReleaseUseCase>(TYPES.AutomatedEscrowUseCase).to(AutomatedEscrowUseCase);
 
 
 // Admin-UseCases
@@ -307,7 +344,7 @@ container.bind<IDeleteSubscriptionPlanUseCase>(TYPES.DeleteSubscriptionPlanUseCa
 container.bind<IUpdateSubscriptionPlanUseCase>(TYPES.UpdateSubscriptionPlanUseCase).to(UpdataSubscriptionPlanUseCase);
 
 // Watchlist Section
-container.bind<IWatchlistRepository>(TYPES.WatchlistRepository).to(MongoWatchlistRepository)
+container.bind<IWatchlistRepository>(TYPES.WatchlistRepository).to(MongoWatchlistRepository);
 container.bind<IGetWatchlistUseCase>(TYPES.GetWatchlistUseCase).to(GetWatchlistUseCase);
 container.bind<IRemoveFromWatchlistUseCase>(TYPES.RemoveFromWatchlistUseCase).to(RemoveFromWatchlistUseCase);
 container.bind<ICheckWatchlistUseCase>(TYPES.CheckWatchlistUseCase).to(CheckWatchlistUseCase);
@@ -315,7 +352,7 @@ container.bind<IAddToWatchlistUseCase>(TYPES.AddToWatchlistUseCase).to(AddToWatc
 
 
 // Notification-Service
-container.bind<ICreateNotificationUseCase>(TYPES.CreateNotificationUseCase).to(CreateNotificationUseCase)
+container.bind<ICreateNotificationUseCase>(TYPES.CreateNotificationUseCase).to(CreateNotificationUseCase);
 container.bind<INotificationRepository>(TYPES.NotificationRepository).to(MongoNotificationRepository);
 container.bind<INotificationService>(TYPES.NotificationService).to(SocketNotificationService);
 container.bind<IGetNotificationUseCase>(TYPES.GetNotificationUseCase).to(GetNotificationUseCase);
@@ -334,14 +371,26 @@ container.bind<WalletController>(TYPES.WalletController).to(WalletController);
 container.bind<AdminPaymentController>(TYPES.AdminPaymentController).to(AdminPaymentController);
 container.bind<WebhookController>(TYPES.WebhookController).to(WebhookController);
 container.bind<SubscriptionController>(TYPES.SubscriptionController).to(SubscriptionController);
-container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController)
+container.bind<SubscriptionPlanController>(TYPES.SubscriptionPlanController).to(SubscriptionPlanController);
 container.bind<WatchlistController>(TYPES.WatchlistController).to(WatchlistController);
-container.bind<NotificationController>(TYPES.NotificationController).to(NotificationController)
+container.bind<NotificationController>(TYPES.NotificationController).to(NotificationController);
+container.bind<Disputecontroller>(TYPES.DisputeController).to(Disputecontroller);
+container.bind<ReviewController>(TYPES.ReviewController).to(ReviewController);
 
+// Dispute-Section
+container.bind<IDisputeRepository>(TYPES.DisputeRepository).to(MongoDisputeRepository);
+container.bind<IRaiseDisputeUseCase>(TYPES.RaiseDisputeUseCase).to(RaiseDisputeUseCase);
+container.bind<IResolveDisputeUseCase>(TYPES.ResolveDisputeUseCase).to(ResolveDisputeUseCase);
+container.bind<IGetDisputeUseCase>(TYPES.GetDisputeUseCase).to(GetDisputeUseCase);
+container.bind<IConfirmDeliveryUseCase>(TYPES.ConfirmDeliveryUseCase).to(ConfirmDeliveryUseCase);
 
+// Rating-Section
+container.bind<ICreateReviewUseCase>(TYPES.CreateReviewUseCase).to(CreateReviewUseCase);
+container.bind<IGetSellerReviewUseCase>(TYPES.GetSellerReviewUseCase).to(GetSellerReviewUseCase);
+container.bind<IReviewRepository>(TYPES.ReviewRepository).to(MongoReviewRepository);
 
 // Admin-Dashboard
-container.bind<IGetDashboardStatsUseCase>(TYPES.GetDashboardUseCase).to(GetDashboardUseCase)
+container.bind<IGetDashboardStatsUseCase>(TYPES.GetDashboardUseCase).to(GetDashboardUseCase);
 
 // Bind Redis
 container.bind<ICacheService>(TYPES.CacheService).to(RedisCacheService);

@@ -41,7 +41,7 @@ export default function AdminLogin() {
             navigate("/admin/dashboard");
         } catch (error: unknown) {
             console.error("Admin login failed", error);
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             setMsg(err.response?.data?.message || "Login Failed - Please check credentials")
         } finally {
             setLoading(false);

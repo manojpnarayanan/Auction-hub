@@ -29,6 +29,7 @@ export const TYPES = {
     EndLiveAuctionUseCase: Symbol.for("EndLiveAuctionUseCase"),
     CancelLiveAuctionUseCase: Symbol.for("CancelLiveAuctionUseCase"),
     RequestCancellationUseCase: Symbol.for("RequestCancellationUseCase"),
+    AutomatedEscrowUseCase:Symbol.for("AutomatedEscrowUseCase"),
 
 
     // Admin 
@@ -88,6 +89,15 @@ export const TYPES = {
     AdminPaymentController: Symbol.for('AdminPaymentController'),
     WebhookController: Symbol.for('WebhookController'),
     GetPendingReleaseUseCase: Symbol.for("GetPendingReleaseUseCase"),
+    
+    
+    // Dispute-Section
+    DisputeRepository:Symbol.for("DisputeRepository"),
+    RaiseDisputeUseCase:Symbol.for("RaiseDisputeUseCase"),
+    ResolveDisputeUseCase:Symbol.for("ResolveDisputeUseCase"),
+    GetDisputeUseCase:Symbol.for("GetDisputeUseCase"),
+    ConfirmDeliveryUseCase:Symbol.for("ConfirmDeliveryUseCase"),
+    DisputeController:Symbol.for("Disputecontroller"),
 
     // Subscription 
     SubscriptionRepository: Symbol.for('SubscriptionRepository'),
@@ -126,6 +136,18 @@ export const TYPES = {
     NotificationController:Symbol.for("NotificationController"),
     NotificationListener:Symbol.for("NotificationListener"),
 
+
+    // Rating-Section
+    ReviewRepository:Symbol.for("ReviewRepository"),
+    CreateReviewUseCase:Symbol.for("CreateReviewUseCase"),
+    GetSellerReviewUseCase:Symbol.for("GetSellerReviewUseCase"),
+    ReviewController:Symbol.for("ReviewController"),
+
     // AdminDashboard
-    GetDashboardUseCase:Symbol.for("GetDashboardUseCase")
+    GetDashboardUseCase:Symbol.for("GetDashboardUseCase"),
+
+    // Cloudinary
+    CloudinaryService:Symbol.for("CloudinaryService"),
+    AuctionPersistanceMapper:Symbol.for("AuctionPersistanceMapper"),
+    UserPersistanceMapper:Symbol.for("UserPersistanceMapper"),
 }

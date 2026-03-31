@@ -14,6 +14,16 @@ interface Props {
   initialData?: Partial<AuctionItem>;
 }
 
+
+const toLocalISO = (dateStr: string | Date | undefined) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    // Adjust for the local timezone offset (in minutes)
+    const offset = date.getTimezoneOffset() * 60000; 
+    const localDate = new Date(date.getTime() - offset);
+    return localDate.toISOString().slice(0, 16);
+};
+
 export default function CreateAuctionModal({ onClose, onSuccess, initialData }: Props) {
 
   const [form, setForm] = useState({
@@ -48,16 +58,17 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
   }, [])
 
   useEffect(() => {
+    
     if (initialData) {
       setForm({
         title: initialData.title || '',
         description: initialData.description || '',
         category: initialData.category || 'others',
         startingPrice: initialData.startingPrice?.toString() || "",
-        endDate: initialData.endDate ? new Date(initialData.endDate).toISOString().slice(0, 16) : "",
+        endDate: initialData.endDate ?  toLocalISO(initialData.endDate)  : "",
         images: initialData.images || [],
         type: initialData.type || 'timed',
-        startTime: initialData.startTime ? new Date(initialData.startTime).toISOString().slice(0, 16) : ""
+        startTime: initialData.startTime ? toLocalISO(initialData.startTime) : ""
       });
     }
   }, [initialData]);

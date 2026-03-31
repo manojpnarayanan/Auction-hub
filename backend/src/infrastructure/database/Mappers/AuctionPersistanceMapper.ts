@@ -1,9 +1,16 @@
 import { Auction } from "../../../domain/entities/Auction.entity";
 import { IAuctionDocument } from "../models/AuctionModel";
+import { CloudinaryService } from "../../Service/CloudinaryService";
+import { injectable,inject } from "inversify";
+import { TYPES } from "../../../di/types";
 
-
+@injectable()
 export class AuctionPersistanceMapper{
-    static toEntity(doc:IAuctionDocument):Auction {
+    constructor(
+        @inject(TYPES.CloudinaryService)private _cloudService:CloudinaryService
+    ){}
+     toEntity(doc:IAuctionDocument):Auction {
+        const signedImages=doc.images.map(img=>this._cloudService.generateSignedUrl(img,15));
         return new Auction (
             doc.title,
             doc.description,
@@ -12,7 +19,7 @@ export class AuctionPersistanceMapper{
             doc.currentPrice,
             doc.endDate,
             doc.sellerId,
-            doc.images,
+            signedImages,
             doc.status,
             doc.id,
             doc.type,
@@ -26,7 +33,9 @@ export class AuctionPersistanceMapper{
             doc.createdAt,
             doc.paymentStatus || 'pending',
             doc.rejectionReason,
-            doc.cancellationReason
+            doc.cancellationReason,
+            doc.deliveryStatus || 'pending_delivery',
+            doc.paidAt
         )
     }
 }

@@ -16,6 +16,7 @@ export function AdminLayout() {
     { name: "Categories", path: "/admin/categories" },
     { name: "Wallet", path: "/admin/wallet" },
     { name: "Subscriptions", path: "/admin/subscription-plans" },
+    { name: "Disputes", path: "/admin/disputes" },
     // {name:"Wallet" ,path:""},
     // {name:"Reports" ,path:""}
 

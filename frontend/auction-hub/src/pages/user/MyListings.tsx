@@ -215,6 +215,7 @@ export default function MyListings() {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={setCurrentPage}
+                variant='light'
             />
             <InfoModal
             isOpen={viewReason}

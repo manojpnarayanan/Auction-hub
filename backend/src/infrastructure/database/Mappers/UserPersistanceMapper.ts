@@ -1,9 +1,18 @@
 import { User } from "../../../domain/entities/User.entity";
 import { IUserDocument } from "../models/UserModel";
+import { injectable,inject } from "inversify";
+import { TYPES } from "../../../di/types";
+import { CloudinaryService } from "../../Service/CloudinaryService";
+
+
 
 
 export class UserPersistanceMapper{
-    static toEntity(doc:IUserDocument):User{
+    constructor(
+        @inject(TYPES.CloudinaryService)private _cloudService:CloudinaryService
+    ){}
+     toEntity(doc:IUserDocument):User{
+        const signedProfileImage=doc.profileImage ? this._cloudService.generateSignedUrl(doc.profileImage,15) : undefined;
         return new User(
             (doc._id as unknown as string).toString(),
         doc.name,
@@ -18,7 +27,7 @@ export class UserPersistanceMapper{
         doc.isVerified,
         doc.isBlocked,
         doc.phone,
-        doc.profileImage,
+        signedProfileImage,
         doc.watchlist || []
         )
     }

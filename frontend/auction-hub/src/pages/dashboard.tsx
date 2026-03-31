@@ -34,7 +34,16 @@ export default function Dashboard() {
       }
     }
     loadCats()
-  }, [searchText])
+  }, [searchText]);
+
+  useEffect(() => {
+  document.body.style.overflow = "auto";
+  window.scrollTo(0, 0);
+  return () => {
+    document.body.style.overflow = "auto";
+  };
+}, []);
+
   
   const fetchAll = useCallback(async (category: string = "All", search: string = "") => {
     try {
@@ -75,7 +84,7 @@ export default function Dashboard() {
             alt="Hero"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 md:p-12">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 md:p-12 pointer-events-none">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">Find Your Next Treasure</h2>
             <p className="text-white/90 text-sm md:text-base max-w-xl">
               Explore a wide range of items, from vintage collectibles to cutting-edge tech. Start bidding now and discover deals.

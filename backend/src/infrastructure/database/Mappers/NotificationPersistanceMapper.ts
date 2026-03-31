@@ -13,6 +13,7 @@ export class NotificationPersistanceMapper {
             doc.isRead,
             doc.createdAt,
             doc.link,
+            doc.isAdmin
         )
     }
 }

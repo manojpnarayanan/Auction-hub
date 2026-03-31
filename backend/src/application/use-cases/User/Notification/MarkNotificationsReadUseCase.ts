@@ -1,8 +1,6 @@
 import { injectable,inject } from "inversify";
 import {TYPES} from '../../../../di/types';
 import { INotificationRepository } from "../../../../domain/interfaces/INotificationRepository";
-import { NotificationResponseDTO } from "../../../dtos/NotificationDTO";
-import { NotificationDTOMapper } from "../../../DTOMapper/NotificationDTOMapper";
 import { IMarkNotificationReadUseCase } from "../../Usecase Interfaces/Notification-Interface/IMarkNotificationReadUseCase";
 
 

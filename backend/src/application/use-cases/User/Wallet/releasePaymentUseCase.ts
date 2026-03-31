@@ -9,6 +9,8 @@ import { releasePaymentDTO } from "../../../dtos/WalletDTO";
 import { IReleasePaymentUseCase } from "../../Usecase Interfaces/Wallet-interfaces/IReleasePaymentUseCase";
 import { IEventEmitter } from "../../../../domain/interfaces/IEventEmitter";
 import { PaymentReleaseEvent } from "../../../../domain/events/PaymentEvents";
+import { IUserRepository } from "../../../../domain/interfaces/IUserRepository";
+import { ValidationError } from "../../../../domain/errors/errors";
 
 
 @injectable()
@@ -17,10 +19,24 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         @inject(TYPES.WalletRepository) private _walletRepository: IWalletRepository,
         @inject(TYPES.EventEmitter)private _eventEmitter:IEventEmitter,
         @inject(TYPES.SubscriptionRepository) private _subscriptionRepository: ISubscriptionRepository,
-        @inject(TYPES.SubscriptionPlanRepository) private _subscriptionPlanRepository: ISubscriptionPlanRepository
+        @inject(TYPES.SubscriptionPlanRepository) private _subscriptionPlanRepository: ISubscriptionPlanRepository,
+        @inject(TYPES.UserRepository) private _userRepo:IUserRepository
     ) { }
 
     async execute(data: releasePaymentDTO): Promise<void> {
+
+        // const isAlreadyReleased=await this._walletRepository.isTransactionReleased(data.transactionId);
+        // if(isAlreadyReleased){
+        //     logger.warn(`Transaction for this auction is already released. Check again before forwarding`);
+        //     return;
+        // }
+        const wasClaimed=await this._walletRepository.isTransactionReleased(data.transactionId);
+        console.log("Release Payment",wasClaimed)
+        if(!wasClaimed){
+            throw new ValidationError(`Payout already in progress or completed.Please check again`);
+            return;
+        }
+        logger.info(data, "Processing payout");
         logger.info(data, "Execute start");
 
         // 1. Fetch REAL commission from seller's active plan (The Security Step)
@@ -44,8 +60,9 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         // logger.info("MATH:SellerAmount ",sellerAmount)
 
         // 2. Setup Wallet Details
-        const adminId = process.env.ADMIN_WALLET_USER_ID!;
-        if (!adminId) throw new Error("ADMIN_WALLET_USER_ID is missing from .env");
+        const admin = await this._userRepo.findAdmin();
+        if (!admin) throw new Error("Admin not found");
+        const adminId=admin.id;
         let adminWallet = await this._walletRepository.findByUserId(adminId);
         if (!adminWallet) {
             const newAdminWallet = new Wallet("", adminId, 0, 'inr', new Date(), new Date())
@@ -66,7 +83,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             purpose: 'auction_payment',
             auctionId: data.auctionId,
             description: `Full amount released for auction ${data.auctionId}`,
-            isReleased: true // Mark payout as released immediately
+            isReleased: true
         });
 
         await this._walletRepository.credit(adminId, commission);
@@ -99,8 +116,10 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         this._eventEmitter.dispatch(new PaymentReleaseEvent(
             data.auctionId!,
             data.sellerId,
+            data.buyerId,
             data.amount,
-            commission
+            commission,
+            data.isAutomatic || false
         ));
     }
 }

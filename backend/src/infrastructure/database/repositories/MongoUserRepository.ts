@@ -3,19 +3,21 @@ import logger from "../../Global/Logger";
 import { User } from "../../../domain/entities/User.entity";
 import { CreateUserDTO, updateUserProfileDTO } from "../../../application/dtos/user.dto";
 import { UserModel, IUserDocument } from "../models/UserModel";
-import { injectable } from "inversify";
+import { injectable,inject } from "inversify";
 import { BaseRepository } from "./BaseRepository";
 import { UserPersistanceMapper } from "../Mappers/UserPersistanceMapper";
 import { NotFoundError } from "../../../domain/errors/errors";
 import { FilterQuery } from "mongoose";
-import { DashboardPeriod } from "../../../domain/Types/DashboardTypes";
 import { getDateConfig } from "../../../domain/utils/dateConfig";
+import { TYPES } from "../../../di/types";
 
 
 @injectable()
 export class MongoUserRepository extends BaseRepository<User,IUserDocument> implements IUserRepository {
-    constructor(){
-        super(UserModel,UserPersistanceMapper.toEntity)
+    constructor(
+        @inject(TYPES.UserPersistanceMapper) private _userPersistanceMapper:UserPersistanceMapper
+    ){
+        super(UserModel,_userPersistanceMapper.toEntity.bind(_userPersistanceMapper))
     }
     
     // async create(userData: CreateUserDTO): Promise<User> {
@@ -24,7 +26,7 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     // }
     async findByEmail(email: string): Promise<User | null> {
         const userDoc = await UserModel.findOne({ email });
-        return userDoc ? UserPersistanceMapper.toEntity(userDoc) : null;
+        return userDoc ? this._userPersistanceMapper.toEntity(userDoc) : null;
     }
     // async findById(id: string): Promise<User | null> {
     //     const userDoc = await UserModel.findById(id);
@@ -36,12 +38,12 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     }
     async findByGoogleId(googleId: string): Promise<User | null> {
         const userDoc = await UserModel.findOne({ googleId });
-        return userDoc ? UserPersistanceMapper.toEntity(userDoc) : null;
+        return userDoc ? this._userPersistanceMapper.toEntity(userDoc) : null;
     }
     async updateUnVerifiedUser(userId: string, userData: CreateUserDTO): Promise<User> {
         const userDoc = await UserModel.findByIdAndUpdate(userId, userData, { new: true });
         if (!userDoc) throw new Error("User not found");
-        return UserPersistanceMapper.toEntity(userDoc);
+        return this._userPersistanceMapper.toEntity(userDoc);
     }
     async updateVerifyStatus(userId: string, isVerified: boolean): Promise<void> {
         await UserModel.updateOne({ _id: userId }, { isVerified })
@@ -64,7 +66,7 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
         ]);
         // logger.info("DB fetch ",JSON.stringify(userDoc,null,2))
         return {
-            users:userDoc.map(doc=>UserPersistanceMapper.toEntity(doc)),total
+            users:userDoc.map(doc=>this._userPersistanceMapper.toEntity(doc)),total
         }
     }
     async updateBlockStatus(userId: string, isBlocked: boolean): Promise<void> {
@@ -74,7 +76,7 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     async updateProfile(userId: string, data: updateUserProfileDTO): Promise<User> {
         const doc=await UserModel.findByIdAndUpdate(userId,data,{new :true});
         if(!doc) throw new NotFoundError("User not found");
-        return UserPersistanceMapper.toEntity(doc)
+        return this._userPersistanceMapper.toEntity(doc)
     }
     
     async updateGoogleId(userId: string, googleId: string): Promise<void> {
@@ -82,7 +84,7 @@ export class MongoUserRepository extends BaseRepository<User,IUserDocument> impl
     }
     async findAdmin(): Promise<User | null> {
         const adminDoc=await UserModel.findOne({role :'admin'});
-        return adminDoc? UserPersistanceMapper.toEntity(adminDoc):null;
+        return adminDoc? this._userPersistanceMapper.toEntity(adminDoc):null;
     }
     
     async getUserGrowth(period: "daily" | "monthly" | "yearly"): Promise<{ timeline: { label: string; count: number; }[]; }> {

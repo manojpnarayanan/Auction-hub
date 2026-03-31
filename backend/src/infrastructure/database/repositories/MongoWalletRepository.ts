@@ -8,7 +8,6 @@ import { Transactions } from "../../../domain/entities/Transaction.entity";
 import { TransactionModel } from "../models/TransactionModel";
 import { TransactionPersistanceMapper } from "../Mappers/TransactionPersistanceMapper";
 import { BaseRepository } from "./BaseRepository";
-import { DashboardPeriod } from "../../../domain/Types/DashboardTypes";
 import { getDateConfig } from "../../../domain/utils/dateConfig";
 
 
@@ -44,7 +43,7 @@ export class MongoWalletRepository extends BaseRepository<Wallet,IWalletDocumet>
     async getTransactions(userId: string, page: number = 1, limit: number = 10): Promise<{ transactions: Transactions[], total: number }> {
         const wallet = await WalletModel.findOne({ userId });
         if (!wallet) return { transactions: [], total: 0 };
-        const query = { walletId: wallet._id };
+        const query = { walletId: wallet._id ,status:'completed'};
         const [docs, total] = await Promise.all([
             TransactionModel.find(query)
                 .sort({ createdAt: -1 })
@@ -105,5 +104,10 @@ export class MongoWalletRepository extends BaseRepository<Wallet,IWalletDocumet>
         total:totals[0]?.total ?? 0,
         timeline:timeline.map(t=>({label:t._id,amount:t.amount}))
     };
+    }
+    async isTransactionReleased(transactionId: string): Promise<boolean> {
+        const transaction=await TransactionModel.findOneAndUpdate({
+            _id:transactionId,isReleased:false},{$set:{isReleased:true}},{new:true});
+        return  !!transaction
     }
 }

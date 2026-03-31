@@ -1,29 +1,29 @@
 import { User } from "../entities/User.entity";
-import { CreateUserDTO ,updateUserProfileDTO} from "../../application/dtos/user.dto";
+import { CreateUserDTO, updateUserProfileDTO } from "../../application/dtos/user.dto";
 
 
 export interface IUserRepository {
-    
+
     create(userData: CreateUserDTO): Promise<User>;
 
-    
+
     findByEmail(email: string): Promise<User | null>;
 
     findById(id: string): Promise<User | null>;
 
-    updateOTP(userId: string, otp: string|null, expiry: Date|null): Promise<void>;
+    updateOTP(userId: string, otp: string | null, expiry: Date | null): Promise<void>;
 
     findByGoogleId(googleId: string): Promise<User | null>;
-    updateUnVerifiedUser(userId:string,userData:CreateUserDTO):Promise<User>;
-    updateVerifyStatus(userId:string,isVerified:boolean):Promise<void>;
-    updatePassword(userId:string,password:string):Promise<void>;
+    updateUnVerifiedUser(userId: string, userData: CreateUserDTO): Promise<User>;
+    updateVerifyStatus(userId: string, isVerified: boolean): Promise<void>;
+    updatePassword(userId: string, password: string): Promise<void>;
 
-    adminUserManage(page:number,limit:number,search:string):Promise<{users:User[],total:number}>;
-    updateBlockStatus(userId:string,isBlocked:boolean):Promise<void>;
+    adminUserManage(page: number, limit: number, search: string): Promise<{ users: User[], total: number }>;
+    updateBlockStatus(userId: string, isBlocked: boolean): Promise<void>;
 
-    updateProfile(userId:string,data:updateUserProfileDTO):Promise<User>;
-    updateGoogleId(userId:string,googleId:string):Promise<void>;
-    findAdmin():Promise<User | null>;
-    getUserGrowth(period:'daily'|'monthly'|'yearly'):Promise<{timeline:{label:string;count:number}[]}>
-    getTotalUserCount():Promise<number>;
+    updateProfile(userId: string, data: updateUserProfileDTO): Promise<User>;
+    updateGoogleId(userId: string, googleId: string): Promise<void>;
+    findAdmin(): Promise<User | null>;
+    getUserGrowth(period: 'daily' | 'monthly' | 'yearly', customRange?: { from: Date; to: Date }): Promise<{ timeline: { label: string; count: number }[] }>;
+    getTotalUserCount(): Promise<number>;
 }

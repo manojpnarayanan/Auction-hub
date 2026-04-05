@@ -6,6 +6,8 @@ import { IBlockUserUseCase } from "../../../application/use-cases/Usecase Interf
 import { HttpStatus } from "../../Enums/StatusCodes";
 import { DashboardPeriod } from "../../../application/dtos/DashboardStatsDTO";
 import { IGetDashboardStatsUseCase } from "../../../application/use-cases/Usecase Interfaces/Admin/DashboardStats/IGetDashboardStatsUseCase";
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -19,17 +21,10 @@ export class AdminController {
         try {
             const page = parseInt(req.query.page as string) || 1
             const limit = parseInt(req.query.limit as string) || 3;
-            // logger.info(req.query)
             const search = req.query.search as string || "";
-            // const query:any={role:"user"};
             const result = await this._adminUserManagementUseCase.execute(page, limit, search);
 
-            res.status(HttpStatus.OK).json({
-                users: result.users,
-                totalPages: Math.ceil(result.total / limit),
-                currentPage: page,
-                totalUsers: result.total
-            });
+            res.status(HttpStatus.OK).json(ApiResponse.paginated(result.users, result.total, page, limit, CustomMessages.USERS_FETCHED));
         } catch (error) {
             next(error);
         }
@@ -40,7 +35,7 @@ export class AdminController {
             const { isBlocked } = req.body;
 
             await this._blockUserUseCase.execute(userId, isBlocked);
-            res.status(HttpStatus.OK).json({ message: `User ${isBlocked ? "blocked" : "unblocked"} successfully` });
+            res.status(HttpStatus.OK).json(ApiResponse.ok(isBlocked ? CustomMessages.USER_BLOCKED_MSG : CustomMessages.USER_UNBLOCKED_MSG));
         } catch (error) {
             next(error);
         }
@@ -51,7 +46,7 @@ export class AdminController {
             const startDate = req.query.startDate as string | undefined;
             const endDate   = req.query.endDate   as string | undefined;
             const stats = await this._getDashboardUseCase.execute(period, startDate, endDate);
-            res.status(HttpStatus.OK).json({ success: true, data: stats });
+            res.status(HttpStatus.OK).json(ApiResponse.success(stats, CustomMessages.STATS_FETCHED));
         } catch (error) {
             next(error);
         }

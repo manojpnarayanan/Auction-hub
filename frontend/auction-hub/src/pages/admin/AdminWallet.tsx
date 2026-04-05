@@ -28,9 +28,9 @@ export default function AdminWallet() {
                     getWallet(currentPage, pageSize),
                     getPendingRelease()
                 ]);
-                setWallet(walletRes.data);
-                setTotalTransactions(walletRes.data.total)
-                setPendingRelease(pendingRes.data);
+                setWallet(walletRes.data.data);
+                setTotalTransactions(walletRes.data.data.total)
+                setPendingRelease(pendingRes.data.data);
                 // const res=await getWallet();
                 // setWallet(res.data)
             } catch (error: unknown) {
@@ -63,14 +63,7 @@ export default function AdminWallet() {
             // auctionRes.data?.auction?.sellerId._id || auctionRes.data?.data?.sellerId;
 
             const rate = selectedTx.commissionPercent;
-            // await releasePayment({
-            //     transactionId:tx.id,
-            //     auctionId:tx.auctionId,
-            //     sellerId:tx.sellerId,
-            //     amount:tx.amount,
-            //     commissionPercent:commissionPercent,
-            //     sellerAmount:tx.amount-(tx.amount*(commissionPercent/100))
-            // });
+           
             await releasePayment({
                 transactionId: selectedTx.id,
                 auctionId: selectedTx.auctionId,
@@ -82,10 +75,9 @@ export default function AdminWallet() {
             toast.success("Funds released to user successfully");
             setPendingRelease(prev => prev.filter(r => r.id !== selectedTx.id));
             setIsConfirmOpen(false);
-            // window.location.reload();
+           
         } catch (error: unknown) {
             const err=error as AxiosError<{message:string}>
-            console.log("THE ACTUAL BACKEND ERROR IS:", );
             toast.error(err.response?.data.message || "failed to release funds")
         } finally {
             setReleasing(false);

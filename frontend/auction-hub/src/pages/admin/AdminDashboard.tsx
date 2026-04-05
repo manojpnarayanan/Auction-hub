@@ -36,7 +36,7 @@ export default function AdminDashboard() {
         if (period === 'custom') return;
         setLoading(true);
         getDashboardStats(period)
-            .then(setStats)
+            .then((data)=> setStats(data))
             .catch(() => toast.error('Failed to load dashboard stats'))
             .finally(() => setLoading(false));
     }, [period]);

@@ -19,7 +19,7 @@ export const getAllSubscriptionPlan = async () => {
 };
 
 export const updateSubscriptionPlan = async (id: string, data: Partial<SubscriptionPlanFormData>) => {
-    return API.put(`/admin/subcriptionplans/${id}`, data);  // ← was missing data!
+    return API.put(`/admin/subcriptionplans/${id}`, data);
 };
 
 export const deleteSubscriptionPlan = async (id: string) => {

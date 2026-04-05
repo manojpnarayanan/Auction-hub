@@ -55,7 +55,6 @@ export default function LiveAuctionRoom() {
     const { id } = useParams();
     const currentUser = useSelector((state: RootState) => state.auth.user);
 
-    // Set initial image when auction loads
     useEffect(() => {
         if (auction?.images && auction.images.length > 0) {
             setSelectedImage(auction.images[0]);

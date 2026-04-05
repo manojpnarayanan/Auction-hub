@@ -30,7 +30,7 @@ const AdminAuctions = () => {
             setLoading(true);
             const res = await getAdminAuctionManagement(page, limit, searchTerm);
             setAuctions(res.data.data || []);
-            setTotalPages(Math.ceil(res.data.total / limit));
+            setTotalPages(Math.ceil(res.data.data.total / limit));
         } catch (error) {
             console.error("Failed to fetch auctions");
             const err = error as AxiosError<{ message: string }>

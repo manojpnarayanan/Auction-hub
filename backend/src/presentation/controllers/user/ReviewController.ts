@@ -4,6 +4,8 @@ import { TYPES } from "../../../di/types";
 import { ICreateReviewUseCase } from "../../../application/use-cases/Usecase Interfaces/Review-Interface/ICreateReviewUseCase";
 import { IGetSellerReviewUseCase } from "../../../application/use-cases/Usecase Interfaces/Review-Interface/IGetSellerReviewUseCase";
 import { HttpStatus } from "../../Enums/StatusCodes";
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -17,7 +19,7 @@ export class ReviewController{
             const buyerId=req.user!.id;
             const data ={...req.body,buyerId}
             await this._createReviewUseCase.execute(data);
-            res.status(HttpStatus.CREATED).json({success:true,message:"Review Addded successfully"});
+            res.status(HttpStatus.CREATED).json(ApiResponse.ok(CustomMessages.REVIEW_ADDED));
         }catch(error){
             next(error);
         }
@@ -28,7 +30,7 @@ export class ReviewController{
             const page=parseInt(req.query.page as string);
             const limit=parseInt(req.query.limit as string);
             const result=await this._getSellerReviewUseCase.execute(sellerId,page,limit);
-            res.status(HttpStatus.OK).json({success:true,data:result});
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.REVIEWS_FETCHED));
         }catch(error){
             next(error);
         }

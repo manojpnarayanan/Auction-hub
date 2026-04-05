@@ -7,7 +7,8 @@ import { HttpStatus } from "../../Enums/StatusCodes";
 import { SubscribePlanDTO } from "../../../application/dtos/SubscriptionDTO";
 import { ICreateSubscriptionPaymentIntentUseCase } from "../../../application/use-cases/Usecase Interfaces/Subscription-Interface/ICreateSubscriptionPaymentIntentUseCase";
 import { IConfirmSubscriptionPaymentUseCase } from "../../../application/use-cases/Usecase Interfaces/Subscription-Interface/IConfirmSubscriptionPaymentUseCase";
-
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 @injectable()
 export class SubscriptionController {
@@ -20,7 +21,7 @@ export class SubscriptionController {
     getSubscription=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             const result=await this._getSubscriptionUseCase.execute(req.user!.id);
-            res.status(HttpStatus.OK).json(result);
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.SUBSCRIPTION_FETCHED));
         }catch(error){
             next(error);
         }
@@ -29,38 +30,26 @@ export class SubscriptionController {
         try{
             const {plan,planId}=req.body;
             if(!['basic','premium'].includes(plan)){
-                res.status(HttpStatus.BAD_REQUEST).json({message:"Invalid plan"});
+                res.status(HttpStatus.BAD_REQUEST).json(ApiResponse.error(CustomMessages.INVALID_PLAN));
                 return;
             }
             const dto:SubscribePlanDTO={userId:req.user!.id,planId,plan}
             const result=await this._subscribePlanUseCase.execute(dto);
-            res.status(HttpStatus.CREATED).json(result);
+            res.status(HttpStatus.CREATED).json(ApiResponse.success(result, CustomMessages.SUBSCRIPTION_CREATED));
         }catch(error){
             next(error);
         }
     }
-    // createCheckoutSession=async(req:Request,res:Response,next:NextFunction)=>{
-    //     try{
-    //         const {planId,planName} = req.body;
-    //         if(!planId || !planName){
-    //             res.status(HttpStatus.BAD_REQUEST).json({message:"Plan Id and Plan name is required"});
-    //             return;
-    //         }
-    //         const sessionUrl=await this._createSubscriptionCheckoutUSeCase.execute(req.user!.id,planId,planName);
-    //         res.status(HttpStatus.OK).json({url:sessionUrl});
-    //     }catch(error){
-    //         next(error);
-    //     }
-    // }
+    
     createPaymentIntent=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             const {planId,planName}=req.body;
             if(!planId || !planName){
-                res.status(HttpStatus.BAD_REQUEST).json({message:"Plan Id and Plan Name required"});
+                res.status(HttpStatus.BAD_REQUEST).json( ApiResponse.error(CustomMessages.PLAN_ID_NAME_REQUIRED));
                 return;
             }
             const result=await this._createSubscriptionPaymentIntentUseCase.execute(req.user!.id,planId,planName);
-            res.status(HttpStatus.OK).json(result);
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.PAYMENT_INTENT_CREATED));
         }catch(error){
             next(error);
         }
@@ -69,7 +58,7 @@ export class SubscriptionController {
         try{
             const {paymentIntentId,planId,planName}=req.body;
             if(!paymentIntentId || !planId || !planName){
-                res.status(HttpStatus.BAD_REQUEST).json({message:"Payment intent ID , planId, plan Name required"});
+                res.status(HttpStatus.BAD_REQUEST).json( ApiResponse.error(CustomMessages.PAYMENT_INTENT_REQUIRED));
                 return;
             }
             const result=await this._confirmSubscriptionPaymentUseCase.execute(
@@ -78,7 +67,7 @@ export class SubscriptionController {
                 planId,
                 planName
             );
-            res.status(HttpStatus.OK).json({message:"Subscription activated successfully",subscription:result});
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.SUBSCRIPTION_ACTIVATED));
         }catch(error){
             next(error)
         }

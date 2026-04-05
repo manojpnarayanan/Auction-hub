@@ -3,6 +3,7 @@ import LogoutButton from "../../components/LogoutButton";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
 import NotificationBell from "../../components/Notification";
+import {ROUTES} from '../../Constants/routes';
 
 
 export function AdminLayout() {
@@ -10,17 +11,15 @@ export function AdminLayout() {
   const location = useLocation();
   const { user } = useSelector((state: RootState) => state.auth);
   const navItems = [
-    { name: "Dashboard", path: "/admin/dashboard", },
-    { name: "Auctions", path: "/admin/auctions" },
-    { name: "Users", path: "/admin/users" },
-    { name: "Categories", path: "/admin/categories" },
-    { name: "Wallet", path: "/admin/wallet" },
-    { name: "Subscriptions", path: "/admin/subscription-plans" },
-    { name: "Disputes", path: "/admin/disputes" },
-    // {name:"Wallet" ,path:""},
-    // {name:"Reports" ,path:""}
-
+    { name: "Dashboard", path: ROUTES.ADMIN.DASHBOARD },
+    { name: "Auctions", path: ROUTES.ADMIN.AUCTIONS },
+    { name: "Users", path: ROUTES.ADMIN.USERS },
+    { name: "Categories", path: ROUTES.ADMIN.CATEGORIES },
+    { name: "Wallet", path: ROUTES.ADMIN.WALLET },
+    { name: "Subscriptions", path: ROUTES.ADMIN.SUBSCRIPTIONS },
+    { name: "Disputes", path: ROUTES.ADMIN.DISPUTES },
   ]
+
   return (
     <div className="min-h-screen bg-[#0d1117] text-gray-300 font-sans">
       {/* Navbar */}
@@ -31,26 +30,12 @@ export function AdminLayout() {
           </div>
           <span className="text-white font-bold text-lg tracking-wide">AuctionHub<span className="text-blue-500">Admin</span></span>
         </div>
-        {/* <nav className="flex items-center gap-1 bg-[#1c2128] p-1 rounded-lg border border-gray-800">
-          {navItems.map(item => (
-            <button
-              key={item.name}
-              onClick={() => navigate(item.path)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${location.pathname === item.path
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-            >
-              {item.name}
-            </button>
-          ))}
-        </nav> */}
+        
         <nav className="flex items-center gap-8">
           {navItems.map(item => (
             <button
               key={item.name}
               onClick={() => navigate(item.path)}
-              // Update styling to be simple text links
               className={`text-sm font-medium transition-colors ${location.pathname === item.path
                 ? "text-white"
                 : "text-gray-400 hover:text-gray-200"
@@ -68,7 +53,6 @@ export function AdminLayout() {
           </div>
         </div>
       </header>
-      {/* Page Content Renders Here */}
       <main className="max-w-7xl mx-auto p-8">
         <Outlet />
       </main>

@@ -26,8 +26,8 @@ export default function UserManagement() {
         setLoading(true);
         try {
             const res = await getUsers(page, searchTerm, token);
-            console.log("userManagement",res.data.users);
-            setUsers(res.data.users);
+            // console.log("userManagement",res.data.users);
+            setUsers(res.data.data);
             setTotalPages(res.data.totalPages);
 
         } catch (error) {
@@ -42,28 +42,7 @@ export default function UserManagement() {
         
     }, [page, searchTerm, token,fetchUserData]);
 
-    // const handleBlockToggle = async (_userId: string, currentStatus: boolean) => {
-    //     if (!token) return;
-    //     const result = await Swal.fire({
-    //         title: currentStatus ? "Unblock User" : "Block user",
-    //         text: currentStatus ? "This user will regain access to the platform." : "This user will be logged out and banned immediately.",
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: currentStatus ? '#10b981' : '#d33',
-    //         confirmButtonText: currentStatus ? "Yes Unblock" : "Yes Block",
-    //     });
-    //     if (!result.isConfirmed) return;
-    //     try {
-    //         const newStatus = !currentStatus;
-    //         await toggleUserBlock(_userId, newStatus, token);
-
-    //         setUsers(prev => prev.map(user => user.id === _userId ? { ...user, isBlocked: newStatus } : user));
-    //         toast.success(currentStatus ? "USer unblocked Successfully" : "user blocked successfully")
-
-    //     } catch (error) {
-             console.error("Failed to update status")
-    //     }
-    // };
+    
     const handleBlockToggle=(_userId:string)=>{
         const user=users.find(u=>u.id ===_userId);
         if(user){

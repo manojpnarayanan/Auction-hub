@@ -1,0 +1,77 @@
+name: Auction Hub Backend CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  # 1. Safety Check: Make sure the code isn't horribly broken before deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+
+      # We skip 'npm run build' here because your backend runs using 'tsx' directly!
+
+  # 2. Deploy to EC2
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Deploy to EC2
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        run: |
+          # Step A: Clone or Update the code on EC2
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            if [ ! -d Auction-Hub ]; then
+              git clone https://github.com/manojpnarayanan/Auction-hub.git
+            fi
+            cd Auction-Hub
+            git pull origin main
+          EOF
+          
+          # Step B: Copy the .env Secret into the backend folder magically over the internet!
+          echo "$ENV_FILE" > .env
+          scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no .env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:Auction-Hub/backend/.env
+          
+          # Step C: Rebuild and Restart Docker
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            cd Auction-Hub
+            
+            # Verify .env exists and is not empty before starting!
+            if [ ! -s backend/.env ]; then
+              echo "ERROR: backend/.env file is empty or missing after SCP!"
+              exit 1
+            fi
+            
+            echo "Environment file verified. Rebuilding Docker containers..."
+            
+            docker compose down
+            docker compose up --build -d
+            docker ps
+          EOF

@@ -4,13 +4,21 @@ export function getDateConfig(period: DashboardPeriod) {
     const now = new Date();
 
     if (period === 'daily') {
+        // ONLY TODAY: Starts from midnight of the current day
         const from = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         return { from, format: '%Y-%m-%d' };
+        
     } else if (period === 'monthly') {
-        const from = new Date(now.getFullYear(), now.getMonth(), 1);
+        // LAST 30 DAYS: Goes back exactly 30 days from today
+        const from = new Date(now);
+        from.setDate(now.getDate() - 30);
         return { from, format: '%Y-%m-%d' };
+        
     } else {
-        const from = new Date(now.getFullYear(), 0, 1);
+        // LAST 12 MONTHS: Goes back 11 months and jumps to the 1st of that month
+        const from = new Date(now);
+        from.setMonth(now.getMonth() - 11);
+        from.setDate(1); 
         return { from, format: '%Y-%m' };
     }
 }
@@ -21,4 +29,3 @@ export function getCustomDateConfig(startDate: string, endDate: string) {
     to.setHours(23, 59, 59, 999); // include the full end day
     return { from, to, format: '%Y-%m-%d' };
 }
-

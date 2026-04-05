@@ -9,6 +9,7 @@ import type { AuctionItem } from "../../types/auction";
 import ReviewModal from "../../components/ReviewModal";
 import toast from "react-hot-toast";
 import type { AxiosError } from "axios";
+import {ROUTES} from '../../Constants/routes';
 
 
 interface MyBidItem {
@@ -40,8 +41,8 @@ export default function MyBids() {
         try {
             setLoading(true);
             const res = await getMyBids(currentPage, limit);
-            setMyBids(res?.data?.data || []);
-            setTotalPages(Math.ceil(res.data.total / limit));
+            setMyBids(res?.data?.data.data || []);
+            setTotalPages(Math.ceil(res.data.data.total / limit));
         } catch (error) {
             console.error("Failed to fetch bids", error);
             setMyBids([]);
@@ -134,7 +135,8 @@ export default function MyBids() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {myBids.map((item: MyBidItem) => (
                             <div key={item.auction.id}
-                                onClick={() => navigate(item.auction.type === 'live' ? `/live-auction/${item.auction.id}` : `/auction/${item.auction.id}`)}
+                                // onClick={() => navigate(item.auction.type === 'live' ? `/live-auction/${item.auction.id}` : `/auction/${item.auction.id}`)}
+                                onClick={() => navigate(item.auction.type === 'live' ? ROUTES.LIVE_AUCTION.replace(':id', item.auction.id) : ROUTES.AUCTION_DETAILS.replace(':id', item.auction.id))}
                                 className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-4 cursor-pointer hover:shadow-md transition">
                                 <div className="flex gap-4">
                                     <img
@@ -193,13 +195,7 @@ export default function MyBids() {
                                         </div>
                                     </div>
                                 )}
-                                {/* {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
-                                    <div className="mt-2 pt-4 border-t border-gray-100">
-                                        <div className="bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">
-                                            Delivery Confirmed & Funds Released
-                                        </div>
-                                    </div>
-                                )} */}
+                                
                                 {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
                                     <div className="mt-2 pt-4 border-t border-gray-100 flex gap-3 items-center">
                                         <div className="flex-1 bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">

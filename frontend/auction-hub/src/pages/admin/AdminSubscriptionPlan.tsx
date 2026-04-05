@@ -41,7 +41,7 @@ export default function AdminSubscriptionPlan() {
     const fetchPlans = async () => {
         try {
             const res = await getAllSubscriptionPlan();
-            setPlans(res.data);
+            setPlans(res.data.data);
         } catch (error:unknown) {
             const err=error as AxiosError<{message:string}>
             toast.error(err.response?.data?.message || "Failed to fetch Plans");

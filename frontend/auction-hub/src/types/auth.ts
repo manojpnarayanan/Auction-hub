@@ -20,6 +20,7 @@ export interface SignupCredentials{
 export interface AuthResponse{
     success:boolean;
     message:string;
-    token:string;
-    user:AuthUser;
+    data:{token:string;
+          user:AuthUser;
+        }
 }

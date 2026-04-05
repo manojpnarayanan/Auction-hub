@@ -3,17 +3,20 @@ import logger from "../../infrastructure/Global/Logger";
 import cloudinary from "../../infrastructure/config/cloudinary";
 import fs from "fs";
 import { HttpStatus } from "../Enums/StatusCodes";
+import { ApiResponse } from "../Common/APIResponse";
+import { CustomMessages } from "../Enums/CustomMessages";
+
 
 export class UploadController {
     static async uploadImage(req: Request, res: Response) {
         try {
             if (!req.files || (req.files as Express.Multer.File[]).length===0) {
-                res.status(HttpStatus.BAD_REQUEST).json({ success: false, message: "No file uploaded" })
+                res.status(HttpStatus.BAD_REQUEST).json( ApiResponse.error(CustomMessages.NO_FILE_UPLOADED))
                 return;
             };
             const files=req.files as Express.Multer.File[];
             if(files.length>5){
-                res.status(HttpStatus.BAD_REQUEST).json({success:false,message:"Maximum 5 images allowed"})
+                res.status(HttpStatus.BAD_REQUEST).json( ApiResponse.error(CustomMessages.MAX_IMAGES_EXCEEDED))
                 return;
             };
             const uploadPromises=files.map(file=>{
@@ -30,10 +33,10 @@ export class UploadController {
                 });
             });
             const results=await Promise.all(uploadPromises);
-            res.status(HttpStatus.OK).json({success:true,images:results});
+            res.status(HttpStatus.OK).json( ApiResponse.success({ images: results }, CustomMessages.FILE_UPLOADED));
         }catch(error){
             logger.error({ error }, "Upload error");
-            res.status(HttpStatus.INERNAL_SERVER_ERROR).json({success:false,message:"Image upload failed"})
+            res.status(HttpStatus.INERNAL_SERVER_ERROR).json(ApiResponse.error(CustomMessages.IMAGE_UPLOAD_FAILED))
         }
     }
 }

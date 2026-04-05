@@ -6,6 +6,8 @@ import { IGetAllSubscriptionPlanUseCase } from "../../../application/use-cases/U
 import { IUpdateSubscriptionPlanUseCase } from "../../../application/use-cases/Usecase Interfaces/SubscriptionPlan-Interfaces/IUpdateSubscriptionPlanUseCase";
 import { IDeleteSubscriptionPlanUseCase } from "../../../application/use-cases/Usecase Interfaces/SubscriptionPlan-Interfaces/IDeleteSubscriptionPlanUseCase";
 import { HttpStatus } from "../../Enums/StatusCodes";
+import { CustomMessages } from "../../Enums/CustomMessages";
+import { ApiResponse } from "../../Common/APIResponse";
 
 
 @injectable()
@@ -20,7 +22,7 @@ export class SubscriptionPlanController{
     create=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             const result=await this._createSubscriptionPlan.execute(req.body);
-            res.status(HttpStatus.CREATED).json(result)
+            res.status(HttpStatus.CREATED).json(ApiResponse.success(result, CustomMessages.PLAN_CREATED))
         }catch(error){
             next(error)
         }
@@ -28,7 +30,7 @@ export class SubscriptionPlanController{
     getAll=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             const result=await this._getAllSubscriptionPlan.execute();
-            res.status(HttpStatus.OK).json(result);
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.PLANS_FETCHED));
         }catch(error){
             next(error);
         }
@@ -36,7 +38,7 @@ export class SubscriptionPlanController{
     update=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             const result=await this._updateSubcriptionPlan.execute(req.params.id,req.body);
-            res.status(HttpStatus.OK).json(result);
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.PLAN_UPDATED));
         }catch(error){
             next(error)
         }
@@ -44,7 +46,7 @@ export class SubscriptionPlanController{
     delete=async(req:Request,res:Response,next:NextFunction)=>{
         try{
             await this._deleteSubscriptionPlan.execute(req.params.id);
-            res.status(HttpStatus.OK).json({message:"Plan deleted Successfully"});
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.PLAN_DELETED));
         }catch(error){
             next(error);
         }

@@ -6,6 +6,7 @@ import ConfirmModal from "../../components/ConfirmationModal";
 import type { Column } from "../../components/reuseabletable";
 import DataTable from "../../components/reuseabletable";
 import type { AxiosError } from "axios";
+import { MESSAGES } from "../../Constants/messages";
 
 
 interface Category {
@@ -41,7 +42,7 @@ export default function AdminCategories() {
     const fetchCategories = useCallback(async () => {
         try {
             const data = await getCategories(page, limit, debounceTerm);
-            console.log(data);
+            // console.log(data);
             setCategories(data.categories);
             setTotalPages(Math.ceil(data.total / limit));
         } catch (error:unknown) {
@@ -61,7 +62,7 @@ export default function AdminCategories() {
         if (!categoryToDelete) return;
         try {
             await deleteCategory(categoryToDelete);
-            toast.success("Category deleted successfully");
+            toast.success(MESSAGES.CATEGORY_CREATED);
             fetchCategories();
             setIsDeleteModalOpen(false);
         } catch (error:unknown) {

@@ -10,6 +10,7 @@ import Pagination from "../../components/Pagination";
 import type { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import InfoModal from "../../components/InfoModal";
+import {ROUTES} from '../../Constants/routes'
 
 
 export default function MyListings() {
@@ -94,7 +95,8 @@ export default function MyListings() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {myAuctions.map((auction: AuctionItem) => (
                             <div key={auction.id}
-                                onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
+                                // onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
+                                onClick={() => navigate(auction.type === 'live' ? ROUTES.LIVE_AUCTION.replace(':id', auction.id) : ROUTES.AUCTION_DETAILS.replace(':id', auction.id))}
                                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition group">
                                 <div className="h-48 bg-gray-200 overflow-hidden relative">
                                     {auction.images?.[0] ? (
@@ -115,42 +117,9 @@ export default function MyListings() {
                                         <div className="text-xs text-gray-500">
                                             {auction.type === 'live' ? '📡 Live Auction' : '⏳ Timed Auction'}
                                         </div>
-                                        {/* <div className="flex gap-2">
-                                            {(auction.status === 'active' || auction.status === 'approved') && (
-                                                 <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleRequestCancellation(auction.id);
-                                                }}
-                                                className="text-sm bg-red-100 hover:bg-red-200 text-red-700 px-4 py-1.5 rounded-lg transition font-medium"
-                                            >
-                                                Request Cancel
-                                            </button>
-                                            )}
-                                            {auction.status === 'rejected' && (
-                                                <span title={auction.rejectionReason} className="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold cursor-help"
-                                                    onClick={(e)=>{
-                                                        e.stopPropagation();
-                                                        alert(`Rejection Reason:${auction.rejectionReason}`)
-                                                    }}
-                                                >
-                                                    View Reason
-                                                </span>
-                                            )}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedAuction(auction);
-                                                    setIsModalOpen(true);
-                                                }}
-                                                className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
-                                            >
-                                                Edit
-                                            </button>
-                                           
-                                        </div> */}
+                                        
                                         <div className="flex gap-2">
-                                            {/* 1. Request Cancel: Only for Active/Approved auctions */}
+                                            
                                             {(auction.status === 'active' || auction.status === 'approved') && (
                                                 <button
                                                     onClick={(e) => {
@@ -163,7 +132,7 @@ export default function MyListings() {
                                                 </button>
                                             )}
 
-                                            {/* 2. View Reason: Only for Rejected auctions */}
+                                        
                                             {(auction.status === 'rejected' || auction.status ==='cancelled') && (
                                                 <span
                                                     title={auction.rejectionReason}
@@ -178,7 +147,7 @@ export default function MyListings() {
                                                 </span>
                                             )}
 
-                                            {/* 3. The existing Edit button */}
+                                        
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
@@ -200,7 +169,7 @@ export default function MyListings() {
             </main>
             {isModalOpen && (
                 <CreateAuctionModal onClose={() => setIsModalOpen(false)}
-                    onSuccess={fetchMyListings} // Refresh list after create/edit
+                    onSuccess={fetchMyListings} 
                     initialData={selectedAuction || undefined}
                 />
             )}

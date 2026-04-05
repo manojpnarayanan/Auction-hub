@@ -45,8 +45,8 @@ export default function AdminDisputes() {
         try {
             setLoading(true);
             const res = await getAllDisputesAPI(currentPage, 10, filterStatus);
-            setDisputes(res.data?.disputes || []);
-            setTotalPages(Math.ceil((res.data?.total || 1) / 10));
+            setDisputes(res.data.data?.disputes || []);
+            setTotalPages(Math.ceil((res.data.data?.total || 1) / 10));
         } catch (error) {
             console.error(error);
         } finally {

@@ -14,6 +14,7 @@ import type { WalletWithTransactions } from "../../types/wallet";
 import { AxiosError } from "axios";
 import type { TransactionItem } from "../../types/transaction";
 import Pagination from "../../components/Pagination";
+import { MESSAGES } from "../../Constants/messages";
 
 
 type Section = "profile" | "password" | "address" | "wallet";
@@ -64,7 +65,7 @@ export default function Profile() {
         const fetchAddresses = async () => {
             try {
                 const res = await getAddress();
-                setAddresses(res.data);
+                setAddresses(res.data.data);
             } catch (error) {
                 const err = error as AxiosError<{ message: string }>
                 toast.error(err.response?.data?.message || "Failed to load Addresses");
@@ -92,7 +93,7 @@ export default function Profile() {
             if (editingAddress) {
                 const res = await updateAddress(editingAddress.id, addressForm);
                 setAddresses(prev => prev.map(a => a.id === editingAddress.id ? res.data : a));
-                toast.success("Addrtess updated successfully");
+                toast.success("Address updated successfully");
             } else {
                 const res = await addAddress(addressForm);
                 setAddresses(prev => [...prev, res.data]);
@@ -165,10 +166,10 @@ export default function Profile() {
             try {
                 const res = await getProfile();
                 setProfileData({
-                    name: res.data.name || "",
-                    email: res.data.email || "",
-                    phone: res.data.phone || "",
-                    profileImage: res.data.profileImage || "",
+                    name: res.data.data.name || '',
+                    email: res.data.data.email || "",
+                    phone: res.data.data.phone || "",
+                    profileImage: res.data.data.profileImage || "",
                 });
             } catch (error) {
                 const err = error as AxiosError<{ message: string }>
@@ -183,7 +184,7 @@ export default function Profile() {
             setWalletLoading(true);
             try {
                 const res = await getWallet(walletPage, walletLimit);
-                setWalletData(res.data);
+                setWalletData(res.data.data);
             } catch (error) {
                 const err = error as AxiosError<{ message: string }>
                 toast.error(err.response?.data?.message || 'Failed to load Wallet');
@@ -202,7 +203,7 @@ export default function Profile() {
                 phone: profileData.phone,
                 profileImage: profileData.profileImage,
             });
-            toast.success("Profile updated successfully!");
+            toast.success(MESSAGES.PROFILE_UPDATED);
         } catch (error) {
             const err = error as AxiosError<{ message: string }>
             toast.error(err.response?.data?.message || "Failed to update profile");
@@ -238,7 +239,7 @@ export default function Profile() {
                 oldPassword: passwordData.oldPassword,
                 newPassword: passwordData.newPassword,
             });
-            toast.success("Password changed successfully!");
+            toast.success(MESSAGES.PASSWORD_CHANGED);
             setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
         } catch (error: unknown) {
             const err = error as AxiosError<{ message: string }>
@@ -261,7 +262,7 @@ export default function Profile() {
             const res = await API.post(`${API_URL}/upload`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const imageUrl = res.data.images[0].url;
+            const imageUrl = res.data.data.images[0].url;
             await updateProfile({
                 name: profileData.name,
                 phone: profileData.phone,

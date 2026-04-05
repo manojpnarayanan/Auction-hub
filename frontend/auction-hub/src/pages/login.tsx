@@ -8,6 +8,7 @@ import { AxiosError } from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../api/auth";
 import toast from "react-hot-toast";
+import { ROUTES } from "../Constants/routes";
 
 
 export default function Login() {
@@ -28,13 +29,13 @@ export default function Login() {
 
                 dispatch(
                     setCredentials({
-                        user: res.data.user,
-                        token: res.data.token,
+                        user: res.data.data.user,
+                        token: res.data.data.token,
                     })
                 );
 
-                toast.success("Google Login Successful!");
-                // navigate("/user/dashboard");
+                toast.success(res.data.message);
+                navigate(ROUTES.USER.DASHBOARD);
             } catch (error: unknown) {
                 console.error("Google login failed", error);
                 const err = error as AxiosError<{ message: string }>;
@@ -69,13 +70,13 @@ export default function Login() {
             // console.log(res);
             dispatch(
                 setCredentials({
-                    user: res.data.user,
-                    token: res.data.token,
+                    user: res.data.data.user,
+                    token: res.data.data.token,
                 })
             );
 
             await new Promise(resolve => setTimeout(resolve, 100));
-            // navigate("/user/dashboard");
+            navigate(ROUTES.USER.DASHBOARD);
         } catch (error: unknown) {
             console.error("login failed", error);
             const err = error as AxiosError<{ message: string }>

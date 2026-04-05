@@ -9,8 +9,10 @@ export interface User {
 }
 
 export interface UsersResponse {
-    users: User[],
-    totalUsers: number,
+    success?:boolean,
+    message?:string,
+    data: User[],
+    total: number,
     totalPages: number,
-    currentpage: number,
+    page: number,
 }

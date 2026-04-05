@@ -4,6 +4,8 @@ import {TYPES } from '../../../di/types';
 import { IReleasePaymentUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/IReleasePaymentUseCase";
 import { HttpStatus } from "../../Enums/StatusCodes";
 import { IGetPendingReleaseUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/IGetPendingUseCase";
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -16,7 +18,7 @@ export class AdminPaymentController{
     releasePayment=async(req:Request,res:Response,next:NextFunction):Promise<void>=>{
         try{
             await this._releasePaymentUseCase.execute(req.body);
-            res.status(HttpStatus.OK).json({message:"Payment released to seller"});
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.PAYMENT_RELEASED));
         }catch(error){
             next(error);
         }
@@ -24,7 +26,7 @@ export class AdminPaymentController{
     getPendingRelease=async(req:Request,res:Response,next:NextFunction):Promise<void>=>{
         try{
             const result=await this._getPendingReleaseUseCase.execute();
-            res.status(HttpStatus.OK).json(result);
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.PENDING_RELEASE_FETCHED));
         }catch(error){
             next(error);
         }

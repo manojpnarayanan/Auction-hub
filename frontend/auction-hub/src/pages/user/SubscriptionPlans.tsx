@@ -37,13 +37,13 @@ export default function SubscriptionPlans() {
     const [loading, setLoading] = useState(true);
     const [activeSubscription, setActiveSubscription] = useState<ActiveSubscription | null>(null);
     const currentUser = useSelector((state: RootState) => state.auth.user);
-    // Modal State
     const [paymentSession, setPaymentSession] = useState<{ clientSecret: string, paymentIntentId: string, amount: number, planId: string, planName: string } | null>(null);
     const [initiating, setInitiating] = useState<string | null>(null);
+
     const fetchPlans = async () => {
         try {
             const res = await getAllSubscriptionPlan();
-            setPlans(res.data?.plans || res.data || []);
+            setPlans(res.data.data || []);
         } catch (error) {
             console.error('Error fetching plans', error)
         } finally {
@@ -53,8 +53,8 @@ export default function SubscriptionPlans() {
     const fetchUserSubscription = async () => {
         try {
             const res = await getSubscription();
-            if (res.data) {
-                setActiveSubscription(res.data.subscription);
+            if (res.data && res.data.success) {
+                setActiveSubscription(res.data.data.subscription);
             }
         } catch (error) {
             console.error(error);
@@ -77,9 +77,9 @@ export default function SubscriptionPlans() {
         try {
             const res = await createSubscriptionPaymentIntent(planId, planName);
             setPaymentSession({
-                clientSecret: res.data.clientSecret,
-                paymentIntentId: res.data.paymentIntentId,
-                amount: res.data.amount,
+                clientSecret: res.data.data.clientSecret,
+                paymentIntentId: res.data.data.paymentIntentId,
+                amount: res.data.data.amount,
                 planId: planId,
                 planName: planName
             });

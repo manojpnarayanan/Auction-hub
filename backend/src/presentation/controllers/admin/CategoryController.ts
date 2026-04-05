@@ -7,6 +7,7 @@ import { IGetAllCategoriesUseCase } from "../../../application/use-cases/Usecase
 import { IUpdateCategoryUseCase } from "../../../application/use-cases/Usecase Interfaces/Admin/Category Interface/IUpdateCategoryUseCase";
 import { IDeleteCategoryUseCase } from "../../../application/use-cases/Usecase Interfaces/Admin/Category Interface/IDeleteCategoryUseCase";
 import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 @injectable()
 export class CategoryController{
@@ -20,7 +21,7 @@ export class CategoryController{
      create= async (req:Request, res:Response, next:NextFunction)=>{
         try{
             const category=await this._createCategoryUseCase.execute(req.body);
-            res.status(HttpStatus.CREATED).json(category);
+            res.status(HttpStatus.CREATED).json(ApiResponse.success(category,CustomMessages.CATEGORY_CREATED));
         }catch(error){
             next(error)
     }
@@ -31,8 +32,7 @@ export class CategoryController{
             const limit=parseInt(req.query.limit as string) || 5
             const searchTerm=req.query.searchTerm as string
             const categories=await this._getAllCategoryUseCase.execute(page,limit,searchTerm);
-            const response=ApiResponse.success(categories,'Categories Fetched Successfully')
-            return res.status(response.statusCode).json(response);
+            return res.status(HttpStatus.OK).json(ApiResponse.success(categories,CustomMessages.CATEGORY_FETCHED));
         }catch(error){
             next(error);
         }
@@ -42,9 +42,9 @@ export class CategoryController{
             const {id}=req.params;
             const category=await this._updateCategoryUseCase.execute(id,req.body);
             if(!category){
-                res.status(HttpStatus.NOT_FOUND).json({message:"Category not Found"});
+                res.status(HttpStatus.NOT_FOUND).json(ApiResponse.error(CustomMessages.CATEGORY_NOT_FOUND));
             };
-            return res.status(HttpStatus.OK).json(category);
+            return res.status(HttpStatus.OK).json(ApiResponse.success(category,CustomMessages.CATEGORY_UPDATED));
         }catch(error){
             next(error);
         }
@@ -54,9 +54,9 @@ export class CategoryController{
             const {id}=req.params;
             const success=await this._deleteCategoryUseCase.execute(id);
             if(!success){
-                return res.status(HttpStatus.NOT_FOUND).json({message:"Category not found or could be deleted"})
+                return res.status(HttpStatus.NOT_FOUND).json(ApiResponse.error(CustomMessages.CATEGORY_NOT_FOUND))
             };
-            res.status(HttpStatus.OK).json({message:"Category deleted successfully"});
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.CATEGORY_DELETED));
         }catch(error){
             next(error);
         }

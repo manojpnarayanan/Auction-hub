@@ -7,6 +7,8 @@ import { IResolveDisputeUseCase } from "../../../application/use-cases/Usecase I
 import { IGetDisputeUseCase } from "../../../application/use-cases/Usecase Interfaces/Dispute-Interface/IGetDisputeUseCase";
 import { RaiseDisputeDTO,ResolveDisputeDTO } from "../../../application/dtos/DisputeDTO";
 import { HttpStatus } from "../../Enums/StatusCodes";
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -22,7 +24,7 @@ export class Disputecontroller{
             const {auctionId} = req.body;
             const buyerId=req.user!.id;
             await this._confirmDeliveryUseCase.execute(auctionId,buyerId);
-            res.status(HttpStatus.OK).json({success:true,message:"Delivery Confiemd . funds released to seller" })
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.DELIVERY_CONFIRMED))
         }catch(error){
             next(error);
         }
@@ -32,7 +34,7 @@ export class Disputecontroller{
             const buyerId=req.user!.id;
             const data:RaiseDisputeDTO= {...req.body,buyerId};
             await this._raiseDisputeUseCase.execute(data);
-            res.status(HttpStatus.CREATED).json({success:true,message:"Dispute raised Successfully. Funds are locked"});
+            res.status(HttpStatus.CREATED).json( ApiResponse.ok(CustomMessages.DISPUTE_RAISED));
         }catch(error){
             next(error);
         }
@@ -43,7 +45,7 @@ export class Disputecontroller{
             const page=parseInt(req.query.page as string) || 1;
             const limit=parseInt(req.query.limit as string) || 10;
             const result=await this._getDisputeUseCase.getBuyerDisputes(buyerId,page,limit);
-            res.status(HttpStatus.OK).json({success:true,data:result})
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.DISPUTES_FETCHED))
         }catch(error){
             next(error);
         }
@@ -55,7 +57,7 @@ export class Disputecontroller{
             const limit=parseInt(req.query.limit as string)||10;
             const status=req.query.status as string;
             const result=await this._getDisputeUseCase.getAllDisputes(page,limit,status);
-            res.status(HttpStatus.OK).json({success:true,data:result})
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.DISPUTES_FETCHED))
         }catch(error){
             next(error)
         }
@@ -66,7 +68,7 @@ export class Disputecontroller{
             const {disputedId}=req.params;
             const resolutionData:ResolveDisputeDTO = {...req.body,disputedId:disputedId}
             await this._resolveDisputeUseCase.execute(resolutionData);
-            res.status(HttpStatus.OK).json({success:true,message:"Dispute resolved "})
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.DISPUTE_RESOLVED))
         }catch(error){
             next(error)
         }

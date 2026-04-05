@@ -17,6 +17,7 @@ import { AxiosError } from "axios";
 import { getSellerReviews } from "../../api/User/Review";
 // import type { BidItem } from "../../types/Bid";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../Constants/routes";
 
 interface Auction {
     id: string;
@@ -316,13 +317,13 @@ export default function AuctionProductDetails() {
                                                 You must be a registered member to place bids and track this item.
                                             </p>
                                             <button
-                                                onClick={() => navigate('/signup')}
+                                                onClick={() => navigate(ROUTES.SIGNUP)}
                                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-lg transition shadow-lg shadow-blue-200 active:scale-95"
                                             >
                                                 GET STARTED FOR FREE
                                             </button>
                                             <p className="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center">
-                                                Already a member? <span onClick={() => navigate('/login')} className="text-blue-500 cursor-pointer hover:underline font-bold">Log in</span>
+                                                Already a member? <span onClick={() => navigate(ROUTES.LOGIN)} className="text-blue-500 cursor-pointer hover:underline font-bold">Log in</span>
                                             </p>
                                         </div>
                                     ) : (

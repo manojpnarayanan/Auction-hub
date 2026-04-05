@@ -9,6 +9,8 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../redux/slices/authSlices";
 import toast from "react-hot-toast";
 import type { AxiosError } from "axios";
+import {ROUTES} from '../Constants/routes';
+
 
 export default function Signup() {
   // const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -36,13 +38,13 @@ export default function Signup() {
 
         dispatch(
           setCredentials({
-            user: res.data.user,
-            token: res.data.token,
+            user: res.data.data.user,
+            token: res.data.data.token,
           })
         );
 
-        toast.success("Account created securely with Google!");
-        navigate("/user/dashboard");
+        toast.success(res.data.message);
+        navigate(ROUTES.USER.DASHBOARD);
       } catch (error: unknown) {
         console.error("Google signup failed", error);
         const err = error as AxiosError<{ message: string }>;

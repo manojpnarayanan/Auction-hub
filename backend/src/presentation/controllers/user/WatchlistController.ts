@@ -7,6 +7,7 @@ import { IAddToWatchlistUseCase } from "../../../application/use-cases/Usecase I
 import { IRemoveFromWatchlistUseCase } from "../../../application/use-cases/Usecase Interfaces/Watchlist-Interface/IRemoveFromWatchlistUseCase";
 import { IGetWatchlistUseCase } from "../../../application/use-cases/Usecase Interfaces/Watchlist-Interface/IGetWatchlistUseCase";
 import { ICheckWatchlistUseCase } from "../../../application/use-cases/Usecase Interfaces/Watchlist-Interface/ICheckWatchlistUseCase";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -23,7 +24,7 @@ export class WatchlistController{
             const userId=req.user!.id;
             const {auctionId}=req.params;
             await this._addToWatchlistUSeCase.execute(userId,auctionId);
-            return res.status(HttpStatus.OK).json(ApiResponse.success(null,"Added to Watchlist"));
+            return res.status(HttpStatus.OK).json(ApiResponse.success(null,CustomMessages.ADDED_TO_WATCHLIST));
         }catch(error){
             next(error)
         }
@@ -33,7 +34,7 @@ export class WatchlistController{
             const userId=req.user!.id;
             const {auctionId}=req.params;
             await this._removeFromWatchlistUseCase.execute(userId,auctionId);
-            return res.status(HttpStatus.OK).json(ApiResponse.success(null,"Removed from watchlist"));
+            return res.status(HttpStatus.OK).json(ApiResponse.success(null,CustomMessages.REMOVED_FROM_WATCHLIST));
         }catch(error){
             next(error)
         }
@@ -42,7 +43,7 @@ export class WatchlistController{
         try{
             const userId=req.user!.id;
             const auctions=await this._getWatchlistUseCase.execute(userId);
-            return res.status(HttpStatus.OK).json(ApiResponse.success(auctions,"Watchlist Fetched"));
+            return res.status(HttpStatus.OK).json(ApiResponse.success(auctions,CustomMessages.WATCHLIST_FETCHED));
         }catch(error){
             next(error)
         }
@@ -52,7 +53,7 @@ export class WatchlistController{
             const userId=req.user!.id;
             const {auctionId}=req.params;
             const isWatchlisted=await this._checkWatchlistUseCase.execute(userId,auctionId);
-            return res.status(HttpStatus.OK).json(ApiResponse.success({isWatchlisted},"Status Checked"));
+            return res.status(HttpStatus.OK).json(ApiResponse.success({isWatchlisted},CustomMessages.WATCHLIST_STATUS_CHECKED));
         }catch(error){
             next(error)
         }

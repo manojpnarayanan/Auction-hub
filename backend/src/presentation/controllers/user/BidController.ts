@@ -5,6 +5,8 @@ import { IPlaceBidUseCase } from "../../../application/use-cases/Usecase Interfa
 import { IGetAuctionBidsUseCase } from "../../../application/use-cases/Usecase Interfaces/Bid-interface/IGetAuctionBidsUseCase";
 import { IGetUserBidsUseCase } from "../../../application/use-cases/Usecase Interfaces/Bid-interface/IGetUserBidsUseCase";
 import { HttpStatus } from "../../Enums/StatusCodes";
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -19,14 +21,10 @@ export class BidController {
         try {
             const { auctionId, amount } = req.body;
             const bidderId = req.user!.id;
-            if (!bidderId) return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "Unauthorized" });
+            if (!bidderId) return res.status(HttpStatus.UNAUTHORIZED).json( ApiResponse.error(CustomMessages.UNAUTHORIZED));
             const bid = await this._placeBidUseCase.execute({ auctionId, bidderId, amount });
 
-            res.status(HttpStatus.CREATED).json({
-                success: true,
-                message: "Bid placed Successsfully",
-                data: bid
-            });
+            res.status(HttpStatus.CREATED).json( ApiResponse.success(bid, CustomMessages.BID_PLACED));
         } catch (error) {
             next(error);
         }
@@ -35,7 +33,7 @@ export class BidController {
         try {
             const { auctionId } = req.params;
             const bids = await this._getAuctionBidsUseCase.execute(auctionId);
-            res.status(HttpStatus.OK).json({ success: true, data: bids });
+            res.status(HttpStatus.OK).json(ApiResponse.success(bids, CustomMessages.BIDS_FETCHED));
         } catch (error) {
             next(error);
         }
@@ -47,11 +45,11 @@ export class BidController {
             const limit=parseInt(req.query.limit as string)
             // logger.info("getMyBids",page,limit)
             if (!userId) {
-                return res.status(HttpStatus.UNAUTHORIZED).json({ success: false, message: "unAuthorized" });
+                return res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
             }
             const bids = await this._getUserBidUseCase.execute(userId,page,limit);
             // logger.info("bids",bids)
-            res.status(HttpStatus.OK).json({ success: true, ...bids });
+            res.status(HttpStatus.OK).json(ApiResponse.success(bids, CustomMessages.BIDS_FETCHED));
         } catch (error) {
             next(error);
         }

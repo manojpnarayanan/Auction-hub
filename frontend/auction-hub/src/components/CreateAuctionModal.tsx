@@ -18,7 +18,6 @@ interface Props {
 const toLocalISO = (dateStr: string | Date | undefined) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    // Adjust for the local timezone offset (in minutes)
     const offset = date.getTimezoneOffset() * 60000; 
     const localDate = new Date(date.getTime() - offset);
     return localDate.toISOString().slice(0, 16);
@@ -29,7 +28,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
   const [form, setForm] = useState({
     title: "",
     description: "",
-    category: "Others", // Default
+    category: "Others",
     startingPrice: "",
     endDate: "",
     images: [] as string[],
@@ -76,8 +75,8 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
   
   useEffect(()=>{
     getSubscription().then(res=>{
-      setSubscriptionLimit(res.data.limits);
-      setPlanName(res.data.plan);
+      setSubscriptionLimit(res.data.data.limits);
+      setPlanName(res.data.data.plan);
     }).catch(()=>{});
   },[]);
 
@@ -104,7 +103,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         headers: { "Content-Type": "multipart/form-data" }
       });
 
-      const newUrls = res.data.images.map((img: {url:string}) => img.url);
+      const newUrls = res.data.data.images.map((img: {url:string}) => img.url);
 
       setForm((prev) => ({ ...prev, images: [...prev.images, ...newUrls] }));
     } catch (err) {

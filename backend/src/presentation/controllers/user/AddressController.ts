@@ -7,6 +7,9 @@ import { IUpdateAddressUseCase } from "../../../application/use-cases/Usecase In
 import { IDeleteAddressUseCase } from "../../../application/use-cases/Usecase Interfaces/Address-Interface/IDeleteAddressUseCase";
 import { IAddAddressUseCase } from "../../../application/use-cases/Usecase Interfaces/Address-Interface/IAddAddressUseCase";
 import { ISetDefaultUseCase } from "../../../application/use-cases/Usecase Interfaces/Address-Interface/ISetDefaultUseCase";
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
+
 
 @injectable()
 export class AddressController{
@@ -21,11 +24,11 @@ export class AddressController{
         try{
             const userId=req.user?.id;
             if(!userId){
-                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
                 return;
             }
             const addresses=await this._getAddressUseCase.execute(userId);
-            res.status(HttpStatus.OK).json(addresses);
+            res.status(HttpStatus.OK).json(ApiResponse.success(addresses, CustomMessages.ADDRESSES_FETCHED));
 
         }catch(error){
             next(error);
@@ -35,11 +38,11 @@ export class AddressController{
         try{
             const userId=req.user?.id;
             if(!userId){
-                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
                 return;
             }
             const address=await this._addAddressUseCase.execute(userId,req.body);
-            res.status(HttpStatus.OK).json(address);
+            res.status(HttpStatus.OK).json(ApiResponse.success(address, CustomMessages.ADDRESS_ADDED));
         }catch(error){
             next(error);
         }
@@ -48,7 +51,7 @@ export class AddressController{
         try{
             const {id}=req.params;
             const address=await this._updateAddressUseCase.execute(id,req.body);
-            res.status(HttpStatus.OK).json(address);
+            res.status(HttpStatus.OK).json(ApiResponse.success(address, CustomMessages.ADDRESS_UPDATED));
         }catch(error){
             next(error);
         }
@@ -57,7 +60,7 @@ export class AddressController{
         try{
             const {id}=req.params;
             await this._deleteAddressUseCase.execute(id);
-            res.status(HttpStatus.OK).json({message:"Address Deleted successfully"})
+            res.status(HttpStatus.OK).json( ApiResponse.ok(CustomMessages.ADDRESS_DELETED))
         }catch(error){
             next(error);
         }
@@ -67,11 +70,11 @@ export class AddressController{
             const userId=req.user?.id;
             const {id}=req.params;
             if(!userId){
-                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
                 return;
             }
             await this._setDefaultUseCase.execute(userId,id);
-            res.status(HttpStatus.OK).json({message:"Default address updated"});
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.ADDRESS_DEFAULT_UPDATED));
         }catch(error){
             next(error);
         }

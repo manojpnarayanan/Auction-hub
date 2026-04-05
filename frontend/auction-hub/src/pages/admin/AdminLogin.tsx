@@ -4,6 +4,8 @@ import { setCredentials } from "../../redux/slices/authSlices";
 import { login } from "../../api/auth";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
+import toast from "react-hot-toast";
+import { ROUTES } from "../../Constants/routes";
 
 export default function AdminLogin() {
     const dispatch = useDispatch();
@@ -24,8 +26,7 @@ export default function AdminLogin() {
         try {
             const res = await login(form);
 
-            // Check if user is admin
-            if (res.data.user.role !== 'admin') {
+            if (res.data.data.user.role !== 'admin') {
                 setMsg("Access Denied: Admin credentials required");
                 setLoading(false);
                 return;
@@ -33,12 +34,12 @@ export default function AdminLogin() {
 
             dispatch(
                 setCredentials({
-                    user: res.data.user,
-                    token: res.data.token,
+                    user: res.data.data.user,
+                    token: res.data.data.token,
                 })
             );
-
-            navigate("/admin/dashboard");
+            toast.success(res.data.message);
+            navigate(ROUTES.ADMIN.DASHBOARD);
         } catch (error: unknown) {
             console.error("Admin login failed", error);
             const err = error as AxiosError<{ message: string }>

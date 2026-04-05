@@ -5,6 +5,8 @@ import { IGetWalletUseCase } from "../../../application/use-cases/Usecase Interf
 import { ICreatePaymentIntentUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/ICreatePaymentIntentUseCase";
 import { IconfirmPaymentUseCase } from "../../../application/use-cases/Usecase Interfaces/Wallet-interfaces/IConfirmPaymentUseCase";
 import { HttpStatus } from "../../Enums/StatusCodes";
+import { CustomMessages } from "../../Enums/CustomMessages";
+import { ApiResponse } from "../../Common/APIResponse";
 
 
 @injectable()
@@ -17,11 +19,11 @@ export class WalletController{
     getWallet = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const userId = req.user?.id;
-            if (!userId) { res.status(HttpStatus.UNAUTHORIZED).json({ message: "Unauthorized" }); return }
+            if (!userId) { res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED)); return }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
             const result = await this._getWalletUseCase.execute(userId, page, limit);
-            res.status(HttpStatus.OK).json(result);
+            res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.WALLET_FETCHED));
         } catch (error) {
             next(error);
         }
@@ -30,11 +32,11 @@ export class WalletController{
         try{
             const userId=req.user?.id;
             if(!userId){
-                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
                 return;
             }
             const result=await this._createPaymentIntentUseCase.execute(userId,req.body);
-            res.status(HttpStatus.OK).json(result)
+            res.status(HttpStatus.OK).json(ApiResponse.success(result))
         }catch(error){
             next(error);
         }
@@ -43,11 +45,11 @@ export class WalletController{
         try{
             const userId=req.user?.id;
             if(!userId){
-                res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+                res.status(HttpStatus.UNAUTHORIZED).json( ApiResponse.error(CustomMessages.UNAUTHORIZED));
                 return;
             }
             await this._confirmPaymentUseCase.execute(userId,req.body);
-            res.status(HttpStatus.OK).json({message:"Payment confirmed"});
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.PAYMENT_CONFIRMED));
         }catch(error){
             next(error);
         }

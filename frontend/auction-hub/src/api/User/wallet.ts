@@ -1,14 +1,13 @@
 import type { AxiosResponse } from "axios";
 import API from "../axiosInstances";
 import type { WalletWithTransactions,CreatePaymentIntentRequest } from "../../types/wallet";
+import type { ApiResponse } from "../../types/api";
 
-
-
-export const getWallet=(page:number=1,limit:number=10):Promise<AxiosResponse<WalletWithTransactions & {total:number}>>=>{
+export const getWallet=(page:number=1,limit:number=10):Promise<AxiosResponse<ApiResponse<WalletWithTransactions>>>=>{
     return API.get(`/user/getwallet?page=${page}&limit=${limit}`);
 }
 
-export const createPaymentIntent=(data:CreatePaymentIntentRequest):Promise<AxiosResponse<{clientSecret:string;paymentIntentId:string}>>=>{
+export const createPaymentIntent=(data:CreatePaymentIntentRequest):Promise<AxiosResponse<ApiResponse<{clientSecret:string;paymentIntentId:string}>>>=>{
     return API.post('/user/payment',data);
 }
 

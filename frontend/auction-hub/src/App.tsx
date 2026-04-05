@@ -27,7 +27,7 @@ import SubscriptionPlans from './pages/user/SubscriptionPlans';
 import LiveAuctionRoom from './pages/user/LiveAuctionRoom';
 import Watchlist from './pages/user/Watchlist';
 import AdminDisputes from './pages/admin/AdminDispute';
-
+import {ROUTES} from './Constants/routes';
 
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"))
 
@@ -51,77 +51,77 @@ function App() {
       </div>} >
         <Routes>
           {/* <Route path='/' element={<Navigate to='login' replace />} /> */}
-          <Route path='/' element={<Home />} />
-          <Route path='/signup' element={
+          <Route path={ROUTES.HOME} element={<Home />} />
+          <Route path={ROUTES.SIGNUP} element={
             <PublicRoute><Signup /></PublicRoute>
           } />
-          <Route path='auctions' element={<Auctions />} />
-          <Route path='login' element={
+          <Route path={ROUTES.AUCTIONS} element={<Auctions />} />
+          <Route path={ROUTES.LOGIN} element={
             <PublicRoute><Login /></PublicRoute>
           } />
 
-          <Route path='/forgot-password' element={
+          <Route path={ROUTES.FORGOT_PASSWORD} element={
             <PublicRoute><ForgotPassword /></PublicRoute>
           } />
-          <Route path='/auth/callback' element={<AuthCallback />} />
-          <Route path='/user/dashboard' element={
+          <Route path={ROUTES.AUTH_CALLBACK} element={<AuthCallback />} />
+          <Route path={ROUTES.USER.DASHBOARD} element={
             <PrivateRoute><Dashboard /></PrivateRoute>
           } />
-          <Route path='/user/my-bids' element={
+          <Route path={ROUTES.USER.MY_BIDS} element={
             <PrivateRoute><MyBids /></PrivateRoute>
           } />
-          <Route path="/user/my-listings" element={
+          <Route path={ROUTES.USER.MY_LISTINGS} element={
             <PrivateRoute><MyListings /></PrivateRoute>
           } />
-          <Route path="/user/profile" element={
+          <Route path={ROUTES.USER.PROFILE} element={
             <PrivateRoute><Profile /></PrivateRoute>
           } />
-          <Route path='subscription-plans' element={
+          <Route path={ROUTES.SUBSCRIPTION_PLANS} element={
             <PrivateRoute><SubscriptionPlans/></PrivateRoute>
           } >
 
           </Route>
 
-          <Route path="auction/:id" element={
+          <Route path={ROUTES.AUCTION_DETAILS} element={
             <AuctionProductDetails />
           } />
-          <Route path='/watchlist' element={
+          <Route path={ROUTES.WATCHLIST} element={
             <PrivateRoute><Watchlist/></PrivateRoute>
           }>
 
           </Route>
 
-          <Route path="admin/login" element={
+          <Route path={ROUTES.ADMIN.LOGIN} element={
             <PublicRoute><AdminLogin /></PublicRoute>
           } />
-          <Route path='live-auction/:id' element={
+          <Route path={ROUTES.LIVE_AUCTION} element={
             <PrivateRoute><LiveAuctionRoom/></PrivateRoute>
           } >
           </Route>
 
 
-          <Route path='/admin' element={<AdminLayout />}>
-            <Route path="dashboard" element={
+          <Route path={ROUTES.ADMIN.LAYOUT} element={<AdminLayout />}>
+            <Route path={ROUTES.ADMIN.DASHBOARD} element={
               <AdminRoute><AdminDashboard /></AdminRoute>
             } />
-            <Route path="users" element={
+            <Route path={ROUTES.ADMIN.USERS}element={
               <AdminRoute><UserManagement /></AdminRoute>
             } />
-            <Route path="categories" element={
+            <Route path={ROUTES.ADMIN.CATEGORIES} element={
               <AdminRoute><AdminCategories /></AdminRoute>
             } >
             </Route>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path='auctions' element={
+            <Route path={ROUTES.ADMIN.AUCTIONS} element={
               <AdminRoute><AdminAuctions /></AdminRoute>
             } />
-            <Route path='wallet' element={
+            <Route path={ROUTES.ADMIN.WALLET} element={
               <AdminRoute><AdminWallet /></AdminRoute>
             } />
-            <Route path='subscription-plans' element={
+            <Route path={ROUTES.ADMIN.SUBSCRIPTIONS} element={
               <AdminRoute><AdminSubscriptionPlan /></AdminRoute>
             } />
-            <Route path='disputes' element={
+            <Route path={ROUTES.ADMIN.DISPUTES} element={
               <AdminRoute><AdminDisputes/></AdminRoute>
             } >
 

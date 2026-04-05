@@ -5,8 +5,8 @@ import { IGetprofileUseCase } from "../../../application/use-cases/Usecase Inter
 import { HttpStatus } from "../../Enums/StatusCodes";
 import { IUpdateProfileUseCase } from "../../../application/use-cases/Usecase Interfaces/profile-interface/IUpdateProfileUseCase";
 import { IChangePasswordUseCase } from "../../../application/use-cases/Usecase Interfaces/profile-interface/IChangePasswordUseCase";
-
-
+import { ApiResponse } from "../../Common/APIResponse";
+import { CustomMessages } from "../../Enums/CustomMessages";
 
 
 @injectable()
@@ -20,9 +20,9 @@ export class profileController {
         try {
             const userId = req.user?.id;
             // logger.info("Get profilr",userId);
-            if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json({message:"UnAuthirized"});
+            if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
             const profile = await this._getProfileUseCase.execute(userId);
-            res.status(HttpStatus.OK).json(profile);
+            res.status(HttpStatus.OK).json(ApiResponse.success(profile, CustomMessages.PROFILE_FETCHED));
         } catch (error) {
             next(error);
         }
@@ -30,9 +30,9 @@ export class profileController {
     updateProfile = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.id;
-            if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json({message:"UnAuthirized"});
+            if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
             const updated =await this._updateProfileUseCase.execute(userId, req.body);
-            res.status(HttpStatus.OK).json(updated);
+            res.status(HttpStatus.OK).json(ApiResponse.success(updated, CustomMessages.PROFILE_UPDATED));
         } catch (error) {
             next(error);
         }
@@ -41,9 +41,9 @@ export class profileController {
         try {
             const { oldPassword, newPassword } = req.body;
             const userId=req.user?.id;
-            if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json({message:"Unauthorized"});
+            if(!userId) return res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED));
             await this._changePassword.execute(userId, oldPassword, newPassword);
-            res.status(HttpStatus.OK).json({ message: "Password changed successfully" });
+            res.status(HttpStatus.OK).json(ApiResponse.ok(CustomMessages.PASSWORD_CHANGED));
         } catch (error) {
             next(error);
         }

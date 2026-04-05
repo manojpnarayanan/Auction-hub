@@ -5,7 +5,7 @@ import type { watchlistDTO } from "../../types/watchlist";
 import toast from "react-hot-toast";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-
+import {ROUTES} from '../../Constants/routes'
 
 
 const Watchlist = () => {
@@ -30,7 +30,7 @@ const Watchlist = () => {
         try {
             await removeFromWatchlist(auctionId);
             setAuctions(prev => prev.filter(a => a.id !== auctionId));
-            toast.success("Removed from watchlist")
+            toast.success("Removed from watchlist");
         } catch {
             toast.error("Failed to remove ")
         }
@@ -51,7 +51,7 @@ if (loading) return (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
                     <p className="text-gray-500 text-lg mb-4">Your watchlist is empty.</p>
                     <button
-                        onClick={() => navigate("/auctions")}
+                        onClick={() => navigate(ROUTES.AUCTIONS)}
                         className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
                     >
                         Browse Auctions

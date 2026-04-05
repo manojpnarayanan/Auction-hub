@@ -2,6 +2,8 @@ import axios from "axios";
 import { Store } from "../redux/store";
 import { logout, updateAccessToken } from "../redux/slices/authSlices";
 import toast from "react-hot-toast";
+import { MESSAGES } from "../Constants/messages";
+import { ROUTES } from "../Constants/routes";
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -19,111 +21,55 @@ API.interceptors.request.use((req) => {
     }
     return req;
 })
-// API.interceptors.response.use(
-//     (response) => response,
-//     async (error) => {
-//         const originalRequest = error.config;
-//         if (error.response?.status === 403) {
-//             const msg = error.response.data.message;
-//             if ((msg === "user is blocked" || msg === "USer is blocked")
-//                 && !originalRequest.url?.includes('/block')) {
-//                 // if(isBlockedAlertShown){
-//                 //     return Promise.reject(error);
-//                 // }
-//                 //  isBlockedAlertShown=true;
-
-//                 //         await Swal.fire({
-//                 //             icon: "error",
-//                 //             title: "Account Blocked",
-//                 //             text: "Your Account has been suspended by Administrator",
-//                 //             confirmButtonText: "Logout",
-//                 //             confirmButtonColor: "#d33",
-//                 //             allowOutsideClick: false,
-//                 //             allowEscapeKey: false,
-//                 //         });
-//                 //         Store.dispatch(logout());
-//                 //         localStorage.clear();
-//                 //         window.location.href = '/login';
-//                 //         isBlockedAlertShown=false;
-//                 //         return Promise.reject(error);
-//                 //     }
-//                 if (!isBlockedAlertShown) {
-//                     isBlockedAlertShown = true;
-//                     toast.error("Your account was suspended by the administrator", { duration: 4000 });
-
-//                     Store.dispatch(logout());
-//                     localStorage.clear();
-//                     setTimeout(() => {
-//                         window.location.href = '/login';
-//                         isBlockedAlertShown = false
-//                     }, 2000);
-//                 }
-//                 return Promise.reject(error);
-//             }
-//         }
-//         if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes("login")) {
-//             originalRequest._retry = true;
-//             try {
-//                 const res = await axios.post(`${API_URL}/user/refresh-token`, {}, {
-//                     withCredentials: true
-//                 });
-//                 const newAccessToken = res.data.accessToken;
-//                 Store.dispatch(updateAccessToken(newAccessToken));
-//                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-//                 return API(originalRequest);
-//             } catch (refreshError) {
-//                 console.error("Session failed", refreshError);
-
-//                 Store.dispatch(logout());
-//                 window.location.href = '/login'
-//             }
-//         }
-//         return Promise.reject(error);
-//     }
-// );
 
 API.interceptors.response.use(
     (response) => response,
+
     async (error) => {
         const originalRequest = error.config;
 
         // --- 1. Handle 403 (Blocked) ---
         if (error.response?.status === 403) {
-            const msg = error.response.data.message;
-            if ((msg === "user is blocked" || msg === "USer is blocked") && !originalRequest.url?.includes('/block')) {
+            const msg = (error.response.data?.message || "").toLowerCase();
+            
+            if ((msg.includes('blocked') || msg.includes('suspended')) && !originalRequest.url?.includes('/block')) {
                 if (!isBlockedAlertShown) {
                     isBlockedAlertShown = true;
-                    toast.error("Your account was suspended by the administrator");
+                    toast.error(MESSAGES.USER_IS_BLOCKED); 
+                    
                     Store.dispatch(logout());
                     localStorage.clear();
-                    setTimeout(() => {
-                        window.location.href = '/login';
-                        isBlockedAlertShown = false;
-                    }, 2000);
+                    sessionStorage.clear();
+                    
+                    window.location.replace(ROUTES.LOGIN);
                 }
-                return Promise.reject(error);
+                return new Promise(() => {});
             }
         }
 
-        // --- 2. Handle 401 (Token Expired) ---
+        // --- 2. Handle 401 
         if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes("login")) {
             originalRequest._retry = true;
             try {
+                
                 const res = await axios.post(`${API_URL}/user/refresh-token`, {}, { withCredentials: true });
-                const newAccessToken = res.data.accessToken;
+                const newAccessToken = res.data.data.accessToken;
+                
+                
                 Store.dispatch(updateAccessToken(newAccessToken));
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                
+               
                 return API(originalRequest);
             } catch (refreshError) {
                 console.error("Session failed", refreshError);
                 Store.dispatch(logout());
-                window.location.href = '/login';
+                window.location.href = ROUTES.LOGIN;
             }
         }
 
-        return Promise.reject(error);
+         return Promise.reject(error);
     }
 );
 
-
-export default API
+export default API;

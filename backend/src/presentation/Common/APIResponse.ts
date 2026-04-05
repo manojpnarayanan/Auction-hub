@@ -2,18 +2,29 @@ export class ApiResponse<T>{
     public success:boolean;
     public message:string;
     public data:T|null;
-    public statusCode:number;
 
-    constructor(success:boolean,message:string,data:T|null,statusCode:number){
+    constructor(success:boolean,message:string,data:T|null){
         this.success=success;
         this.message=message;
         this.data=data;
-        this.statusCode=statusCode;
     }
-    static success<T>(data:T,message:string="Success",statusCode:number=200):ApiResponse<T>{
-        return new ApiResponse<T>(true,message,data,statusCode);
+    static success<T>(data:T,message:string="Success"):ApiResponse<T>{
+        return new ApiResponse<T>(true,message,data);
     }
-    static error<T>(message:string,statusCode:number=500,data:T | null=null):ApiResponse<T>{
-        return new ApiResponse<T>(false,message,data,statusCode)
+    static ok(message:string):ApiResponse<null>{
+        return new ApiResponse<null>(true,message,null);
+    }
+    static paginated<T>(data:T[],total:number,page:number,limit:number,message:string){
+        return {
+            success:true,
+            message,
+            data,
+            total,
+            page,
+            totalPages:Math.ceil(total/limit)
+        }
+    }
+    static error<T>(message:string ):ApiResponse<T>{
+        return new ApiResponse<T>(false,message,null)
     }
 }

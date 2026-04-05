@@ -1,10 +1,10 @@
 import API from "../axiosInstances";
 import type { AxiosResponse } from "axios";
 import type { CreateAddressDTO,UpdateAddressDTO, AddressResponseDTO } from "../../types/User-Address"; 
+import type { ApiResponse } from "../../types/api";
 
 
-
-export const getAddress=():Promise<AxiosResponse<AddressResponseDTO[]>>=>{
+export const getAddress=():Promise<AxiosResponse<ApiResponse<AddressResponseDTO[]>>>=>{
     return API.get('/user/address')
 }
 

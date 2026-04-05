@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword, resetPassword } from '../api/auth';
 import { AxiosError } from "axios";
+import { ROUTES } from "../Constants/routes";
 
 export default function ForgotPassword() {
     const navigate = useNavigate();
@@ -37,7 +38,7 @@ export default function ForgotPassword() {
         try {
             await resetPassword({ email, otp, newPassword });
             setMsg("Password Reset Successfully");
-            setTimeout(() => navigate('/login'), 1000);
+            setTimeout(() => navigate(ROUTES.LOGIN), 1000);
 
         } catch (error: unknown) {
             const err=error as AxiosError<{message:string}>

@@ -17,8 +17,8 @@ export function usePayment(){
         try{
             const res=await createPaymentIntent({auctionId,amount});
             setPaymentSession({
-                clientSecret:res.data.clientSecret,
-                paymentIntentId:res.data.paymentIntentId
+                clientSecret:res.data.data.clientSecret,
+                paymentIntentId:res.data.data.paymentIntentId
             });
         }catch(err:unknown){
             const error=err as AxiosError<{message:string}>

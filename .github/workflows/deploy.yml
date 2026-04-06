@@ -71,7 +71,7 @@ jobs:
             
             echo "Environment file verified. Rebuilding Docker containers..."
             
-            docker compose down
-            docker compose up --build -d
+            docker-compose down
+            docker-compose up --build -d
             docker ps
           EOF

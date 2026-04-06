@@ -14,11 +14,7 @@ export class UpdateCategoryUseCase implements IUpdateCategoryUseCase{
         @inject (TYPES.CategoryRepository) private _categoryRepository:ICategoryRepository
     ){}
     async execute(id: string, data: CategoryRequestDTO): Promise<CategoryDTO | null> {
-        // const updatedCategory=await this.categoryRepository.update(id,{
-        //     name:data.name,
-        //     description:data.description,
-        // });
-        // if(!updatedCategory) return null;
+        
         const {categories}=await this._categoryRepository.findAll(1,5,data.name)
         const check=categories.find((c)=>c.name.toLowerCase()===data.name.trim().toLowerCase());
 

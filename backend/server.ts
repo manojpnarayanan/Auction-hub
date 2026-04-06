@@ -4,7 +4,6 @@ import cors from "cors";
 import { connectDB } from "./src/config/db.js";
 import { errorHandler } from "./src/presentation/middleware/errorHandler.middleware.js";
 import { config } from "./src/infrastructure/config/environment.js";
-// import { configurePassport } from "./src/infrastructure/auth/passport.config.js";
 import passport from "passport";
 import { connectRedis } from './src/infrastructure/redis/redisClient.js'
 import cookieParser from "cookie-parser";

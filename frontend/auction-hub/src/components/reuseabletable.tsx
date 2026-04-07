@@ -30,7 +30,7 @@ export default function DataTable<T>({
 }:DataTableProps<T>){
      return (
     <div className="w-full">
-      <div className="bg-[#161b22] rounded-xl border border-gray-800 overflow-hidden min-h-[400px]">
+      <div className="bg-[#161b22] rounded-xl border border-gray-800 min-h-[400px]">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-[400px] gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
@@ -41,28 +41,30 @@ export default function DataTable<T>({
             <p className="text-gray-500 text-sm">{emptyMessage}</p>
           </div>
         ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-[#1c2128] border-b border-gray-800 text-gray-400 uppercase text-xs tracking-wider">
-                {columns.map((col, index) => (
-                  <th key={index} className={`py-4 px-6 font-semibold ${col.className || ''}`}>
-                    {col.header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800">
-              {data.map((row) => (
-                <tr key={keyExtractor(row)} className="hover:bg-white/5 transition group">
-                  {columns.map((col, colIndex) => (
-                    <td key={colIndex} className={`py-4 px-6 ${col.className || ''}`}>
-                      {col.render(row)}
-                    </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap md:whitespace-normal">
+              <thead>
+                <tr className="bg-[#1c2128] border-b border-gray-800 text-gray-400 uppercase text-xs tracking-wider">
+                  {columns.map((col, index) => (
+                    <th key={index} className={`py-4 px-6 font-semibold ${col.className || ''}`}>
+                      {col.header}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-800">
+                {data.map((row) => (
+                  <tr key={keyExtractor(row)} className="hover:bg-white/5 transition group">
+                    {columns.map((col, colIndex) => (
+                      <td key={colIndex} className={`py-4 px-6 ${col.className || ''}`}>
+                        {col.render(row)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
       {/* Pagination Controls */}

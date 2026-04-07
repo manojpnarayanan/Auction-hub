@@ -197,10 +197,10 @@ export default function AuctionProductDetails() {
 
                     {/* Left Side: Image Gallery */}
                     <div className="w-full lg:w-3/5 space-y-4">
-                        <div className="relative group aspect-square sm:aspect-video bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
+                        <div className="relative group aspect-square md:aspect-video bg-white rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border border-slate-200 transition-all">
                             <img src={selectedImage} alt={auction.title} className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" />
-                            <div className="absolute top-4 left-4">
-                                <span className={`px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase shadow-lg ${isActive ? 'bg-green-500 text-white animate-pulse' : 'bg-red-500 text-white'}`}>
+                            <div className="absolute top-3 left-3 md:top-4 md:left-4">
+                                <span className={`px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-black tracking-widest uppercase shadow-lg ${isActive ? 'bg-green-500 text-white animate-pulse' : 'bg-red-500 text-white'}`}>
                                     {auction.status}
                                 </span>
                             </div>
@@ -208,12 +208,12 @@ export default function AuctionProductDetails() {
 
                         {/* Thumbnails */}
                         {auction.images && auction.images.length > 1 && (
-                            <div className="flex gap-4 overflow-x-auto py-2 px-1 scrollbar-hide">
+                            <div className="flex gap-3 md:gap-4 overflow-x-auto py-2 px-1 scrollbar-hide">
                                 {auction.images.map((img, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedImage(img)}
-                                        className={`w-24 h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${selectedImage === img ? 'border-blue-600 scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                        className={`w-20 h-16 md:w-24 md:h-20 rounded-xl overflow-hidden border-2 transition-all flex-shrink-0 ${selectedImage === img ? 'border-blue-600 scale-105 shadow-md' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                     >
                                         <img src={img} className="w-full h-full object-cover" />
                                     </button>
@@ -223,15 +223,15 @@ export default function AuctionProductDetails() {
                     </div>
 
                     {/* Right Side: Auction Action Card */}
-                    <div className="w-full lg:w-2/5 sticky top-8">
-                        <div className="bg-white rounded-3xl p-8 shadow-xl border border-slate-100 relative overflow-hidden">
+                    <div className="w-full lg:w-2/5 lg:sticky lg:top-8 self-start">
+                        <div className="bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 shadow-xl border border-slate-100 relative overflow-hidden">
                             {/* Decorative Background Element */}
                             <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
 
                             <div className="relative">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h1 className="text-3xl font-black text-slate-800 leading-tight">{auction.title}</h1>
-                                    <button onClick={handleWatchlistToggle} className={`text-2xl p-2 rounded-full hover:bg-slate-50 transition-colors ${isWatchlisted ? 'text-red-500' : 'text-slate-300'}`}>
+                                <div className="flex justify-between items-start mb-4 gap-2">
+                                    <h1 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight">{auction.title}</h1>
+                                    <button onClick={handleWatchlistToggle} className={`text-xl md:text-2xl p-2 rounded-full hover:bg-slate-50 transition-colors ${isWatchlisted ? 'text-red-500' : 'text-slate-300'} shrink-0`}>
                                         {isWatchlisted ? "❤️" : "🤍"}
                                     </button>
                                 </div>

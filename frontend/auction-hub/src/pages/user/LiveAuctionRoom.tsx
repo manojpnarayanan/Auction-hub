@@ -183,23 +183,23 @@ export default function LiveAuctionRoom() {
             <Navbar />
 
             {/* Header */}
-            <div className="bg-gray-800 border-b border-gray-700 px-6 py-3 flex items-center justify-between shadow-sm">
-                <div className="flex items-center gap-3">
-                    {isActive && <span className="bg-red-600 text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.7)]">🔴 LIVE</span>}
-                    {isPending && <span className="bg-yellow-500 text-black text-xs font-bold px-3 py-1 rounded-full">⏳ UPCOMING</span>}
-                    {auctionStatus === "sold" && <span className="bg-green-600 text-xs font-bold px-3 py-1 rounded-full">✅ ENDED</span>}
-                    {auctionStatus === "cancelled" && <span className="bg-gray-600 text-xs font-bold px-3 py-1 rounded-full">❌ CANCELLED</span>}
-                    <h1 className="text-xl font-bold tracking-wide">{auction.title}</h1>
+            <div className="bg-gray-800 border-b border-gray-700 px-4 md:px-6 py-3 flex flex-col md:flex-row items-start md:items-center justify-between shadow-sm gap-2">
+                <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                    {isActive && <span className="bg-red-600 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full animate-pulse shadow-[0_0_10px_rgba(220,38,38,0.7)]">🔴 LIVE</span>}
+                    {isPending && <span className="bg-yellow-500 text-black text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full">⏳ UPCOMING</span>}
+                    {auctionStatus === "sold" && <span className="bg-green-600 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full">✅ ENDED</span>}
+                    {auctionStatus === "cancelled" && <span className="bg-gray-600 text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded-full">❌ CANCELLED</span>}
+                    <h1 className="text-lg md:text-xl font-bold tracking-wide truncate max-w-[200px] sm:max-w-none">{auction.title}</h1>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-gray-400 font-medium tracking-wide">
-                    <span className="flex items-center gap-1">
+                <div className="flex items-center gap-3 md:gap-4 text-[10px] md:text-sm text-gray-400 font-medium tracking-wide w-full md:w-auto justify-between md:justify-end">
+                    <span className="flex items-center gap-1 shrink-0">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                        {viewerCount} watching
+                        {viewerCount}
                     </span>
-                    {isActive && <span className="font-mono text-white bg-gray-700 px-2 py-1 rounded opacity-90">⏱ {timeLeft}</span>}
+                    {isActive && <span className="font-mono text-white bg-gray-700 px-2 py-1 rounded opacity-90 shrink-0">⏱ {timeLeft}</span>}
                     {isPending && (
-                        <span className="text-yellow-400 text-sm font-semibold">
-                            🗓 Starts at {auction.startTime ? new Date(auction.startTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : new Date(auction.endDate).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                        <span className="text-yellow-400 text-xs font-semibold text-right">
+                            🗓 Starts {auction.startTime ? new Date(auction.startTime).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : new Date(auction.endDate).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}
                         </span>
                     )}
                 </div>
@@ -310,14 +310,14 @@ export default function LiveAuctionRoom() {
                 {/* Right Side: Bid Panel & Feed */}
                 <div className="lg:w-1/2 flex flex-col border-l border-gray-800 bg-gray-900 shadow-xl z-10 w-full">
 
-                    <div className="bg-gray-800 p-8 border-b border-gray-700 shadow-sm relative">
-                        <p className="text-xs text-gray-400 mb-1 uppercase tracking-wider font-semibold">Current Highest Bid</p>
-                        <p className="text-5xl font-extrabold text-green-400 tracking-tight drop-shadow-sm">₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}</p>
+                    <div className="bg-gray-800 p-6 md:p-8 border-b border-gray-700 shadow-sm relative">
+                        <p className="text-[10px] md:text-xs text-gray-400 mb-1 uppercase tracking-wider font-semibold">Current Highest Bid</p>
+                        <p className="text-3xl md:text-5xl font-extrabold text-green-400 tracking-tight drop-shadow-sm">₹{(auction.currentPrice || auction.startingPrice).toLocaleString('en-IN')}</p>
                     </div>
 
-                    <div className="p-8 border-b border-gray-800 bg-gray-800/50">
+                    <div className="p-4 md:p-8 border-b border-gray-800 bg-gray-800/50">
                         {isActive ? (
-                            <div className="flex gap-4">
+                            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                                 <div className="relative flex-1">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₹</span>
                                     <input
@@ -325,11 +325,11 @@ export default function LiveAuctionRoom() {
                                         placeholder={`Min ${(auction.currentPrice + 1).toLocaleString('en-IN')}`}
                                         value={bidAmount}
                                         onChange={e => setBidAmount(e.target.value)}
-                                        className="w-full bg-gray-950 border border-gray-700 text-white pl-10 pr-4 py-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium text-lg shadow-inner"
+                                        className="w-full bg-gray-950 border border-gray-700 text-white pl-10 pr-4 py-3 md:py-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-medium text-base md:text-lg shadow-inner"
                                     />
                                 </div>
                                 <button onClick={handleBid} disabled={bidding}
-                                    className="bg-blue-600 hover:bg-blue-500 px-8 py-4 rounded-xl font-bold text-lg shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    className="bg-blue-600 hover:bg-blue-500 px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
                                     {bidding ? "..." : "PLACE BID"}
                                 </button>
                             </div>

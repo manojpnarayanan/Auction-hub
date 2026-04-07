@@ -250,7 +250,7 @@ export default function AdminSubscriptionPlan() {
             </div>
 
             {isCreating && (
-                <form onSubmit={handleSubmit} className="bg-[#161b22] p-6 rounded-xl border border-gray-800 mb-6 grid grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit} className="bg-[#161b22] p-6 rounded-xl border border-gray-800 mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-bold text-gray-300 mb-2">Plan Name</label>
                         <input type="text" required value={form.name}
@@ -287,7 +287,7 @@ export default function AdminSubscriptionPlan() {
                             className="w-5 h-5 rounded border-gray-700 bg-[#0f111a] text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-900" />
                         <label htmlFor="hasLive" className="text-sm font-bold text-gray-300">Allow Live Auctions</label>
                     </div>
-                    <div className="col-span-2 mt-4">
+                    <div className="col-span-1 md:col-span-2 mt-4">
                         <button className="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-lg hover:bg-emerald-700 shadow-lg shadow-emerald-500/20 transition">
                             {editingId ? "Update Plan" : "Create Plan"}
                         </button>

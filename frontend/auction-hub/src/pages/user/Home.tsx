@@ -63,23 +63,23 @@ const Home = () => {
             <Navbar searchText={searchText} setSearchText={setSearchText} />
 
             {/* 2. Hero Section (Mirrors Dashboard) */}
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[21/9]">
+            <div className="max-w-7xl mx-auto px-4 py-6 md:py-8">
+                <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-video md:aspect-[21/9]">
                     <img
                         src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2600"
                         alt="Hero"
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-end p-8 md:p-12 pointer-events-none">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-2">Find Your Next Treasure</h2>
-                        <p className="text-white/90 text-sm md:text-base max-w-xl">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-6 md:p-12 pointer-events-none">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-2 leading-tight">Find Your Next Treasure</h2>
+                        <p className="text-white/90 text-xs md:text-base max-w-xl line-clamp-2 md:line-clamp-none">
                             Explore a wide range of items, from vintage collectibles to cutting-edge tech. Start bidding now and discover deals.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-6 pb-12 space-y-12">
+            <main className="max-w-7xl mx-auto px-4 md:px-6 pb-12 space-y-12">
                 {/* 3. Categories (Mirrors Dashboard) */}
                 <section>
                     <h3 className="text-xl font-bold text-gray-800 mb-4">Categories</h3>

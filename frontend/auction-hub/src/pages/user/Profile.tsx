@@ -288,53 +288,53 @@ export default function Profile() {
                     <p className="text-sm text-gray-500 mt-1">Manage your profile, password, addresses and wallet</p>
                 </div>
 
-                <div className="flex gap-6">
+                <div className="flex flex-col lg:flex-row gap-6">
                     {/* ── Side Navbar ── */}
-                    <aside className="w-64 shrink-0">
+                    <aside className="w-full lg:w-64 shrink-0">
                         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            {/* Avatar area */}
-                            <div className="bg-[#1da1f2] px-6 py-8 flex flex-col items-center gap-3">
+                            {/* Avatar area - Hidden or minimized on smaller mobile if needed, but keeping it for now with responsive padding */}
+                            <div className="bg-[#1da1f2] px-6 py-6 lg:py-8 flex flex-row lg:flex-col items-center gap-4 lg:gap-3">
                                 <div
-                                    className="relative cursor-pointer group"
+                                    className="relative cursor-pointer group shrink-0"
                                     onClick={() => fileInputRef.current?.click()}
                                 >
                                     {profileData.profileImage ? (
                                         <img
                                             src={profileData.profileImage}
                                             alt="Profile"
-                                            className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md"
+                                            className="w-12 h-12 lg:w-20 lg:h-20 rounded-full object-cover border-2 lg:border-4 border-white shadow-md transition-transform active:scale-95"
                                         />
                                     ) : (
-                                        <div className="w-20 h-20 rounded-full bg-white/20 border-4 border-white shadow-md flex items-center justify-center text-white text-2xl font-bold">
+                                        <div className="w-12 h-12 lg:w-20 lg:h-20 rounded-full bg-white/20 border-2 lg:border-4 border-white shadow-md flex items-center justify-center text-white text-lg lg:text-2xl font-bold">
                                             {getInitials(profileData.name || "U")}
                                         </div>
                                     )}
-                                    <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                        <span className="text-white text-xs font-semibold">Change</span>
+                                    <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center pointer-events-none">
+                                        <span className="text-white text-[10px] lg:text-xs font-semibold">Change</span>
                                     </div>
                                 </div>
                                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-                                <div className="text-center">
-                                    <p className="text-white font-bold text-sm">{profileData.name}</p>
-                                    <p className="text-white/70 text-xs">{profileData.email}</p>
+                                <div className="text-left lg:text-center min-w-0">
+                                    <p className="text-white font-bold text-sm lg:text-base truncate">{profileData.name}</p>
+                                    <p className="text-white/70 text-xs truncate">{profileData.email}</p>
                                 </div>
                             </div>
 
-                            {/* Nav items */}
-                            <nav className="p-3 space-y-1">
+                            {/* Nav items - Scrollable on mobile */}
+                            <nav className="p-2 lg:p-3 flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible scrollbar-hide">
                                 {navItems.map((item) => (
                                     <button
                                         key={item.key}
                                         onClick={() => setActiveSection(item.key)}
-                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${activeSection === item.key
-                                            ? "bg-[#1da1f2]/10 text-[#1da1f2] border border-[#1da1f2]/20"
-                                            : "text-gray-600 hover:bg-gray-50"
+                                        className={`flex items-center gap-2 lg:gap-3 px-4 py-2.5 lg:py-3 rounded-xl text-xs lg:text-sm font-medium transition-all whitespace-nowrap lg:whitespace-normal shrink-0 lg:w-full ${activeSection === item.key
+                                            ? "bg-[#1da1f2]/10 text-[#1da1f2] border border-[#1da1f2]/20 lg:border-[#1da1f2]/20"
+                                            : "text-gray-600 hover:bg-gray-50 border border-transparent"
                                             }`}
                                     >
                                         <span className="text-base">{item.icon}</span>
                                         {item.label}
                                         {activeSection === item.key && (
-                                            <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#1da1f2]" />
+                                            <span className="ml-auto hidden lg:block w-1.5 h-1.5 rounded-full bg-[#1da1f2]" />
                                         )}
                                     </button>
                                 ))}

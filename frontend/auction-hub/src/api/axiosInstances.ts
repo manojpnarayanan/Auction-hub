@@ -5,9 +5,12 @@ import toast from "react-hot-toast";
 import { MESSAGES } from "../Constants/messages";
 import { ROUTES } from "../Constants/routes";
 
-const API_URL = import.meta.env.VITE_API_URL
+const DEV_API_URL=import.meta.env.VITE_DEV_URL;
+const PROD_API_URL = import.meta.env.VITE_API_URL;
 
 let isBlockedAlertShown = false;
+
+const API_URL=window.location.hostname=== 'localhost' ? DEV_API_URL :PROD_API_URL;
 
 const API = axios.create({
     baseURL: API_URL,
@@ -31,19 +34,19 @@ API.interceptors.response.use(
         // --- 1. Handle 403 (Blocked) ---
         if (error.response?.status === 403) {
             const msg = (error.response.data?.message || "").toLowerCase();
-            
+
             if ((msg.includes('blocked') || msg.includes('suspended')) && !originalRequest.url?.includes('/block')) {
                 if (!isBlockedAlertShown) {
                     isBlockedAlertShown = true;
-                    toast.error(MESSAGES.USER_IS_BLOCKED); 
-                    
+                    toast.error(MESSAGES.USER_IS_BLOCKED);
+
                     Store.dispatch(logout());
                     localStorage.clear();
                     sessionStorage.clear();
-                    
+
                     window.location.replace(ROUTES.LOGIN);
                 }
-                return new Promise(() => {});
+                return new Promise(() => { });
             }
         }
 
@@ -51,15 +54,15 @@ API.interceptors.response.use(
         if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url.includes("login")) {
             originalRequest._retry = true;
             try {
-                
+
                 const res = await axios.post(`${API_URL}/user/refresh-token`, {}, { withCredentials: true });
                 const newAccessToken = res.data.data.accessToken;
-                
-                
+
+
                 Store.dispatch(updateAccessToken(newAccessToken));
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                
-               
+
+
                 return API(originalRequest);
             } catch (refreshError) {
                 console.error("Session failed", refreshError);
@@ -68,7 +71,7 @@ API.interceptors.response.use(
             }
         }
 
-         return Promise.reject(error);
+        return Promise.reject(error);
     }
 );
 

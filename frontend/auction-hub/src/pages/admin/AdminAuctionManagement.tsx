@@ -30,7 +30,7 @@ const AdminAuctions = () => {
             setLoading(true);
             const res = await getAdminAuctionManagement(page, limit, searchTerm);
             setAuctions(res.data.data || []);
-            setTotalPages(Math.ceil(res.data.data.total / limit));
+            setTotalPages(res.data.totalPages);
         } catch (error) {
             console.error("Failed to fetch auctions");
             const err = error as AxiosError<{ message: string }>
@@ -130,6 +130,7 @@ const AdminAuctions = () => {
                         <tr>
                             <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Item</th>
                             <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Title</th>
+                            <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Date</th>
                             <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Current Price</th>
                             <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Status</th>
                             <th className="p-4 text-xs font-semibold text-gray-400 uppercase">Actions</th>
@@ -155,6 +156,10 @@ const AdminAuctions = () => {
                                         onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}>
                                         {auction.title}
                                     </td>
+                                    <td className="p-4 text-xs text-gray-400">
+                                        {new Date(auction.createdAt).toLocaleDateString()}
+                                    </td>
+
                                     <td className="p-4 text-blue-600 font-bold">₹{auction.currentPrice || auction.startingPrice}</td>
                                     <td className="p-4">
                                         <span className={`px-2 py-1 text-xs rounded-full font-bold ${auction.status === 'active' ? 'bg-green-100 text-green-700' :

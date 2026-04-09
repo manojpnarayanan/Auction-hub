@@ -23,9 +23,9 @@ export class ApproveAuctionUseCase implements IAdminAuctionManagamentUseCase {
         await this._auctionRepository.updateAuctionStatus(auctionId, status, undefined, reason);
 
         if (status === 'rejected' && reason) {
-            this._eventEmitter.dispatch(new AuctionRejectedEvent(auctionId, auction.sellerId, reason));
+            this._eventEmitter.dispatch(new AuctionRejectedEvent(auctionId, auction.sellerId, reason,auction.title));
         }else if(status==='approved' || status === 'active'){
-            this._eventEmitter.dispatch(new AuctionApprovedEvent(auctionId,auction.sellerId))
+            this._eventEmitter.dispatch(new AuctionApprovedEvent(auctionId,auction.sellerId,auction.title))
         }
     }
 }

@@ -69,11 +69,11 @@ export class AutomatedEscrowUseCase implements IAutomatedEscrowReleaseUseCase{
                     } else {
                         logger.warn(`[Auto-Escrow] Payment confirmed but no pending escrow found for ${auction.id}`);
                     }
-                } catch (error) {
+                } catch (_error) {
                     logger.error(`[Auto-Escrow] Failed to process release for auction ${auction.id}:`);
                 }
             }
-        } catch (error) {
+        } catch (_error) {
             logger.error("[Auto-Escrow] Critical error in automated release check:");
         }
     }

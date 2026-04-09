@@ -37,7 +37,8 @@ export class AuctionEndedEvent implements IDomainEvent{
         public readonly auctionId:string,  
         public readonly status:string,  
         public readonly winnerId:string | undefined,  
-        public readonly finalPrice:number,  
+        public readonly finalPrice:number,
+        public readonly auctionTitle:string, 
     ){
         this.dateTimeOccurred=new Date();
     }
@@ -64,6 +65,7 @@ export class AuctionRejectedEvent implements IDomainEvent{
         public readonly auctionId:string,
         public readonly sellerId:string,
         public readonly reason:string,
+        public readonly auctionTitle:string,
     ){
         this.dateTimeOccurred=new Date();
     }
@@ -91,6 +93,7 @@ export class AuctionApprovedEvent implements IDomainEvent{
     constructor(
         public readonly auctionId:string,
         public readonly sellerId:string,
+        public readonly auctionTitle:string,
     ){
         this.dateTimeOccurred=new Date();
     }

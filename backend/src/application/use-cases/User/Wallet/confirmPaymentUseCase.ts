@@ -4,7 +4,7 @@ import { IWalletRepository } from "../../../../domain/interfaces/IWalletReposito
 import { IPaymentService } from "../../../../domain/interfaces/IPaymentService";
 import { confirmPaymentDTO } from "../../../dtos/WalletDTO";
 import { IconfirmPaymentUseCase } from "../../Usecase Interfaces/Wallet-interfaces/IConfirmPaymentUseCase";
-import { ValidationError } from "../../../../domain/errors/errors";
+import { NotFoundError, ValidationError } from "../../../../domain/errors/errors";
 import { IAuctionRepository } from "../../../../domain/interfaces/IAuctionRepository";
 import { IEventEmitter } from "../../../../domain/interfaces/IEventEmitter";
 import { PaymentConfirmedEvent } from "../../../../domain/events/PaymentEvents";
@@ -46,9 +46,12 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
         }
         await this._walletRepository.updateTransactions(data.paymentIntentId, 'completed');
         await this._auctionRepository.updatePaymentStatus(data.auctionId, 'completed');
+        const auction=await this._auctionRepository.findById(data.auctionId);
+        if(!auction) throw new NotFoundError("Auction not found")
         // logger.info("DATABASE UPDATED SUCCESSFULLY for auction:", data.auctionId);
         this._eventEmitter.dispatch(new PaymentConfirmedEvent(
             data.auctionId,
+            auction.title,
             buyerId,
             intent.amount/100,
             data.paymentIntentId

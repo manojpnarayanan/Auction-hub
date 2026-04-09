@@ -21,11 +21,11 @@ export class CloseExpiredAuctionUseCase implements ICloseExpiredAuctionUseCase {
                 const highestBid = auction.bids.reduce((max, bid) => bid.amount > max.amount ? bid : max)
                 await this._auctionRepository.updateAuctionStatus(auction.id!, 'sold', highestBid.bidderId);
                 // logger.info(`[Cron ] Auction ${auction.id} marked as SOLD to ${highestBid.bidderId}`);
-                this._eventEmitter.dispatch(new AuctionEndedEvent(auction.id!,'sold',highestBid.bidderId,highestBid.amount));
+                this._eventEmitter.dispatch(new AuctionEndedEvent(auction.id!,'sold',highestBid.bidderId,highestBid.amount,auction.title));
             } else {
                 await this._auctionRepository.updateAuctionStatus(auction.id!, 'expired');
                 // logger.info(`[Cron] Auction ${auction.id} marked as Expired`);
-                this._eventEmitter.dispatch(new AuctionEndedEvent(auction.id!,'expired',undefined,auction.currentPrice));
+                this._eventEmitter.dispatch(new AuctionEndedEvent(auction.id!,'expired',undefined,auction.currentPrice,auction.title));
             }
         }
     }

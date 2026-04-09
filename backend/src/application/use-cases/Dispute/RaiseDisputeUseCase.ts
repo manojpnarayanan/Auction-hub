@@ -6,19 +6,22 @@ import { IRaiseDisputeUseCase } from "../Usecase Interfaces/Dispute-Interface/IR
 import { RaiseDisputeDTO } from "../../dtos/DisputeDTO";
 import { Dispute } from "../../../domain/entities/Dispute.entity";
 import { ValidationError, NotFoundError } from "../../../domain/errors/errors";
+import { IEventEmitter } from "../../../domain/interfaces/IEventEmitter";
+import { DisputeRaisedEvent } from "../../../domain/events/DisputeEvents";
 
 @injectable()
 export class RaiseDisputeUseCase implements IRaiseDisputeUseCase {
     constructor(
         @inject(TYPES.AuctionRepository) private _auctionRepo: IAuctionRepository,
-        @inject(TYPES.DisputeRepository) private _disputeRepo: IDisputeRepository
+        @inject(TYPES.DisputeRepository) private _disputeRepo: IDisputeRepository,
+        @inject(TYPES.EventEmitter) private _eventEmitter:IEventEmitter,
     ) { }
     async execute(data: RaiseDisputeDTO): Promise<void> {
         const auction = await this._auctionRepo.findById(data.auctionId);
         if (!auction) throw new NotFoundError("Auction not found");
         if (auction.winnerId !== data.buyerId) throw new ValidationError("Only the winning buyer can raise a dispute");
-        if (auction.paymentStatus !== 'completed') throw new ValidationError("Payment must be completed gefore raising a dispute");
-        if (auction.deliveryStatus !== 'pending_delivery') throw new ValidationError("Cannot raise a dispute .Current delivery status is not congirmed");
+        if (auction.paymentStatus !== 'completed') throw new ValidationError("Payment must be completed before raising a dispute");
+        if (auction.deliveryStatus !== 'pending_delivery') throw new ValidationError("Cannot raise a dispute .Current delivery status is not confirmed");
         const existingDispute = await this._disputeRepo.findByAuctionId(data.auctionId);
         if (existingDispute) throw new ValidationError("A dispute has already beenm raised");
 
@@ -33,5 +36,11 @@ export class RaiseDisputeUseCase implements IRaiseDisputeUseCase {
         );
         await this._disputeRepo.create(newDispute);
         await this._auctionRepo.update(data.auctionId, { deliveryStatus: 'disputed' });
+        await this._eventEmitter.dispatch( new DisputeRaisedEvent(
+            data.auctionId,
+            auction.title,
+            data.buyerId,
+            data.reason
+        ))
     }
 }

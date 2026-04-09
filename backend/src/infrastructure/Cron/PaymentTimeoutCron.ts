@@ -49,7 +49,7 @@ export function startPaymentTimeoutJob() {
                         auction.endDate = new Date(); 
                         await auction.save();
                         logger.info(`Auction ${auction._id} shifted to next winner: ${nextBidder.bidderId}`);
-                        eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'sold',nextBidder.bidderId,nextBidder.amount))
+                        eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'sold',nextBidder.bidderId,nextBidder.amount,auction.title))
                     } else {
                         // Nobody left to shift to!
                         auction.status = 'expired';
@@ -60,7 +60,7 @@ export function startPaymentTimeoutJob() {
                     auction.status = 'expired';
                     await auction.save();
                     logger.info(`Auction ${auction._id} fully expired`);
-                    eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'expired',undefined,auction.currentPrice));
+                    eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'expired',undefined,auction.currentPrice,auction.title));
                 }
             }
         } catch (error) {

@@ -23,7 +23,8 @@ export class AuctionDTOMapper {
             bids: auction.bids,
             paymentStatus: auction.paymentStatus,
             rejectionReason:auction.rejectionReason,
-            cancellationReason:auction.cancellationReason
+            cancellationReason:auction.cancellationReason,
+            createdAt:auction.createdAt || new Date()
         }
     }
     static toResponseDTOs(auctions: Auction[]): AuctionResponseDTO[] {

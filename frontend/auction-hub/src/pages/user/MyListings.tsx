@@ -112,7 +112,7 @@ export default function MyListings() {
                                 </div>
                                 <div className="p-5">
                                     <h4 className="font-bold text-gray-900 text-lg mb-1 truncate">{auction.title}</h4>
-                                    <p className="text-blue-600 font-bold text-xl">${auction.startingPrice}</p>
+                                    <p className="text-blue-600 font-bold text-xl">₹{auction.startingPrice}</p>
                                     <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-50">
                                         <div className="text-xs text-gray-500">
                                             {auction.type === 'live' ? '📡 Live Auction' : '⏳ Timed Auction'}

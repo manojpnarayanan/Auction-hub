@@ -40,4 +40,5 @@ export interface AuctionResponseDTO {
     paymentStatus?: string;
     rejectionReason?:string;
     cancellationReason?:string;
+    createdAt:Date|string;
 }

@@ -8,8 +8,8 @@ import Pagination from "../../components/Pagination";
 import type { AuctionItem } from "../../types/auction";
 import ReviewModal from "../../components/ReviewModal";
 import toast from "react-hot-toast";
-import type { AxiosError } from "axios";
-import {ROUTES} from '../../Constants/routes';
+import { AxiosError } from "axios";
+import { ROUTES } from '../../Constants/routes';
 
 
 interface MyBidItem {
@@ -99,7 +99,8 @@ export default function MyBids() {
                 const formData = new FormData();
                 formData.append('images', disputeImage);
                 const uploadRes = await uploadEvidence(formData);
-                evidenceUrl = uploadRes.data.images[0].url || uploadRes.data.secure_url;
+                console.log("UPLOAD SUCCESS", uploadRes.data)
+                evidenceUrl = uploadRes.data.data.images[0].url || uploadRes.data.secure_url;
                 setIsUploading(false);
             };
             await raiseDisputeAPI(disputeId, disputeReason, evidenceUrl);
@@ -109,7 +110,8 @@ export default function MyBids() {
             setDisputeImage(null);
             fetchBids();
         } catch (error: unknown) {
-            toast.error("Failed to submit dispute, Please try again");
+            const err = error as AxiosError<{ message: string }>
+            toast.error(err.response?.data?.message || "Failed to submit dispute, Please try again");
         } finally {
             setActionLoading(false);
             setIsUploading(false);
@@ -195,7 +197,7 @@ export default function MyBids() {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {item.status === 'won' && item.auction.deliveryStatus === 'delivered' && (
                                     <div className="mt-2 pt-4 border-t border-gray-100 flex gap-3 items-center">
                                         <div className="flex-1 bg-gray-50 text-gray-600 text-sm font-semibold p-2 rounded-lg text-center border border-gray-200">

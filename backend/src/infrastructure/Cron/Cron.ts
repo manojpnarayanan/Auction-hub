@@ -11,7 +11,7 @@ import { IAutomatedEscrowReleaseUseCase } from "../../application/use-cases/Usec
 
 export function startCronJobs():void{
     // logger.info("[Cron] Starting cron jobs");
-    cron.schedule("* * * * *",async ()=>{
+    cron.schedule("*/5 * * * * *",async ()=>{
         // logger.info("[Cron] Checking for ExpiredAuctions");
         try{
             const closeExpiredAuctionsUseCase=container.get<ICloseExpiredAuctionUseCase>(
@@ -22,7 +22,7 @@ export function startCronJobs():void{
         }
     });
 
-    cron.schedule('* * * * *',async ()=>{
+    cron.schedule('*/5 * * * * *',async ()=>{
         try{
             const auctionRepo=container.get<IAuctionRepository>(TYPES.AuctionRepository);
             const socketService=container.get<ISocketService>(TYPES.SocketService);

@@ -207,7 +207,9 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         ...form,
         startingPrice: Number(form.startingPrice),
         currentPrice: Number(form.startingPrice),
-        images: form.images
+        images: form.images,
+        endDate:new Date(form.endDate),
+        startTime:form.startTime? new Date(form.startTime) : undefined
       }as AuctionItem
       // await createAuction(auctionData);
       // onSuccess();

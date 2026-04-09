@@ -202,7 +202,7 @@ export default function LiveAuctionRoom() {
                     {isActive && <span className="font-mono text-white bg-gray-700 px-2 py-1 rounded opacity-90 shrink-0">⏱ {timeLeft}</span>}
                     {isPending && (
                         <span className="text-yellow-400 text-xs font-semibold text-right">
-                            🗓 Starts {auction.startTime ? new Date(auction.startTime).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' }) : new Date(auction.endDate).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}
+                            🗓 Starts {auction.startTime ? new Date(auction.startTime).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short', hour12:false }) : new Date(auction.endDate).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short',hour12:false })}
                         </span>
                     )}
                 </div>

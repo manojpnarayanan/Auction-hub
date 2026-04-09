@@ -134,7 +134,7 @@ export default function LiveAuctionRoom() {
                     setAuction(d);
                 }
             } catch (r) { console.error(r) }
-        }, 30000);
+        }, 3000);
         return () => clearInterval(poll)
     }, [id, auctionStatus]);
 

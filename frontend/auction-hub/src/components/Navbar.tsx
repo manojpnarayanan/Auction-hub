@@ -102,9 +102,9 @@ export default function Navbar({ searchText, setSearchText }: NavbarProps) {
                             <NotificationBell />
                             <div 
                                 onClick={() => navigate(ROUTES.USER.PROFILE)}
-                                className="w-8 h-8 rounded-full bg-white/20 overflow-hidden border border-white/50 cursor-pointer hover:border-white transition"
+                                // className="w-8 h-8 rounded-full bg-white/20 overflow-hidden border border-white/50 cursor-pointer hover:border-white transition"
                             >
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2500" alt="Profile" className="w-full h-full object-cover" />
+                                {/* <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=2500" alt="Profile" className="w-full h-full object-cover" /> */}
                             </div>
                             <div className="hidden sm:block">
                                 <LogoutButton />

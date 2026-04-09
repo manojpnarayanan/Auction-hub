@@ -6,7 +6,7 @@ import { CloudinaryService } from "../../Service/CloudinaryService";
 
 
 
-
+@injectable()
 export class UserPersistanceMapper{
     constructor(
         @inject(TYPES.CloudinaryService)private _cloudService:CloudinaryService

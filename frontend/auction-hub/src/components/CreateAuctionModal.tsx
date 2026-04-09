@@ -98,8 +98,8 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
     });
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL;
-      const res = await API.post(`${API_URL}/upload`, formData, {
+      // const API_URL = import.meta.env.VITE_API_URL;
+      const res = await API.post(`/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 

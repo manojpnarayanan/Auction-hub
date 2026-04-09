@@ -20,7 +20,7 @@ export class RequestCancellationUseCase implements IRequestCancellationUseCase {
         
         await this._auctionRepository.updateAuctionStatus(auctionId, 'pending_cancellation', undefined, undefined, reason);
 
-        this._eventEmitter.dispatch(new AuctionCancellationRequestEvent(auctionId, sellerId, reason))
+        this._eventEmitter.dispatch(new AuctionCancellationRequestEvent(auctionId, sellerId, reason,auction.title))
 
     }
 }

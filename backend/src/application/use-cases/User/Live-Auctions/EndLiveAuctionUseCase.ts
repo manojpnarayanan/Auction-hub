@@ -28,18 +28,13 @@ export class EndLiveAuctionUseCase implements IEndLiveAuctionUseCase{
             auction.endDate=new Date();
         }
         await this._auctionRepository.updateAuctionStatus(auctionId,finalStatus,winnerId);
-        // this._socketService.emit("auction_ended",{
-        //     auctionId,
-        //     status:finalStatus,
-        //     winnerId,
-        //     finalPrice:auction.currentPrice,
-        // },auctionId);
 
         this._eventEmitter.dispatch(new AuctionEndedEvent(
             auctionId,
             finalStatus,
             winnerId,
-            auction.currentPrice
+            auction.currentPrice,
+            auction.title
         ));
     }
 }

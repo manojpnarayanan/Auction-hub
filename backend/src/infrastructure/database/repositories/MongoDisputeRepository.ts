@@ -19,7 +19,7 @@ export class MongoDisputeRepository extends BaseRepository<Dispute, IDisputeDocu
         const query: FilterQuery<IDisputeDocument> = { buyerId };
         const skip = (page - 1) * limit;
         const [docs, total] = await Promise.all([
-            DisputeModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('auctionId'),
+            DisputeModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('auctionId','title').populate('buyerId','name email').populate('sellerId','name email'),
             DisputeModel.countDocuments(query)
         ]);
         return { dispute: docs.map(DisputePersistanceMapper.toEntity), total };

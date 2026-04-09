@@ -24,7 +24,7 @@ export class MongoBidRepository extends BaseRepository<Bid,IBidDocument> impleme
     {
         $group: {
             _id: '$auctionId',
-            highestBid: { $first: '$$ROOT' } as any,
+            highestBid: { $first: '$$ROOT' },
             latestTime: { $max: "$time" }
         }
     },

@@ -4,7 +4,7 @@ import { IWalletRepository } from "../../../../domain/interfaces/IWalletReposito
 import { IPaymentService } from "../../../../domain/interfaces/IPaymentService";
 import { confirmPaymentDTO } from "../../../dtos/WalletDTO";
 import { IconfirmPaymentUseCase } from "../../Usecase Interfaces/Wallet-interfaces/IConfirmPaymentUseCase";
-import { ValidationError } from "../../../../domain/errors/errors";
+import { NotFoundError, ValidationError } from "../../../../domain/errors/errors";
 import { IAuctionRepository } from "../../../../domain/interfaces/IAuctionRepository";
 import { IEventEmitter } from "../../../../domain/interfaces/IEventEmitter";
 import { PaymentConfirmedEvent } from "../../../../domain/events/PaymentEvents";
@@ -26,6 +26,8 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
         if (intent.status !== 'succeeded' && intent.status !== 'processing') {
             throw new ValidationError(`Payment status is ${intent.status}, not succeeded.`);
         }
+        const auction=await this._auctionRepository.findById(data.auctionId);
+        if(!auction) throw new NotFoundError("Auction not found")
 
         const adminId = process.env.ADMIN_WALLET_USER_ID!;
         await this._walletRepository.credit(adminId, intent.amount / 100);
@@ -40,15 +42,17 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
                 purpose: 'auction_payment',
                 auctionId: data.auctionId,
                 stripePaymentIntentId: data.paymentIntentId,
-                description: `Payment received for auction ${data.auctionId}`,
+                description: `Payment received for auction ${auction.title}`,
                 isReleased: false
             });
         }
         await this._walletRepository.updateTransactions(data.paymentIntentId, 'completed');
         await this._auctionRepository.updatePaymentStatus(data.auctionId, 'completed');
+        
         // logger.info("DATABASE UPDATED SUCCESSFULLY for auction:", data.auctionId);
         this._eventEmitter.dispatch(new PaymentConfirmedEvent(
             data.auctionId,
+            auction.title,
             buyerId,
             intent.amount/100,
             data.paymentIntentId

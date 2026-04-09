@@ -645,7 +645,7 @@ export default function Profile() {
                                                     {walletData.transactions.map((tx: TransactionItem) => (
                                                         <div key={tx.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100">
                                                             <div>
-                                                                <p className="font-semibold text-gray-700 text-sm capitalize">{tx.purpose?.replace('_', ' ')}</p>
+                                                                <p className="font-semibold text-gray-700 text-sm capitalize">{tx.description || tx.purpose?.replace('_', ' ')}</p>
                                                                 <p className="text-xs text-gray-400">{new Date(tx.createdAt).toLocaleDateString()}</p>
                                                             </div>
                                                             <div className="text-right">

@@ -11,7 +11,7 @@ import { IEventEmitter } from "../../../../domain/interfaces/IEventEmitter";
 import { PaymentReleaseEvent } from "../../../../domain/events/PaymentEvents";
 import { IUserRepository } from "../../../../domain/interfaces/IUserRepository";
 import { ValidationError } from "../../../../domain/errors/errors";
-
+import { IAuctionRepository } from "../../../../domain/interfaces/IAuctionRepository";
 
 @injectable()
 export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
@@ -20,7 +20,8 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         @inject(TYPES.EventEmitter)private _eventEmitter:IEventEmitter,
         @inject(TYPES.SubscriptionRepository) private _subscriptionRepository: ISubscriptionRepository,
         @inject(TYPES.SubscriptionPlanRepository) private _subscriptionPlanRepository: ISubscriptionPlanRepository,
-        @inject(TYPES.UserRepository) private _userRepo:IUserRepository
+        @inject(TYPES.UserRepository) private _userRepo:IUserRepository,
+        @inject (TYPES.AuctionRepository) private _auctionRepository:IAuctionRepository
     ) { }
 
     async execute(data: releasePaymentDTO): Promise<void> {
@@ -72,6 +73,8 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         const sellerWallet = await this._walletRepository.findByUserId(data.sellerId);
         if (!sellerWallet) throw new Error("Seller wallet not found!");
 
+        const auction=await this._auctionRepository.findById(data.auctionId as string);
+        const title=auction? auction.title :"Unknown Auction";
 
         await this._walletRepository.debit(adminId, data.amount);
         await this._walletRepository.createTransactions({
@@ -82,7 +85,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             status: 'completed',
             purpose: 'auction_payment',
             auctionId: data.auctionId,
-            description: `Full amount released for auction ${data.auctionId}`,
+            description: `Full amount released for auction ${title}`,
             isReleased: true
         });
 
@@ -95,7 +98,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             status: 'completed',
             purpose: 'commission',
             auctionId: data.auctionId,
-            description: `Commission (${percent}%) kept from auction ${data.auctionId}`
+            description: `Commission (${percent}%) kept from auction ${title}`
         });
 
         await this._walletRepository.credit(data.sellerId, sellerAmount);
@@ -107,14 +110,16 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             status: 'completed',
             purpose: 'seller_credit',
             auctionId: data.auctionId,
-            description: `Auction payout received for ${data.auctionId}`
+            description: `Auction payout received for ${title}, Total :₹ ${data.amount}, Commission:₹${commission}`
         });
+        
 
         // logger.info("2. Calling markTransactions", data.transactionId);
         // 3. Mark the original Escrow as Released
         await this._walletRepository.markTransactionAsReleased(data.transactionId);
         this._eventEmitter.dispatch(new PaymentReleaseEvent(
             data.auctionId!,
+            title,
             data.sellerId,
             data.buyerId,
             data.amount,

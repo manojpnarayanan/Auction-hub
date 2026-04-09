@@ -38,13 +38,13 @@ const Home = () => {
     }, [selectedCategory, searchText]);
 
     useEffect(() => {
-        const loadCats=async()=>{
-            try{
-                const data=await getCategories(1,100,searchText);
-                setCategories([{_id:'all',name:"All"},...data.categories]);
-            }catch(error){
+        const loadCats = async () => {
+            try {
+                const data = await getCategories(1, 100, searchText);
+                setCategories([{ _id: 'all', name: "All" }, ...data.categories]);
+            } catch (error) {
                 toast.error(("Failed to load categories"));
-                
+                console.error("Failed to load categories",error);
             }
         }
         loadCats();
@@ -115,8 +115,8 @@ const Home = () => {
                                     onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                                     className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
                                     <div className="h-40 overflow-hidden bg-gray-200">
-                                        {auction.images?.[0] ? 
-                                            <img src={auction.images[0]} alt={auction.title} className="w-full h-full object-cover" /> : 
+                                        {auction.images?.[0] ?
+                                            <img src={auction.images[0]} alt={auction.title} className="w-full h-full object-cover" /> :
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
                                         }
                                     </div>
@@ -150,8 +150,8 @@ const Home = () => {
                                     onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                                     className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
                                     <div className="h-40 overflow-hidden bg-gray-200">
-                                        {auction.images?.[0] ? 
-                                            <img src={auction.images[0]} alt={auction.title} className="w-full h-full object-cover" /> : 
+                                        {auction.images?.[0] ?
+                                            <img src={auction.images[0]} alt={auction.title} className="w-full h-full object-cover" /> :
                                             <div className="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
                                         }
                                     </div>
@@ -171,7 +171,7 @@ const Home = () => {
                     </div>
                 </section>
             </main>
-            
+
             <Footer />
         </div>
     );

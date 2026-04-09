@@ -1,53 +1,53 @@
-import {useEffect,useState, useRef} from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addRealtimeNotification, fetchNotifications, markAsReadThunk } from '../redux/slices/notificationSlice';
-import type { RootState,AppDispatch } from '../redux/store';
+import type { RootState, AppDispatch } from '../redux/store';
 import { socket } from '../utils/socket';
 
-export default function NotificationBell(){
-    const dispatch=useDispatch<AppDispatch>();
-    const {notifications,unreadCount}=useSelector((state:RootState)=>state.notifications);
-    const {user}=useSelector((state:RootState)=>state.auth);
-    const [isOpen,setIsOpen] = useState(false);
-    const dropdownRef=useRef<HTMLDivElement>(null);
+export default function NotificationBell() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { notifications, unreadCount } = useSelector((state: RootState) => state.notifications);
+    const { user } = useSelector((state: RootState) => state.auth);
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(fetchNotifications());
-        if(!socket.connected) socket.connect();
-        if(user?.role === 'admin'){
+        if (!socket.connected) socket.connect();
+        if (user?.role === 'admin') {
             socket.emit('join_admin');
-            socket.on('admin_notification',(newNotification)=>{
+            socket.on('admin_notification', (newNotification) => {
                 dispatch(addRealtimeNotification(newNotification))
             })
-        }else if(user?.id){
-            socket.emit("join_user",user.id);
-            socket.on('notification',(newNotification)=>{
+        } else if (user?.id) {
+            socket.emit("join_user", user.id);
+            socket.on('notification', (newNotification) => {
                 dispatch(addRealtimeNotification(newNotification))
             });
         }
-        function handleClickOutside(event:MouseEvent){
-            if(dropdownRef.current && !dropdownRef.current.contains(event.target as Node)){
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         }
-        document.addEventListener('mousedown',handleClickOutside);
-        return ()=>{
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
             socket.off('notification');
             socket.off('admin_notification');
-            document.removeEventListener('mousedown',handleClickOutside)
+            document.removeEventListener('mousedown', handleClickOutside)
         }
-                // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[dispatch]);
+        
+    }, [dispatch, user]);
 
-    const handleMarkRead=(id:string,isRead:boolean)=>{
-        if(!isRead){
+    const handleMarkRead = (id: string, isRead: boolean) => {
+        if (!isRead) {
             dispatch(markAsReadThunk(id))
         }
     }
     return (
         <div className="relative" ref={dropdownRef}>
             {/* Bell Button */}
-            <button 
+            <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="text-white hover:bg-white/10 p-2 rounded-full transition relative"
             >
@@ -67,14 +67,14 @@ export default function NotificationBell(){
                     <div className="bg-gray-50 border-b px-4 py-3 flex justify-between items-center">
                         <h3 className="font-semibold text-gray-800 text-sm">Notifications</h3>
                     </div>
-                    
+
                     <div className="max-h-96 overflow-y-auto">
                         {notifications?.length === 0 ? (
                             <div className="p-4 text-center text-gray-500 text-sm">No new notifications</div>
                         ) : (
                             notifications?.map((notif) => (
-                                <div 
-                                    key={notif.id} 
+                                <div
+                                    key={notif.id}
                                     className={`p-3 border-b hover:bg-gray-50 transition cursor-pointer ${notif.isRead ? 'opacity-70' : 'bg-blue-50/20'}`}
                                     onClick={() => handleMarkRead(notif.id, notif.isRead)}
                                 >

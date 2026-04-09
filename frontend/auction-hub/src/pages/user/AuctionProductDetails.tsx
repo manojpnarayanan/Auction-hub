@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { getAuctionProductDetails } from "../../api/auctions";
 import { placeBid } from "../../api/User/Bidding";
 import { socket } from "../../utils/socket";
@@ -54,6 +54,7 @@ export default function AuctionProductDetails() {
     const [sellerReviews, setSellerReviews] = useState({ reviews: [], averageRating: 0, total: 0 });
 
     const navigate = useNavigate();
+    const location=useLocation();
     const calculateTimeLeft = useCallback(() => {
         if (!auction?.endDate) return { h: "00", m: "00", s: "00", ended: true };
         const difference = +new Date(auction.endDate) - +new Date();
@@ -102,6 +103,15 @@ export default function AuctionProductDetails() {
             setLoading(false);
         }
     }, [id]);
+
+    useEffect(()=>{
+        if(timeLeft.ended && auction?.status === 'active'){
+            const timer=setTimeout(()=>{
+                fetchAuction()
+            },2000);
+            return ()=>clearTimeout(timer);
+        }
+    },[timeLeft.ended,auction?.status,fetchAuction])
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -160,6 +170,7 @@ export default function AuctionProductDetails() {
         }
     };
 
+    const adminView=location.search.includes("adminView=true");
 
     useEffect(() => { fetchAuction(); }, [fetchAuction]);
 
@@ -187,9 +198,13 @@ export default function AuctionProductDetails() {
 
     const isActive = auction.status === 'active';
 
+    const winnerInfo=auction.bids.find(b=>b.bidderId === auction.winnerId);
+    const displayName=winnerInfo?.bidderName || auction.winnerId?.substring(0,10) || "Unknown user";
+
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-gray-900 flex flex-col">
-            <Navbar />
+            {/* <Navbar /> */}
+                    {!adminView && <Navbar />}
 
             <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full">
                 {/* 2-Column Hero Section */}
@@ -289,7 +304,7 @@ export default function AuctionProductDetails() {
                                                 <span className="text-2xl">🏆</span>
                                                 <div>
                                                     <p className="text-xs uppercase opacity-70">Auction Won By</p>
-                                                    <p className="text-sm">User ID: {auction.winnerId.substring(0, 10)}...</p>
+                                                    <p className="text-sm">User {displayName}...</p>
                                                 </div>
                                             </div>
                                             {currentUser?.id === auction.winnerId && auction.paymentStatus !== 'completed' && (
@@ -423,7 +438,8 @@ export default function AuctionProductDetails() {
                 </div>
             </main>
 
-            <Footer />
+            {/* <Footer /> */}
+             {currentUser?.role.toLowerCase() !== 'admin' && <Footer />}
 
             {paymentSession && (
                 <PaymentModal

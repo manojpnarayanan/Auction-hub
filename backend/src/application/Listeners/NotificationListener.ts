@@ -2,9 +2,10 @@ import { injectable,inject } from "inversify";
 import { TYPES } from "../../di/types";
 import EventEmitter from "events";
 import { ICreateNotificationUseCase } from "../use-cases/Usecase Interfaces/Notification-Interface/ICreateNotificationUseCase";
-import { AuctionApprovedEvent, AuctionEndedEvent, AuctionRejectedEvent,AuctionCreatedEvent } from "../../domain/events/AuctionEvents";
+import { AuctionApprovedEvent, AuctionEndedEvent, AuctionRejectedEvent,AuctionCreatedEvent ,AuctionCancellationRequestEvent } from "../../domain/events/AuctionEvents";
 import { PaymentConfirmedEvent, PaymentReleaseEvent, SubscriptionActivateEvent } from "../../domain/events/PaymentEvents";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
+import { DisputeRaisedEvent } from "../../domain/events/DisputeEvents";
 
 
 @injectable()
@@ -24,12 +25,14 @@ export class NotificationListener{
         this._eventEmitter.on("PaymentReleaseEvent",(e)=>this.handlePaymentRelease(e));
         this._eventEmitter.on("SubscriptionActivateEvent",(e)=>this.handleSubscriptionActivated(e));
         this._eventEmitter.on('AuctionCreatedEvent',(e)=>this.handleAuctionCreated(e));
+        this._eventEmitter.on('DisputeRaisedEvent',(e)=>this.handleDisputeRaised(e));
+        this._eventEmitter.on("AuctionCancellationRequestEvent",(e)=>this.handleAuctionCancellationRequest(e));
     }
     private async handleAuctionApproved(event:AuctionApprovedEvent){
         await this._createNotificationUseCase.execute({
             userId:event.sellerId,
             title:"Auction Approved",
-            message:`Your Auction for ${event.auctionId} has been approved`,
+            message:`Your Auction for ${event.auctionTitle} has been approved`,
             type:'success',
             link:'/my-listings'
         })
@@ -38,7 +41,7 @@ export class NotificationListener{
         await this._createNotificationUseCase.execute({
             userId:event.sellerId,
             title:"Auction Rejected",
-            message:`Your Auction ${event.auctionId} was rejected, Reason:${event.reason}`,
+            message:`Your Auction ${event.auctionTitle} was rejected, Reason:${event.reason}`,
             type:'error',
             link:'/user/my-listings'
         });
@@ -48,19 +51,22 @@ export class NotificationListener{
             await this._createNotificationUseCase.execute({
                 userId:event.winnerId,
                 title:"You won an Auction",
-                message:`You won auction ${event.auctionId}.Please proceed for payment`,
+                message:`You won auction ${event.auctionTitle}.Please proceed for payment`,
                 type:"success",
                 link:"/user/my-bids"
             });
         }
     }
     private async handlePaymentConfirmed(event:PaymentConfirmedEvent){
-        const admin=await this._userRepository.findAdmin();
+        const [admin,buyer]=await Promise.all([
+            this._userRepository.findAdmin(),
+            this._userRepository.findById(event.buyerId)
+        ]) 
         if(!admin) return ;
         await this._createNotificationUseCase.execute({
             userId:admin.id,
             title:"Payment Received",
-            message:`Payment of ${event.amount} received from user ${event.buyerId} for auction ${event.auctionId}`,
+            message:`Payment of ${event.amount} received from user ${buyer?.name} for auction ${event.auctionTitle}`,
             type:"info",
             link:'/admin',
             isAdmin:true
@@ -110,10 +116,34 @@ export class NotificationListener{
         await this._createNotificationUseCase.execute({
             userId:admin.id,
             title:`New Auction pending Approval`,
-            message:`User ${event.sellerId} submitted the auction`,
+            message:`New Auction listing  ${event.title} pending for approval`,
             type:"info",
             link:"/admin/auctions",
             isAdmin:true
         })
+    }
+    private async handleDisputeRaised(event:DisputeRaisedEvent){
+        const admin=await this._userRepository.findAdmin();
+        if(!admin) return;
+        await this._createNotificationUseCase.execute({
+            userId:admin.id,
+            title:"New Dispute Raised",
+            message:`A Dispute has been raised for auction ${event.auctionTitle}`,
+            type:'error',
+            link:'/admin/disputes',
+            isAdmin:true
+        })
+    }
+    private async handleAuctionCancellationRequest(event:AuctionCancellationRequestEvent){
+        const admin=await this._userRepository.findAdmin();
+        if(!admin) return;
+        await this._createNotificationUseCase.execute({
+            userId:admin.id,
+            title:"Cancellation Requested",
+            message:`A seller has requested to cancel ${event.auctionTitle}. Reason:${event.reason}`,
+            type:'info',
+            link:'/admin/auctions',
+            isAdmin:true
+        });
     }
 }

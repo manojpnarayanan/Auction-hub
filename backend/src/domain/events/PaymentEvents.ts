@@ -5,6 +5,7 @@ export class PaymentConfirmedEvent implements IDomainEvent{
     public dateTimeOccurred: Date;
     constructor(
         public readonly auctionId:string,
+        public readonly auctionTitle:string,
         public readonly buyerId:string,
         public readonly amount:number,
         public readonly paymentIntentId:string,
@@ -21,6 +22,7 @@ export class PaymentReleaseEvent implements IDomainEvent{
     public dateTimeOccurred: Date;
     constructor(
         public readonly auctionId:string,
+        public readonly auctionTitle:string,
         public readonly sellerId:string,
         public readonly buyerId:string,
         public readonly amount:number,

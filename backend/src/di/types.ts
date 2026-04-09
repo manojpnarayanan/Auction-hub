@@ -30,6 +30,7 @@ export const TYPES = {
     CancelLiveAuctionUseCase: Symbol.for("CancelLiveAuctionUseCase"),
     RequestCancellationUseCase: Symbol.for("RequestCancellationUseCase"),
     AutomatedEscrowUseCase:Symbol.for("AutomatedEscrowUseCase"),
+    AuctionControlListener:Symbol.for("AuctionControlListener"),
 
 
     // Admin 

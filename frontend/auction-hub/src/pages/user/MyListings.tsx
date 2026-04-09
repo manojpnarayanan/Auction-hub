@@ -10,7 +10,7 @@ import Pagination from "../../components/Pagination";
 import type { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import InfoModal from "../../components/InfoModal";
-import {ROUTES} from '../../Constants/routes'
+import { ROUTES } from '../../Constants/routes'
 
 
 export default function MyListings() {
@@ -25,8 +25,8 @@ export default function MyListings() {
     const limit = 6;
     const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
     const [auctionToCancel, setAuctionToCancel] = useState<string | null>(null);
-    const [viewReason,setViewReason]=useState(false);
-    const [selectedReason,setSelectedReason]=useState<string>('');
+    const [viewReason, setViewReason] = useState(false);
+    const [selectedReason, setSelectedReason] = useState<string>('');
 
 
     useEffect(() => {
@@ -65,7 +65,7 @@ export default function MyListings() {
             setIsReasonModalOpen(false);
             fetchMyListings();
         } catch (error: unknown) {
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             toast.error(err.response?.data?.message || "Failed to send request");
         }
     };
@@ -117,9 +117,9 @@ export default function MyListings() {
                                         <div className="text-xs text-gray-500">
                                             {auction.type === 'live' ? '📡 Live Auction' : '⏳ Timed Auction'}
                                         </div>
-                                        
+
                                         <div className="flex gap-2">
-                                            
+
                                             {(auction.status === 'active' || auction.status === 'approved') && (
                                                 <button
                                                     onClick={(e) => {
@@ -132,23 +132,37 @@ export default function MyListings() {
                                                 </button>
                                             )}
 
-                                        
-                                            {(auction.status === 'rejected' || auction.status ==='cancelled') && (
+
+                                            {(auction.status === 'rejected' || auction.status === 'cancelled') && (
                                                 <span
                                                     title={auction.rejectionReason}
                                                     className="text-xs bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold cursor-help flex items-center gap-1"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        setSelectedReason(auction.cancellationReason || auction.rejectionReason || "No reason attached")  
-                                                         setViewReason(true);
+                                                        setSelectedReason(auction.cancellationReason || auction.rejectionReason || "No reason attached")
+                                                        setViewReason(true);
                                                     }}
                                                 >
                                                     View Reason ⚠️
                                                 </span>
                                             )}
 
-                                        
-                                            <button
+
+                                            {/* Only allowed to edit if status is 'pending' or 'rejected' */}
+                                            {(auction.status === 'pending' || auction.status === 'rejected') && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedAuction(auction);
+                                                        setIsModalOpen(true);
+                                                    }}
+                                                    className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
+                                                >
+                                                    Edit
+                                                </button>
+                                            )}
+
+                                            {/* <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setSelectedAuction(auction);
@@ -157,7 +171,7 @@ export default function MyListings() {
                                                 className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
                                             >
                                                 Edit
-                                            </button>
+                                            </button> */}
                                         </div>
 
                                     </div>
@@ -169,7 +183,7 @@ export default function MyListings() {
             </main>
             {isModalOpen && (
                 <CreateAuctionModal onClose={() => setIsModalOpen(false)}
-                    onSuccess={fetchMyListings} 
+                    onSuccess={fetchMyListings}
                     initialData={selectedAuction || undefined}
                 />
             )}
@@ -187,10 +201,10 @@ export default function MyListings() {
                 variant='light'
             />
             <InfoModal
-            isOpen={viewReason}
-            onClose={()=>setViewReason(false)}
-            title="Auction Rejected"
-            message={selectedReason}
+                isOpen={viewReason}
+                onClose={() => setViewReason(false)}
+                title="Auction Rejected"
+                message={selectedReason}
             />
             <Footer />
         </div>

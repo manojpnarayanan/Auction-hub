@@ -2,7 +2,7 @@ import { injectable,inject } from "inversify";
 import { TYPES } from "../../di/types";
 import EventEmitter from "events";
 import { ICreateNotificationUseCase } from "../use-cases/Usecase Interfaces/Notification-Interface/ICreateNotificationUseCase";
-import { AuctionApprovedEvent, AuctionEndedEvent, AuctionRejectedEvent,AuctionCreatedEvent } from "../../domain/events/AuctionEvents";
+import { AuctionApprovedEvent, AuctionEndedEvent, AuctionRejectedEvent,AuctionCreatedEvent ,AuctionCancellationRequestEvent } from "../../domain/events/AuctionEvents";
 import { PaymentConfirmedEvent, PaymentReleaseEvent, SubscriptionActivateEvent } from "../../domain/events/PaymentEvents";
 import { IUserRepository } from "../../domain/interfaces/IUserRepository";
 import { DisputeRaisedEvent } from "../../domain/events/DisputeEvents";
@@ -25,7 +25,8 @@ export class NotificationListener{
         this._eventEmitter.on("PaymentReleaseEvent",(e)=>this.handlePaymentRelease(e));
         this._eventEmitter.on("SubscriptionActivateEvent",(e)=>this.handleSubscriptionActivated(e));
         this._eventEmitter.on('AuctionCreatedEvent',(e)=>this.handleAuctionCreated(e));
-        this._eventEmitter.on('DisputeRaisedEvent',(e)=>this.handleDisputeRaised(e))
+        this._eventEmitter.on('DisputeRaisedEvent',(e)=>this.handleDisputeRaised(e));
+        this._eventEmitter.on("AuctionCancellationRequestEvent",(e)=>this.handleAuctionCancellationRequest(e));
     }
     private async handleAuctionApproved(event:AuctionApprovedEvent){
         await this._createNotificationUseCase.execute({
@@ -57,12 +58,15 @@ export class NotificationListener{
         }
     }
     private async handlePaymentConfirmed(event:PaymentConfirmedEvent){
-        const admin=await this._userRepository.findAdmin();
+        const [admin,buyer]=await Promise.all([
+            this._userRepository.findAdmin(),
+            this._userRepository.findById(event.buyerId)
+        ]) 
         if(!admin) return ;
         await this._createNotificationUseCase.execute({
             userId:admin.id,
             title:"Payment Received",
-            message:`Payment of ${event.amount} received from user ${event.buyerId} for auction ${event.auctionId}`,
+            message:`Payment of ${event.amount} received from user ${buyer?.name} for auction ${event.auctionTitle}`,
             type:"info",
             link:'/admin',
             isAdmin:true
@@ -129,5 +133,17 @@ export class NotificationListener{
             link:'/admin/disputes',
             isAdmin:true
         })
+    }
+    private async handleAuctionCancellationRequest(event:AuctionCancellationRequestEvent){
+        const admin=await this._userRepository.findAdmin();
+        if(!admin) return;
+        await this._createNotificationUseCase.execute({
+            userId:admin.id,
+            title:"Cancellation Requested",
+            message:`A seller has requested to cancel ${event.auctionTitle}. Reason:${event.reason}`,
+            type:'info',
+            link:'/admin/auctions',
+            isAdmin:true
+        });
     }
 }

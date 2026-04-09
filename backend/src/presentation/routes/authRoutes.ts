@@ -13,25 +13,25 @@ const authController = container.get<AuthController>(TYPES.AuthController);
 const authLimiter = rateLimit(100, 15 * 60);
 
 
-
-
 router.post(ROUTES.AUTH.SIGNUP, authLimiter, validate(signupSchema), authController.signup);
 router.post(ROUTES.AUTH.LOGIN, authLimiter, validate(loginSchema), authController.login);
 router.post(ROUTES.AUTH.GOOGLE, authController.googleAuth);
-// router.get(
-//     "/auth/google",
-//     passport.authenticate("google", { scope: ["profile", "email"] })
-// );
-// router.get(
-//     "/auth/google/callback",
-//     passport.authenticate("google", {
-//         failureRedirect: "/user/auth/google/failure",
-//         session: false
-//     }),
-//     authController.googleAuthCallback
-// );
-// router.get("/auth/google/failure", authController.googleAuthFailure);
+
+
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.post("/refresh-token", authController.refreshToken);
 router.post('/verify-otp', authController.verifyOTP);

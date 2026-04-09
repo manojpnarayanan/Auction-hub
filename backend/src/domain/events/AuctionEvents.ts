@@ -80,6 +80,7 @@ export class AuctionCancellationRequestEvent implements IDomainEvent{
         public readonly auctionId:string,
         public readonly sellerId:string,
         public readonly reason:string,
+        public readonly auctionTitle:string,
     ){
         this.dateTimeOccurred=new Date()
     }

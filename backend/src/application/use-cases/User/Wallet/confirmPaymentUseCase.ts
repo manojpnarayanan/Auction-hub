@@ -26,6 +26,8 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
         if (intent.status !== 'succeeded' && intent.status !== 'processing') {
             throw new ValidationError(`Payment status is ${intent.status}, not succeeded.`);
         }
+        const auction=await this._auctionRepository.findById(data.auctionId);
+        if(!auction) throw new NotFoundError("Auction not found")
 
         const adminId = process.env.ADMIN_WALLET_USER_ID!;
         await this._walletRepository.credit(adminId, intent.amount / 100);
@@ -40,14 +42,13 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
                 purpose: 'auction_payment',
                 auctionId: data.auctionId,
                 stripePaymentIntentId: data.paymentIntentId,
-                description: `Payment received for auction ${data.auctionId}`,
+                description: `Payment received for auction ${auction.title}`,
                 isReleased: false
             });
         }
         await this._walletRepository.updateTransactions(data.paymentIntentId, 'completed');
         await this._auctionRepository.updatePaymentStatus(data.auctionId, 'completed');
-        const auction=await this._auctionRepository.findById(data.auctionId);
-        if(!auction) throw new NotFoundError("Auction not found")
+        
         // logger.info("DATABASE UPDATED SUCCESSFULLY for auction:", data.auctionId);
         this._eventEmitter.dispatch(new PaymentConfirmedEvent(
             data.auctionId,

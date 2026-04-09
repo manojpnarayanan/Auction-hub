@@ -73,6 +73,8 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
         const sellerWallet = await this._walletRepository.findByUserId(data.sellerId);
         if (!sellerWallet) throw new Error("Seller wallet not found!");
 
+        const auction=await this._auctionRepository.findById(data.auctionId as string);
+        const title=auction? auction.title :"Unknown Auction";
 
         await this._walletRepository.debit(adminId, data.amount);
         await this._walletRepository.createTransactions({
@@ -83,7 +85,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             status: 'completed',
             purpose: 'auction_payment',
             auctionId: data.auctionId,
-            description: `Full amount released for auction ${data.auctionId}`,
+            description: `Full amount released for auction ${title}`,
             isReleased: true
         });
 
@@ -96,7 +98,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             status: 'completed',
             purpose: 'commission',
             auctionId: data.auctionId,
-            description: `Commission (${percent}%) kept from auction ${data.auctionId}`
+            description: `Commission (${percent}%) kept from auction ${title}`
         });
 
         await this._walletRepository.credit(data.sellerId, sellerAmount);
@@ -108,10 +110,9 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
             status: 'completed',
             purpose: 'seller_credit',
             auctionId: data.auctionId,
-            description: `Auction payout received for ${data.auctionId}`
+            description: `Auction payout received for ${title}, Total :₹ ${data.amount}, Commission:₹${commission}`
         });
-        const auction=await this._auctionRepository.findById(data.auctionId as string);
-        const title=auction? auction.title :"Unknown Auction";
+        
 
         // logger.info("2. Calling markTransactions", data.transactionId);
         // 3. Mark the original Escrow as Released

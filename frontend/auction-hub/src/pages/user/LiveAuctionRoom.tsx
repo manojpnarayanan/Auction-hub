@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useLocation } from "react-router-dom";
 import { socket } from '../../utils/socket';
 import { getAuctionProductDetails } from "../../api/auctions";
 import { placeBid } from "../../api/User/Bidding";
@@ -53,6 +53,7 @@ export default function LiveAuctionRoom() {
     const { paymentSession, initiating, initiatePayment, closePayment } = usePayment();
 
     const { id } = useParams();
+    const location=useLocation();
     const currentUser = useSelector((state: RootState) => state.auth.user);
 
     useEffect(() => {
@@ -137,6 +138,8 @@ export default function LiveAuctionRoom() {
         return () => clearInterval(poll)
     }, [id, auctionStatus]);
 
+    const adminview=location.search.includes("adminView=true");
+
     useEffect(()=>{
         const fetchReviews=async()=>{
             if(auction?.sellerId){
@@ -180,7 +183,7 @@ export default function LiveAuctionRoom() {
 
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-            <Navbar />
+            {!adminview &&<Navbar />}
 
             {/* Header */}
             <div className="bg-gray-800 border-b border-gray-700 px-4 md:px-6 py-3 flex flex-col md:flex-row items-start md:items-center justify-between shadow-sm gap-2">

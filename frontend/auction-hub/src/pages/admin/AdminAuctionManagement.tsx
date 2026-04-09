@@ -153,7 +153,7 @@ const AdminAuctions = () => {
                                     </td>
                                     {/* <td className="p-4 font-medium text-gray-200">{auction.title}</td> */}
                                     <td className="p-4 font-medium text-blue-400 hover:text-blue-300 cursor-pointer underline"
-                                        onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}>
+                                        onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}?adminView=true` : `/auction/${auction.id}?adminView=true`)}>
                                         {auction.title}
                                     </td>
                                     <td className="p-4 text-xs text-gray-400">

@@ -85,6 +85,7 @@ const socketService = container.get<ISocketService>(TYPES.SocketService);
 socketService.init(httpServer)
 container.get(TYPES.BidListener);
 container.get(TYPES.NotificationListener);
+container.get(TYPES.AuctionControlListener);
 
 const PORT = config.port;
 httpServer.listen(PORT, () => {

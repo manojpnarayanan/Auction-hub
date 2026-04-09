@@ -60,6 +60,7 @@ import { ICancelLiveAuctionUseCase } from "../application/use-cases/Usecase Inte
 import { CancelLiveAuctionUseCase } from "../application/use-cases/User/Live-Auctions/CancelLiveAuctionUseCase";
 import { IAutomatedEscrowReleaseUseCase } from "../application/use-cases/Usecase Interfaces/Auction-Interface/IAutomatedEscrowReleaseUseCase";
 import { AutomatedEscrowUseCase } from "../application/use-cases/auction/AutomatedEscrowUseCase";
+import { AuctionControlListener } from "../application/Listeners/AuctionControllerListener";
 
 
 // Admin-useCases
@@ -278,7 +279,7 @@ container.bind<IEndLiveAuctionUseCase>(TYPES.EndLiveAuctionUseCase).to(EndLiveAu
 container.bind<ICancelLiveAuctionUseCase>(TYPES.CancelLiveAuctionUseCase).to(CancelLiveAuctionUseCase);
 container.bind<IRequestCancellationUseCase>(TYPES.RequestCancellationUseCase).to(RequestCancellationUseCase);
 container.bind<IAutomatedEscrowReleaseUseCase>(TYPES.AutomatedEscrowUseCase).to(AutomatedEscrowUseCase);
-
+container.bind<AuctionControlListener>(TYPES.AuctionControlListener).to(AuctionControlListener).inSingletonScope();
 
 // Admin-UseCases
 container.bind<IAdminUserManagementUseCase>(TYPES.AdminUserManagementUseCase).to(AdminUserManagementUseCase);

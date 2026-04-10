@@ -52,7 +52,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
 
         // Use plan percent, or fallback to 5% if something goes wrong
         const percent = plan ? plan.commission : 6;
-        const commission = Math.ceil(data.amount * (percent/100));
+        const commission = Math.ceil(data.amount * percent);
         const sellerAmount = data.amount - commission;
 
         // logger.info("MATH:AMOUNT ",data.amount)

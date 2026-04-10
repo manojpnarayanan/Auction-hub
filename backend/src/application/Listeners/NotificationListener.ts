@@ -94,7 +94,7 @@ export class NotificationListener{
             await this._createNotificationUseCase.execute({
                 userId:admin.id,
                 title:`Escrow funds released (${event.isAutomatic ? "Auto":"Manual"})`,
-                message:`Auction ${event.auctionId} :${event.amount} released to seller`,
+                message:`Auction ${event.auctionTitle} :${event.amount} released to seller`,
                 type:'info',
                 link:'/admin',
                 isAdmin:true

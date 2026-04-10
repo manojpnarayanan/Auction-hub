@@ -21,7 +21,7 @@ export class SubscriptionPlanRepository extends BaseRepository<SubscriptionPlan,
         return doc? SubscriptionPlanPersistanceMapper.toEntity(doc):null;
     }
     async findDefaultPlan(): Promise<SubscriptionPlan | null> {
-        const doc=await SubscriptionPlanModel.findOne({price:0,isActive:true});
+        const doc=await SubscriptionPlanModel.findOne({isDefault:true,isActive:true});
         return doc? SubscriptionPlanPersistanceMapper.toEntity(doc):null
     }
      

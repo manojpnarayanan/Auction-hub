@@ -11,11 +11,11 @@ const Pagination: React.FC<PaginationProps> = ({
     currentPage, 
     totalPages, 
     onPageChange, 
-    variant = "dark" // Default to dark so admin side stays the same
+    variant = "dark" 
 }) => {
     if (totalPages <= 1) return null;
 
-    // Define colors based on the variant
+    
     const isLight = variant === "light";
     
     const buttonClasses = isLight

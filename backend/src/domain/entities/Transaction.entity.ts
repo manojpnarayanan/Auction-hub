@@ -1,3 +1,4 @@
+
 export type TransactionType='credit'  | 'debit';
 export type TransactionStatus= 'pending' | 'completed' | 'failed' | 'refunded';
 
@@ -22,5 +23,8 @@ export class Transactions {
         public readonly description:string="",
         public readonly isReleased?:boolean,
         public readonly createdAt:Date=new Date(),
+        public readonly userName?:string,
+        public readonly auctionTitle?:string
+        
     ){}
 }

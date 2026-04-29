@@ -72,23 +72,6 @@ export default function MyBids() {
         }
     };
 
-    // const handleRaiseDispute = async () => {
-    //     if (!disputeId || !disputeReason.trim()) return;
-    //     try {
-    //         setActionLoading(true);
-    //         await raiseDisputeAPI(disputeId, disputeReason);
-    //         toast.success("Dispute raised. Staff will review the issue and contact you.");
-    //         setDisputeId(null);
-    //         setDisputeReason('');
-    //         fetchBids();
-    //     } catch (error: unknown) {
-    //         const err=error as AxiosError<{message:string}>
-    //         toast.error(err?.response?.data?.message || "Failed to raise dispute");
-    //     } finally {
-    //         setActionLoading(false);
-    //     }
-    // };
-
     const handleRaiseDispute = async () => {
         if (!disputeId || !disputeReason.trim()) return;
         try {
@@ -137,7 +120,6 @@ export default function MyBids() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {myBids.map((item: MyBidItem) => (
                             <div key={item.auction.id}
-                                // onClick={() => navigate(item.auction.type === 'live' ? `/live-auction/${item.auction.id}` : `/auction/${item.auction.id}`)}
                                 onClick={() => navigate(item.auction.type === 'live' ? ROUTES.LIVE_AUCTION.replace(':id', item.auction.id) : ROUTES.AUCTION_DETAILS.replace(':id', item.auction.id))}
                                 className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-4 cursor-pointer hover:shadow-md transition">
                                 <div className="flex gap-4">
@@ -159,7 +141,7 @@ export default function MyBids() {
                                                 </span>
                                             </div>
                                             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.auction.description}</p>
-                                            {/* <p className="text-sm text-gray-500 mt-1 line-clamp-2">{item.auction.endDate.()}</p> */}
+                                            
                                         </div>
 
                                         <div className="flex justify-between items-end mt-4">

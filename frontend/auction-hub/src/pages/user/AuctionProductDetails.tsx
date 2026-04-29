@@ -15,7 +15,6 @@ import type { RootState } from "../../redux/store";
 import type { Review } from "../../types/review";
 import { AxiosError } from "axios";
 import { getSellerReviews } from "../../api/User/Review";
-// import type { BidItem } from "../../types/Bid";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../Constants/routes";
 

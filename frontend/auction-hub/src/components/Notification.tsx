@@ -10,34 +10,45 @@ export default function NotificationBell() {
     const { user } = useSelector((state: RootState) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
         dispatch(fetchNotifications());
-        if (!socket.connected) socket.connect();
-        if (user?.role === 'admin') {
-            socket.emit('join_admin');
-            socket.on('admin_notification', (newNotification) => {
-                dispatch(addRealtimeNotification(newNotification))
-            })
-        } else if (user?.id) {
-            socket.emit("join_user", user.id);
-            socket.on('notification', (newNotification) => {
-                dispatch(addRealtimeNotification(newNotification))
-            });
-        }
+
+        
+        const handleConnect = () => {
+            if (user?.role === 'admin') {
+                socket.emit('join_admin');
+            } else if (user?.id) {
+                socket.emit("join_user", user.id);
+            }
+        };
+
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
+        if (socket.connected) handleConnect();
+        socket.on('connect', handleConnect);
+
+        socket.on('notification', (newNotification) => {
+            dispatch(addRealtimeNotification(newNotification));
+        });
+
+        socket.on('admin_notification', (newNotification) => {
+            dispatch(addRealtimeNotification(newNotification));
+        });
+
+        if (!socket.connected) socket.connect();
+
         return () => {
+            socket.off('connect', handleConnect);
             socket.off('notification');
             socket.off('admin_notification');
-            document.removeEventListener('mousedown', handleClickOutside)
-        }
-        
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, [dispatch, user]);
+
 
     const handleMarkRead = (id: string, isRead: boolean) => {
         if (!isRead) {
@@ -46,7 +57,7 @@ export default function NotificationBell() {
     }
     return (
         <div className="relative" ref={dropdownRef}>
-            {/* Bell Button */}
+           
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="text-white hover:bg-white/10 p-2 rounded-full transition relative"
@@ -54,14 +65,14 @@ export default function NotificationBell() {
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                {/* Red Badge */}
+               
                 {unreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-[#1da1f2]">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
             </button>
-            {/* Dropdown Panel */}
+           
             {isOpen && (
                 <div className="absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl overflow-hidden z-50">
                     <div className="bg-gray-50 border-b px-4 py-3 flex justify-between items-center">

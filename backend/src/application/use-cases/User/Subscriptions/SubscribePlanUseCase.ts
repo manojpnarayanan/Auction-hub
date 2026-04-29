@@ -19,7 +19,7 @@ export class SubscribePlanUseCase implements ISubscribePlanUseCase{
     async execute(data: SubscribePlanDTO): Promise<SubscriptionResponseDTO> {
         const startDate=new Date();
         const endDate=new Date();
-        endDate.setFullYear(endDate.getFullYear()+1);// 1year subscription
+        endDate.setFullYear(endDate.getFullYear()+1);
         const existing=await this._subscriptionRepository.findActiveByUSerId(data.userId);
         if(existing){
             const currentPlan=await this._subscriptionPlanRepo.findById(existing.planId);
@@ -29,7 +29,6 @@ export class SubscribePlanUseCase implements ISubscribePlanUseCase{
                     throw new ConflictError("User already has an equal or higher active subcription");
                 }
             }
-            // throw new ConflictError("User already has an active subcription");
             await this._subscriptionRepository.update(existing.id!,{status:'expired'})
         }
         

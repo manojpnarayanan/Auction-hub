@@ -24,9 +24,7 @@ export default function Login() {
         onSuccess: async (codeResponse) => {
             try {
                 setLoading(true);
-                // Send the code to your backend using your updated API function
                 const res = await googleAuth()(codeResponse.code);
-
                 dispatch(
                     setCredentials({
                         user: res.data.data.user,

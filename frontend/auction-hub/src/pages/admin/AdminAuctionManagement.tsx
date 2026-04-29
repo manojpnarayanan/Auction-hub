@@ -60,17 +60,6 @@ const AdminAuctions = () => {
             toast.error("Failed to delete Auction")
         }
     }
-    // const handleCancelLiveAuction = async (id: string) => {
-    //     if (window.confirm("Are you sure you wan tot completely cancel this live auction?"))
-    //         try {
-    //             await cancelLiveAuctionAdmin(id);
-    //             toast.success("Live auction cancelled successfully");
-    //             fetchAuctions();
-    //         } catch (error: unknown) {
-    //             const err = error as AxiosError<{ message: string }>
-    //             toast.error(err.response?.data?.message || "Failed to cancel live auction");
-    //         }
-    // }
 
     const handleStatusUpdate = async (id: string, status: 'active' | 'rejected' | 'approved' | 'cancelled') => {
         if (status === 'rejected') {
@@ -151,7 +140,7 @@ const AdminAuctions = () => {
                                             className="w-12 h-12 rounded object-cover border border-gray-200"
                                         />
                                     </td>
-                                    {/* <td className="p-4 font-medium text-gray-200">{auction.title}</td> */}
+                                    
                                     <td className="p-4 font-medium text-blue-400 hover:text-blue-300 cursor-pointer underline"
                                         onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}?adminView=true` : `/auction/${auction.id}?adminView=true`)}>
                                         {auction.title}
@@ -168,16 +157,9 @@ const AdminAuctions = () => {
                                             {auction.status ? auction.status.toUpperCase() : 'UNKNOWN'}
                                         </span>
                                     </td>
-                                    {/* <td className="p-4">
-                                        <button 
-                                            onClick={() => handleDelete(auction.id)}
-                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1 rounded transition text-sm font-medium"
-                                        >
-                                            Delete
-                                        </button>
-                                    </td> */}
+                                    
                                     <td className="p-4 flex flex-wrap gap-2">
-                                        {/* Cancellation Request Section */}
+                                        
                                         {auction.status === 'pending_cancellation' && (
                                             <div className="flex items-center gap-2 bg-red-500/10 p-2 rounded-lg border border-red-500/20 w-full mb-2">
                                                 <div className="flex-1">
@@ -228,7 +210,7 @@ const AdminAuctions = () => {
                                                 Cancel live
                                             </button>
                                         )}
-                                        {/* Timed Auctions Control */}
+                                        
                                         {auction.status === 'active' && auction.type === 'timed' && (
                                             <button onClick={() => {
                                                 setSelectedAuctionId(auction.id);
@@ -238,11 +220,7 @@ const AdminAuctions = () => {
                                                 Block
                                             </button>
                                         )}
-                                        {/* {auction.status === 'rejected' && auction.type === 'timed' && (
-                                            <button onClick={() => handleStatusUpdate(auction.id, 'active')} className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium">
-                                                Unblock
-                                            </button>
-                                        )} */}
+                                        
                                         <button
                                             onClick={() => handleDelete(auction.id)}
                                             className="text-red-500 hover:text-red-700 hover:bg-red-500/10 px-3 py-1 rounded transition text-sm font-medium"

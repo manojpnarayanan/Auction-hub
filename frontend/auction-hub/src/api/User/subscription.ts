@@ -8,9 +8,6 @@ export const getSubscription =async()=>{
 export const subscribeToPlan=async(planId:string,plan:string)=>{
     return API.post('/user/user-subscribe',{planId,plan})
 }
-// export const getSubscriptionPlans=async()=>{
-//     return API.get('/user/plans')
-// }
 export const createSubscriptionPaymentIntent = (planId: string, planName: string) => {
     return API.post('/user/create-payment-intent', { planId, planName });
 };

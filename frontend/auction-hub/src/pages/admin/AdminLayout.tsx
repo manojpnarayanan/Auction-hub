@@ -48,7 +48,7 @@ export function AdminLayout() {
       {/* Navbar */}
       <header className="flex items-center justify-between px-6 md:px-8 py-5 bg-[#0d1117] border-b border-gray-800 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          {/* Hamburger for Mobile */}
+          
           <button 
             className="md:hidden p-1 hover:bg-gray-800 rounded transition mr-1"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -64,7 +64,7 @@ export function AdminLayout() {
           </span>
         </div>
         
-        {/* Desktop Nav */}
+        
         <nav className="hidden md:flex items-center gap-6 lg:gap-8 mx-4 overflow-x-auto scrollbar-hide">
           <NavButtons />
         </nav>
@@ -78,7 +78,7 @@ export function AdminLayout() {
         </div>
       </header>
 
-      {/* Mobile Drawer */}
+      
       {isMenuOpen && (
         <div className="md:hidden fixed inset-0 top-[73px] z-40 flex flex-col bg-[#0d1117] border-t border-gray-800 animate-in slide-in-from-left duration-300">
           <nav className="flex flex-col">
@@ -92,4 +92,4 @@ export function AdminLayout() {
       </main>
     </div>
   );
-}
+}

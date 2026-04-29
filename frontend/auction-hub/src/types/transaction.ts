@@ -10,6 +10,8 @@ export interface TransactionItem{
     description:string;
     purpose:string;
     auctionId?:string;
+    auctionTitle?:string;
+    userName?:string;
     sellerId?:string;
     isReleased?:string;
     commissionPercent?:number;

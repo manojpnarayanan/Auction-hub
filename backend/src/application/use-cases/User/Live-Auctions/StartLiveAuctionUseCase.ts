@@ -23,11 +23,7 @@ export class StartLiveAuctionUseCase implements IStartLiveAuctionUseCase{
         if(auction.type !== 'live' )throw new ValidationError('This is not a live auction');
         if (auction.status === 'active')throw new ValidationError("Auction is already live");
         await this._auctionRepository.updateAuctionStatus(auctionId,'active');
-        // this._socketService.emit('auction_started',{
-        //     auctionId,
-        //     startTime:new Date(),
-        //     currentPrice:auction.currentPrice
-        // },auctionId);
+        
         this._eventEmitter.dispatch(new AuctionStartedEvent(
             auctionId,
             new Date(),

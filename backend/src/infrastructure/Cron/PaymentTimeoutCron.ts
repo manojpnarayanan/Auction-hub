@@ -24,7 +24,6 @@ export function startPaymentTimeoutJob() {
             
             for (const auction of expiredAuctions) {
                 if (auction.bids && auction.bids.length > 0) {
-                    // Extract unique bidders array sorted by highest bid
                     const uniqueBidders: {bidderId:string;amount:number;time:Date}[] = [];
                     const seen = new Set();
                     
@@ -36,22 +35,20 @@ export function startPaymentTimeoutJob() {
                         }
                     }
 
-                    // Find the current defaulting winner in the ordered list
                     const currentWinnerIndex = uniqueBidders.findIndex(bid => bid.bidderId === auction.winnerId);
                     const nextWinnerIndex = currentWinnerIndex + 1;
 
-                    // If they exist and there is another bidder behind them
                     if (currentWinnerIndex !== -1 && nextWinnerIndex < uniqueBidders.length) {
                         const nextBidder = uniqueBidders[nextWinnerIndex];
                         auction.winnerId = nextBidder.bidderId;
                         auction.currentPrice = nextBidder.amount;
-                        // Reset the 1-hour clock starting from NOW for the new winner
+
                         auction.endDate = new Date(); 
                         await auction.save();
                         logger.info(`Auction ${auction._id} shifted to next winner: ${nextBidder.bidderId}`);
                         eventEmitter.dispatch(new AuctionEndedEvent(auction._id as string,'sold',nextBidder.bidderId,nextBidder.amount,auction.title))
                     } else {
-                        // Nobody left to shift to!
+                        
                         auction.status = 'expired';
                         await auction.save();
                         logger.info(`Auction ${auction._id} fully expired.`);

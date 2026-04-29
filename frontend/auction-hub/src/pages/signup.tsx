@@ -13,7 +13,7 @@ import {ROUTES} from '../Constants/routes';
 
 
 export default function Signup() {
-  // const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  
   const [form, setForm] = useState<SignupCredentials & { confirmPassword: string }>({
     name: "",
     email: "",

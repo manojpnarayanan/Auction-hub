@@ -56,22 +56,12 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
                 });
                 isNewUser=true;
             } else {
-                // user.googleId=payload.sub;
                 await this._UserRepository.updateGoogleId(user.id,payload.sub);
                 const updatedUser=await this._UserRepository.findByEmail(payload.email);
                 if(updatedUser){
                     user=updatedUser;
                 }
             }
-                // user = await this._UserRepository.create({
-                //     name: data.name,
-                //     email: data.email,
-                //     googleId: data.googleId,
-                //     role: "user",
-                //     password: "",
-                //     isVerified: true
-                // });
-                // isNewUser = true;
         }
         const token = jwt.sign(
             { id: user.id, email: user!.email, role: user!.role },
@@ -90,13 +80,6 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
             refreshToken,
             isNewUser,
             user: UserDTOMapper.toResponseDTO(user)
-            //  {
-            //     id: user.id,
-            //     name: user.name,
-            //     email: user.email,
-            //     role: user.role,
-            //     createdAt: user.createdAt
-            // }
 
         }
     }

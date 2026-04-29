@@ -51,11 +51,11 @@ export default function AdminLogin() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-            {/* Background Pattern */}
+            
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
 
             <div className="relative w-full max-w-md">
-                {/* Logo/Header */}
+                
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 bg-slate-800/50 backdrop-blur-sm px-6 py-3 rounded-full border border-cyan-500/20 mb-4">
                         <svg className="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,7 +67,7 @@ export default function AdminLogin() {
                     <p className="text-slate-400 text-sm">Secure access for administrators only</p>
                 </div>
 
-                {/* Login Card */}
+                
                 <div className="bg-slate-800/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden">
                     <div className="p-8">
                         <h2 className="text-2xl font-bold text-white mb-6 text-center">Admin Login</h2>
@@ -79,7 +79,7 @@ export default function AdminLogin() {
                                 </div>
                             )}
 
-                            {/* Email Field */}
+                            
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-2">
                                     Admin Email
@@ -95,7 +95,6 @@ export default function AdminLogin() {
                                 />
                             </div>
 
-                            {/* Password Field */}
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-2">
                                     Password
@@ -129,7 +128,6 @@ export default function AdminLogin() {
                                 </div>
                             </div>
 
-                            {/* Login Button */}
                             <button
                                 type="submit"
                                 disabled={loading}
@@ -152,7 +150,7 @@ export default function AdminLogin() {
                             </button>
                         </form>
 
-                        {/* Footer */}
+                        
                         <div className="mt-6 pt-6 border-t border-slate-700/50">
                             <p className="text-center text-xs text-slate-500">
                                 Protected by enterprise-grade security
@@ -161,7 +159,7 @@ export default function AdminLogin() {
                     </div>
                 </div>
 
-                {/* Back to User Login */}
+                
                 <div className="text-center mt-6">
                     <button
                         onClick={() => navigate('/login')}

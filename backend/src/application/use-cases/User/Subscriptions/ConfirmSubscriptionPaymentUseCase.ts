@@ -32,10 +32,12 @@ export class confirmSubscriptionPaymentUseCase implements IConfirmSubscriptionPa
         const activatedSubcription = await this._subscribePlanUseCase.execute(dto);
         const amount = intent.amount / 100;
         const userWallet = await this._walletRepository.findByUserId(userId);
+        const adminId = process.env.ADMIN_WALLET_USER_ID;
+        if (!adminId) throw new Error("Admin wallet not found");
         if (userWallet) {
             await this._walletRepository.createTransactions({
                 walletId: userWallet.id,
-                userId,
+                userId:adminId,
                 amount,
                 type: "debit",
                 status: 'completed',
@@ -44,14 +46,13 @@ export class confirmSubscriptionPaymentUseCase implements IConfirmSubscriptionPa
                 description: `Subscription payment for ${planName}`
             })
         }
-        const adminId = process.env.ADMIN_WALLET_USER_ID;
-        if (!adminId) throw new Error("Admin wallet not found");
+        
         await this._walletRepository.credit(adminId, amount);
         const adminWallet = await this._walletRepository.findByUserId(adminId);
         if (adminWallet) {
             await this._walletRepository.createTransactions({
                 walletId: adminWallet.id,
-                userId: adminId,
+                userId: userId,
                 amount,
                 type: 'credit',
                 status: 'completed',

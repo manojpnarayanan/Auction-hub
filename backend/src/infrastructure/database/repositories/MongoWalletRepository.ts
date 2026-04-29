@@ -9,7 +9,7 @@ import { TransactionModel } from "../models/TransactionModel";
 import { TransactionPersistanceMapper } from "../Mappers/TransactionPersistanceMapper";
 import { BaseRepository } from "./BaseRepository";
 import { getDateConfig } from "../../../domain/utils/dateConfig";
-
+import { ITransactionDocument } from "../models/TransactionModel";
 
 
 @injectable()
@@ -40,17 +40,21 @@ export class MongoWalletRepository extends BaseRepository<Wallet, IWalletDocumet
         return WalletPersistanceMapper.toEntity(doc!);
     }
 
-    async getTransactions(userId: string, page: number = 1, limit: number = 10): Promise<{ transactions: Transactions[], total: number }> {
+    async getTransactions(userId: string, page: number = 1, limit: number = 10,purpose?:string): Promise<{ transactions: Transactions[], total: number }> {
         const wallet = await WalletModel.findOne({ userId });
         if (!wallet) return { transactions: [], total: 0 };
-        const query = { walletId: wallet._id, status: 'completed' };
+        const query:Record<string , unknown> = { walletId: wallet._id, status: 'completed' };
+        if(purpose) query.purpose=purpose
         const [docs, total] = await Promise.all([
             TransactionModel.find(query)
+            .populate('auctionId','title')
+            .populate('userId','name')
                 .sort({ createdAt: -1 })
                 .skip((page - 1) * limit)
                 .limit(limit),
             TransactionModel.countDocuments(query)
         ]);
+        console.log("BEBUD+G Tranasctions",docs[0])
         return {
             transactions: docs.map(TransactionPersistanceMapper.toEntity),
             total
@@ -71,8 +75,10 @@ export class MongoWalletRepository extends BaseRepository<Wallet, IWalletDocumet
         return doc ? TransactionPersistanceMapper.toEntity(doc) : null;
     }
     async getPendingRelease(adminId: string): Promise<Transactions[]> {
+        const adminWallet=await  WalletModel.findOne({userId:adminId});
+        if(!adminWallet) return [];
         const docs = await TransactionModel.find({
-            userId: adminId,
+            walletId: adminWallet._id,
             purpose: "auction_payment",
             isReleased: false,
             type: "credit"

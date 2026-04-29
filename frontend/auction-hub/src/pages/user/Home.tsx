@@ -16,7 +16,6 @@ const Home = () => {
     const [searchText, setSearchText] = useState("");
     const navigate = useNavigate();
 
-    // Replicate Categories with Icons logic from Dashboard
     const getCategoryIcon = (name: string) => {
         switch (name.toLowerCase()) {
             case "vehicles": return '🚗';

@@ -13,8 +13,6 @@ import { BidPlacedEvent } from "../../../domain/events/AuctionEvents";
 import logger from "../../../infrastructure/Global/Logger";
 import { ICacheService } from "../../../domain/interfaces/ICacheService";
 
-
-
 @injectable()
 
 export class PlaceBidUseCase implements IPlaceBidUseCase {

@@ -120,9 +120,9 @@ export default function Dashboard() {
           <h3 className="text-xl font-bold text-gray-800 mb-4">Live Auctions</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* CHECK IF EMPTY */}
+          
             {liveAuction.length === 0 ? (
-              // 1. SHOW THIS IF EMPTY
+            
               <div className="col-span-3 text-center py-10 bg-white rounded-xl border border-gray-100">
                 <p className="text-gray-500 font-medium">No auctions available at the moment.</p>
                 <p className="text-sm text-gray-400 mt-1">Check back later or list your own!</p>
@@ -136,7 +136,7 @@ export default function Dashboard() {
                   {/* Image */}
                   <div className="h-40 overflow-hidden bg-gray-200">
                     {(() => {
-                      // Prioritize first image of array, fallback to old single string
+                      
                       const imgSrc = auction.images?.[0];
 
                       return imgSrc ? (
@@ -169,20 +169,19 @@ export default function Dashboard() {
         </section>
        
         <section>
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Timed Auctions</h3> {/* Changed Title */}
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Timed Auctions</h3>
 
-          {/* Copy the Grid layout from Live Auctions but use timedAuctions */}
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {timedAuctions.length === 0 ? (
               <p className="text-gray-500">No timed auctions available.</p>
             ) : (
               timedAuctions.map((auction: AuctionItem) => (
-                // ... Copy the exact same Card code from Live Auctions ...
-                // ... just change key={auction.id} ...
+                
                 <div key={auction.id}
                   onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
                   className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition cursor-pointer">
-                  {/* ... Same Image Logic ... */}
+                  
                   <div className="h-40 overflow-hidden bg-gray-200">
                     {(() => {
                       const imgSrc = auction.images?.[0];

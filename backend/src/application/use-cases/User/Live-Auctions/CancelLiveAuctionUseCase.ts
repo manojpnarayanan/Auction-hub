@@ -25,10 +25,6 @@ export class CancelLiveAuctionUseCase implements ICancelLiveAuctionUseCase{
         if(auction.status !== 'active') throw new ValidationError("Only active auctions can be cancelled");
 
         await this._auctionRepository.updateAuctionStatus(auctionId,'cancelled',undefined,undefined,reason);
-        // this._socketService.emit('auction_cancelled',{
-        //     auctionId,
-        //     message:"This auction has been cancellec by the admin"
-        // },auctionId);
 
         this._eventEmitter.dispatch(new AuctionCancelledEvent(
             auctionId,

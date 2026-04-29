@@ -12,6 +12,9 @@ export interface TransactionResponseDTO{
     purpose:string;
     description:string;
     auctionId?:string;
+    auctionTitle?:string;
+    userName?:string;
+    userId?:string
     createdAt:string;
 }
 export interface createPaymentIntentDTO{

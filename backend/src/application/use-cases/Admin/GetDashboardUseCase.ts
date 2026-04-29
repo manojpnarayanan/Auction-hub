@@ -26,8 +26,8 @@ export class GetDashboardUseCase implements IGetDashboardStatsUseCase {
 
         const [auctionStats, revenueData, userGrowthData] = await Promise.all([
             this._auctionRepo.getAuctionStats(),
-            this._walletRepo.getTotalRevenue(period, customRange),  // KPI total unchanged
-            this._userRepo.getUserGrowth(period, customRange),       // timeline scoped
+            this._walletRepo.getTotalRevenue(period, customRange),
+            this._userRepo.getUserGrowth(period, customRange),
             this._userRepo.getTotalUserCount(),
         ]);
         const totalClosed = auctionStats.sold + auctionStats.expired;
@@ -47,4 +47,4 @@ export class GetDashboardUseCase implements IGetDashboardStatsUseCase {
             userGrowthTimeline: userGrowthData.timeline,
         };
     }
-}
+}

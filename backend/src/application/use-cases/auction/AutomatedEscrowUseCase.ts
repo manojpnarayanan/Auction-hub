@@ -25,7 +25,6 @@ export class AutomatedEscrowUseCase implements IAutomatedEscrowReleaseUseCase{
             const thresholdDate = new Date();
             
             thresholdDate.setDate(thresholdDate.getDate() - 3);
-            // thresholdDate.setMinutes(thresholdDate.getMinutes() - 3);
             
             logger.info(`[Auto-Escrow] Checking for auctions paid before ${thresholdDate.toISOString()}`);
 
@@ -50,10 +49,8 @@ export class AutomatedEscrowUseCase implements IAutomatedEscrowReleaseUseCase{
                     if (escrowTX && escrowTX.id) {
                         logger.info(`[Auto-Escrow] Automatically releasing funds for auction: ${auction.id}`);
 
-                        
                         await this._auctionRepository.update(auction.id!, { deliveryStatus: 'delivered' });
 
-                        
                         await this._releasePaymentUseCase.execute({
                             auctionId: auction.id!,
                             sellerId: auction.sellerId,

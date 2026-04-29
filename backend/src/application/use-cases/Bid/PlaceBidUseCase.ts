@@ -34,7 +34,6 @@ export class PlaceBidUseCase implements IPlaceBidUseCase {
             throw new Error("Bid is too low >Please a higher amount");
         }
 
-
         const auction = await this._auctionRepository.findById(data.auctionId);
 
         if (!auction) throw new Error("Auction not found");
@@ -49,12 +48,7 @@ export class PlaceBidUseCase implements IPlaceBidUseCase {
             time: newBid.time
         });
         await this._cacheService.set(redisKey,data.amount.toString());
-        // const user=await this._userRepository.findById(data.bidderId);
-        // this._socketService.emit('bid_update',{
-        //     auctionId:data.auctionId,
-        //     newPrice:data.amount,
-        //     bid:savedBid,
-        // },data.auctionId);
+        
         let bidderName = 'Anonymous';
         try {
             const user = await this._userRepository.findById(data.bidderId);
@@ -63,16 +57,6 @@ export class PlaceBidUseCase implements IPlaceBidUseCase {
             logger.error(e,'[PlaceBid] User lookup failed:');
         }
 
-        // this._socketService.emit('bid_update', {
-        //     auctionId: data.auctionId,
-        //     newPrice: data.amount,
-        //     bid: {
-        //         bidderId: data.bidderId,
-        //         amount: data.amount,
-        //         time: newBid.time,
-        //         bidderName,
-        //     },
-        // }, data.auctionId);
         this._eventEmitter.dispatch(new BidPlacedEvent(
             data.auctionId,
             data.bidderId,

@@ -98,7 +98,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
     });
 
     try {
-      // const API_URL = import.meta.env.VITE_API_URL;
+      
       const res = await API.post(`/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
@@ -125,7 +125,6 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
     setLoading(true);
     setError("");
 
-    // Validation
     if (!form.title || !form.startingPrice || !form.endDate) {
       setError("Please fill the required fields");
       setLoading(false);
@@ -188,7 +187,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         setLoading(false);
         return;
       }
-      // const durationHours=(endDate.getTime() - startTime.getTime() )/1000*60*60;
+      
       const durationHours = (endDate.getTime() - startTime.getTime()) / (1000 * 60 * 60);
       if(durationHours>2){
         setError("Live auctions cannot exceedded 2 hours. Please shorten the duration");
@@ -211,9 +210,6 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
         endDate:new Date(form.endDate),
         startTime:form.startTime? new Date(form.startTime) : undefined
       }as AuctionItem
-      // await createAuction(auctionData);
-      // onSuccess();
-      // onClose();
       if (initialData) {
         await updateAuction(initialData.id!, auctionData);
       } else {
@@ -247,13 +243,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">Category</label>
-              {/* <select name="category" value={form.category} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg bg-white outline-none">
-                <option value="Vehicles">Vehicles</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Real Estate">Real Estate</option>
-                <option value="Art">Art</option>
-                <option value="Others">Others</option>
-              </select> */}
+              
               <select
                 name="category"
                 value={form.category}
@@ -282,10 +272,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
                 <input type="radio" name="type" value="timed" checked={form.type === 'timed'} onChange={handleChange} />
                 <span className="text-sm">Timed Auction</span>
               </label>
-              {/* <label className="flex items-center gap-2 cursor-pointer">
-                <input type="radio" name="type" value="live" checked={form.type === 'live'} onChange={handleChange} />
-                <span className="text-sm">Live Auction</span>
-              </label> */}
+              
               <label className={`flex items-center gap-2 ${!subscriptionLimit?.hasLive ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}>
   <input
     type="radio"
@@ -315,7 +302,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
               </div>
             )}
 
-            {/* End Date is standard for Timed, but for Live it might mean "Expected End" */}
+           
             <div>
               <label className="block text-xs font-bold text-gray-600 mb-1">
                 {form.type === 'live' ? 'Expected End Time' : 'End Date & Time'}
@@ -323,11 +310,7 @@ export default function CreateAuctionModal({ onClose, onSuccess, initialData }: 
               <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg outline-none" />
             </div>
           </div>
-          {/* <div>
-            <label className="block text-xs font-bold text-gray-600 mb-1">End Date & Time</label>
-            <input type="datetime-local" name="endDate" value={form.endDate} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg outline-none" />
-          </div> */}
-          {/* --- NEW FILE UPLOAD SECTION --- */}
+          
           <div>
             <label className="block text-xs font-bold text-gray-600 mb-1">
               Product Images (Min 3)

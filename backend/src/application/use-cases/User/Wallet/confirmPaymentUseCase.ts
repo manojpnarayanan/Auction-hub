@@ -22,7 +22,6 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
         // logger.info("Checking payment for Auction:", data.auctionId); // DEBUG LOG
         const intent = await this._paymentService.retrievePaymentIntent(data.paymentIntentId);
 
-        // Sometimes Stripe is still 'processing' for a half-second
         if (intent.status !== 'succeeded' && intent.status !== 'processing') {
             throw new ValidationError(`Payment status is ${intent.status}, not succeeded.`);
         }
@@ -35,7 +34,7 @@ export class ConfirmPayment implements IconfirmPaymentUseCase {
         if (adminWallet) {
             await this._walletRepository.createTransactions({
                 walletId: adminWallet.id,
-                userId: adminId,
+                userId: buyerId,
                 amount: intent.amount / 100,
                 type: 'credit',
                 status: 'completed',

@@ -95,7 +95,7 @@ export default function MyListings() {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {myAuctions.map((auction: AuctionItem) => (
                             <div key={auction.id}
-                                // onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
+
                                 onClick={() => navigate(auction.type === 'live' ? ROUTES.LIVE_AUCTION.replace(':id', auction.id) : ROUTES.AUCTION_DETAILS.replace(':id', auction.id))}
                                 className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition group">
                                 <div className="h-48 bg-gray-200 overflow-hidden relative">
@@ -148,7 +148,6 @@ export default function MyListings() {
                                             )}
 
 
-                                            {/* Only allowed to edit if status is 'pending' or 'rejected' */}
                                             {(auction.status === 'pending' || auction.status === 'rejected') && (
                                                 <button
                                                     onClick={(e) => {
@@ -161,17 +160,6 @@ export default function MyListings() {
                                                     Edit
                                                 </button>
                                             )}
-
-                                            {/* <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setSelectedAuction(auction);
-                                                    setIsModalOpen(true);
-                                                }}
-                                                className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-1.5 rounded-lg transition font-medium"
-                                            >
-                                                Edit
-                                            </button> */}
                                         </div>
 
                                     </div>

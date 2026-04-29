@@ -8,5 +8,5 @@ export interface WalletWithTransactions{
 }
 
 export interface IGetWalletUseCase{
-    execute(userId:string, page?: number, limit?: number):Promise<WalletWithTransactions>
+    execute(userId:string, page?: number, limit?: number,purpose?:string):Promise<WalletWithTransactions>
 }

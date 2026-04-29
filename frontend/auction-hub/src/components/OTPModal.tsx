@@ -15,14 +15,14 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [canResend, setcanResend] = useState(false);
 
-  // 1. Initialize timer from Storage
+  
   const [timer, setTimer] = useState(() => {
     const savedExpiry = localStorage.getItem("otpExpiry");
     if (savedExpiry) {
       const remaining = Math.floor((parseInt(savedExpiry) - Date.now()) / 1000);
       return remaining > 0 ? remaining : 0;
     }
-    // If no saved time, start new 60s and save it
+    
     const expiry = Date.now() + 60 * 1000;
     localStorage.setItem("otpExpiry", expiry.toString());
     return 60;
@@ -33,7 +33,7 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
       interval = setInterval(() => {
         setTimer((prev) => {
           if (prev <= 1) {
-            localStorage.removeItem("otpExpiry"); // Clear when done
+            localStorage.removeItem("otpExpiry"); 
             setcanResend(true);
             return 0;
           }
@@ -56,11 +56,9 @@ const OTPModal = ({ email, onClose, onSuccess }: OTPModalProps) => {
     } catch (error: unknown) {
       const err=error as AxiosError<{message:string}>
       const errorMsg = err.response?.data?.message || "Verification Failed";
-      // If OTP is already verified (race condition), just proceed!
+      
       if (errorMsg === "OTP Invalid" || errorMsg.includes("Invalid")) {
-        // Optional: You could choose to treat this as success if you trust the user flow, 
-        // but safer to just show the error. 
-        // However, if it's a double-click issue, the UI might have already transitioned.
+       
       }
       setMessage({ text: errorMsg, type: "error" });
     } finally {

@@ -26,7 +26,7 @@ export class ConfirmDeliveryUseCase implements IConfirmDeliveryUseCase{
         if(!admin ) throw new Error("Admin not found");
         const adminId=admin.id;
         const pendingTransactions=await this._walletRepo.getPendingRelease(adminId);
-        const escrowTX=pendingTransactions.find(tx=>tx.auctionId?.toString() === auctionId && tx.userId ===adminId );
+        const escrowTX=pendingTransactions.find(tx=>tx.auctionId?.toString() === auctionId );
 
         if(!escrowTX)throw new ValidationError("Escrow transactions not found");
         auction.deliveryStatus='delivered';

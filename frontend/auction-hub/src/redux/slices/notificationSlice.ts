@@ -32,7 +32,7 @@ const notificationSlice = createSlice({
     name: 'notifications',
     initialState,
     reducers: {
-        addRealtimeNotification: (state, action: PayloadAction<AppNotification>) => { // Using the alias
+        addRealtimeNotification: (state, action: PayloadAction<AppNotification>) => {
             state.notifications.unshift(action.payload); 
             if (!action.payload.isRead) {
                 state.unreadCount += 1;
@@ -45,7 +45,7 @@ const notificationSlice = createSlice({
             .addCase(fetchNotifications.fulfilled, (state, action) => {
                 state.loading = false;
                 state.notifications = action.payload;
-                state.unreadCount = action.payload.filter((n: AppNotification) => !n.isRead).length; // Type annotation added to be safe
+                state.unreadCount = action.payload.filter((n: AppNotification) => !n.isRead).length;
             })
             .addCase(fetchNotifications.rejected, (state, action) => {
                 state.loading = false;

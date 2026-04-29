@@ -174,7 +174,6 @@ export default function LiveAuctionRoom() {
         }
     }
 
-    // const isSeller = currentUser?.id === auction?.sellerId;
     const isActive = auctionStatus === 'active';
     const isPending = auctionStatus === 'pending' || auctionStatus === 'approved';
 
@@ -373,23 +372,7 @@ export default function LiveAuctionRoom() {
                             </div>
                         )}
 
-                        {/* Seller Controls */}
-                        {/* {isSeller && (
-                            <div className="flex gap-4 mt-6">
-                                {isPending && (
-                                    <button onClick={() => startLiveAuction(id!).then(() => { toast.success("Started!"); setAuctionStatus("active"); }).catch(e => toast.error(e.response?.data?.message))}
-                                        className="flex-1 bg-green-600 hover:bg-green-500 py-3 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-0.5 uppercase tracking-wide text-sm">
-                                        ▶ Start Live Auction
-                                    </button>
-                                )}
-                                {isActive && (
-                                    <button onClick={() => endLiveAuction(id!).then(() => { toast.success("Ended!"); setAuctionStatus("sold"); }).catch(e => toast.error(e.response?.data?.message))}
-                                        className="flex-1 bg-red-600 hover:bg-red-500 py-3 rounded-xl font-bold shadow-lg transition-transform hover:-translate-y-0.5 uppercase tracking-wide text-sm flex justify-center items-center gap-2">
-                                        🔨 Drop Hammer
-                                    </button>
-                                )}
-                            </div>
-                        )} */}
+                        
                     </div>
 
                     {/* Live Feed */}

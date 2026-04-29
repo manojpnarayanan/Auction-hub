@@ -12,18 +12,17 @@ export class CloudinaryService {
 
     generateSignedUrl(publicId: string, expireMinutes: number): string {
         if (!publicId) return '';
-        // Add this logic manually to your generateSignedUrl
         const urlWithoutQuery = publicId.split("?")[0];
         const parts = urlWithoutQuery.split("/");
         const vIndex = parts.findIndex(p => /^v\d+$/.test(p));
 
         let cleanId = urlWithoutQuery;
         if (vIndex !== -1 && vIndex < parts.length - 1) {
-            // This correctly gets "folder/filename" instead of just "filename"
+
             const publicIdWithExt = parts.slice(vIndex + 1).join("/");
             cleanId = publicIdWithExt.split(".")[0];
         } else {
-            // Fallback for URLs without a version number or direct IDs
+            
             cleanId = urlWithoutQuery.includes("http") ? (urlWithoutQuery.split("/").pop()?.split(".")[0] || urlWithoutQuery) : urlWithoutQuery;
         }
 

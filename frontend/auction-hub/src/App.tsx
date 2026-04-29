@@ -1,5 +1,3 @@
-
-// import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Signup from './pages/signup';
@@ -50,7 +48,7 @@ function App() {
         Loading...
       </div>} >
         <Routes>
-          {/* <Route path='/' element={<Navigate to='login' replace />} /> */}
+          
           <Route path={ROUTES.HOME} element={<Home />} />
           <Route path={ROUTES.SIGNUP} element={
             <PublicRoute><Signup /></PublicRoute>

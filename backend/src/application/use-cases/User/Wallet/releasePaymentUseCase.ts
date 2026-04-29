@@ -28,7 +28,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
 
         
         const wasClaimed = await this._walletRepository.isTransactionReleased(data.transactionId);
-        console.log("Release Payment", wasClaimed)
+        // console.log("Release Payment", wasClaimed)
         if (!wasClaimed) {
             throw new ValidationError(`Payout already in progress or completed.Please check again`);
             return;
@@ -83,7 +83,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
 
         await this._walletRepository.credit(adminId, commission);
         await this._walletRepository.createTransactions({
-            userId: adminId,
+            userId: data.sellerId,
             walletId: adminWallet.id,
             amount: commission,
             type: 'credit',
@@ -95,7 +95,7 @@ export class ReleasePaymentUseCase implements IReleasePaymentUseCase {
 
         await this._walletRepository.credit(data.sellerId, sellerAmount);
         await this._walletRepository.createTransactions({
-            userId: data.sellerId,
+            userId: adminId,
             walletId: sellerWallet.id,
             amount: sellerAmount,
             type: 'credit',

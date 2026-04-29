@@ -31,7 +31,6 @@ export default function AdminDashboard() {
         { key: 'custom', label: '📅 Custom' },
     ];
 
-    // Fetch when preset period changes (not for custom — waits for Apply)
     useEffect(() => {
         if (period === 'custom') return;
         setLoading(true);
@@ -60,16 +59,16 @@ export default function AdminDashboard() {
 
     return (
         <div className="min-h-screen bg-slate-900 text-white p-4 md:p-8">
-            {/* Header */}
+           
             <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
                     <p className="text-slate-400 mt-1">Live platform overview</p>
                 </div>
 
-                {/* Period Filter + Custom Date Range */}
+                
                 <div className="flex flex-col items-end gap-3">
-                    {/* Preset button group */}
+                   
                     <div className="flex bg-slate-800 rounded-lg p-1 gap-1">
                         {presetPeriods.map(({ key, label }) => (
                             <button
@@ -86,7 +85,7 @@ export default function AdminDashboard() {
                         ))}
                     </div>
 
-                    {/* Custom date inputs — revealed only when Custom is selected */}
+                    
                     {period === 'custom' && (
                         <div className="flex flex-col gap-2 bg-slate-800 border border-slate-700 rounded-xl p-4 w-full sm:w-auto">
                             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">
@@ -133,7 +132,7 @@ export default function AdminDashboard() {
                 </div>
             ) : stats ? (
                 <>
-                    {/* KPI Cards */}
+                   
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                         <KPICard title="Total Revenue" value={`₹${stats.totalRevenue.toLocaleString()}`} icon="💰" color="indigo" />
                         <KPICard title="Success Rate" value={`${stats.auctionSuccessRate}%`} icon="📈" color="emerald" />
@@ -141,7 +140,7 @@ export default function AdminDashboard() {
                         <KPICard title="Total Users" value={stats.totalUsers.toString()} icon="👥" color="violet" />
                     </div>
 
-                    {/* Revenue Chart */}
+                    
                     <div className="bg-slate-800 rounded-2xl p-6 mb-6">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold text-slate-200">Revenue Over Time</h2>
@@ -172,7 +171,7 @@ export default function AdminDashboard() {
                         )}
                     </div>
 
-                    {/* User Growth Chart */}
+                    
                     <div className="bg-slate-800 rounded-2xl p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-lg font-semibold text-slate-200">User Growth</h2>

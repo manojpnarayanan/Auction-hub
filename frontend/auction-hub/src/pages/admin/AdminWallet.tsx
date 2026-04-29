@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-// import { getWallet } from "../../api/User/wallet";
 import toast from "react-hot-toast";
 import type { WalletWithTransactions } from "../../types/wallet";
 import DataTable from "../../components/reuseabletable";
@@ -19,20 +18,20 @@ export default function AdminWallet() {
     const [releasing, setReleasing] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalTransactions, setTotalTransactions] = useState(0);
+    const [purposeFilter, setPurposeFilter] = useState<string>('');
     const pageSize = 10;
 
     useEffect(() => {
         const fetchWallet = async () => {
             try {
                 const [walletRes, pendingRes] = await Promise.all([
-                    getWallet(currentPage, pageSize),
+                    getWallet(currentPage, pageSize,purposeFilter),
                     getPendingRelease()
                 ]);
                 setWallet(walletRes.data.data);
                 setTotalTransactions(walletRes.data.data.total)
                 setPendingRelease(pendingRes.data.data);
-                // const res=await getWallet();
-                // setWallet(res.data)
+                
             } catch (error: unknown) {
                 console.error("Failed to load admin wallet");
                 const err = error as AxiosError<{ message: string }>
@@ -42,11 +41,11 @@ export default function AdminWallet() {
             }
         }
         fetchWallet();
-    }, [currentPage]);
+    }, [currentPage,purposeFilter]);
     if (loading) return <div className="p-8" > loading Wallet...</div>
 
     const handleRelease = async () => {
-        // toast.error("Release logic will add ")
+        
         if (selectedTx?.commissionPercent === undefined) {
             toast.error("Commission percent not seeen in plan");
             return;
@@ -60,10 +59,9 @@ export default function AdminWallet() {
                 auctionRes.data?.data?.sellerId ||
                 auctionRes.data?.auction?.sellerId?._id ||
                 auctionRes.data?.auction?.sellerId;
-            // auctionRes.data?.auction?.sellerId._id || auctionRes.data?.data?.sellerId;
 
             const rate = selectedTx.commissionPercent;
-           
+
             await releasePayment({
                 transactionId: selectedTx.id,
                 auctionId: selectedTx.auctionId,
@@ -75,9 +73,9 @@ export default function AdminWallet() {
             toast.success("Funds released to user successfully");
             setPendingRelease(prev => prev.filter(r => r.id !== selectedTx.id));
             setIsConfirmOpen(false);
-           
+
         } catch (error: unknown) {
-            const err=error as AxiosError<{message:string}>
+            const err = error as AxiosError<{ message: string }>
             toast.error(err.response?.data.message || "failed to release funds")
         } finally {
             setReleasing(false);
@@ -85,6 +83,14 @@ export default function AdminWallet() {
     }
 
     const columns: Column<TransactionItem>[] = [
+        {
+            header: "Auction",
+            render: (tx) => <div className="text-blue-400 text-sm truncate max-w-[150px]">{tx.auctionTitle || ""} </div>
+        },
+        {
+            header: "User",
+            render: (tx) => <div className="text-gray-300 text-sm">{tx.userName || "-"}</div>
+        },
         {
             header: "Date",
             render: (tx) => <div className="text-gray-400 text-sm">{new Date(tx.createdAt).toLocaleDateString()}</div>
@@ -155,9 +161,29 @@ export default function AdminWallet() {
                     emptyMessage="No payments currently held in escrow."
                 />
             </div>
-            <h3 className="text-xl font-bold text-white mb-4">Payment History</h3>
+           
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-bold text-white">Payment History</h3>
 
-            {/* Reusable Data Table replacing the HTML table entirely */}
+               
+                <select
+                    value={purposeFilter}
+                    onChange={(e) => {
+                        setPurposeFilter(e.target.value);
+                        setCurrentPage(1); 
+                    }}
+                    className="bg-[#161b22] border border-gray-800 text-gray-300 text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 transition"
+                >
+                    <option value="">All Transactions</option>
+                    <option value="commission">Commissions</option>
+                    <option value="subscription_payment">Subscription Revenue</option>
+                    <option value="auction_payment">Auction Payments</option>
+                    <option value="refund">Refunds</option>
+                </select>
+            </div>
+
+
+           
             <DataTable<TransactionItem>
                 columns={columns}
                 data={wallet?.transactions || []}
@@ -199,61 +225,6 @@ export default function AdminWallet() {
 
         </div>
     );
-
-
-    // return (
-    //     <div className="p-8">
-    //         <h1 className="text-3xl font-bold mb-6">Platform Wallet</h1>
-
-    //         <div className="bg-white p-6 rounded-xl shadow-md border mb-8 flex justify-between items-center">
-    //             <div>
-    //                 <p className="text-gray-500 font-semibold mb-1">Total Balance Collected</p>
-    //                 <h2 className="text-4xl font-extrabold text-blue-600">
-    //                     ₹{wallet?.wallet?.balance || 0}
-    //                 </h2>
-    //             </div>
-    //             <div className="bg-blue-50 p-4 rounded-lg">
-    //                 <span className="text-blue-600 font-bold">Admin Account</span>
-    //             </div>
-    //         </div>
-    //         <h3 className="text-xl font-bold mb-4">Payment History</h3>
-    //         <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-    //             <table className="w-full text-left">
-    //                 <thead className="bg-gray-50 text-gray-600 text-sm">
-    //                     <tr>
-    //                         <th className="py-3 px-4">Date</th>
-    //                         <th className="py-3 px-4">Type</th>
-    //                         <th className="py-3 px-4">Amount</th>
-    //                         <th className="py-3 px-4">Purpose</th>
-    //                         <th className="py-3 px-4">Status</th>
-    //                     </tr>
-    //                 </thead>
-    //                 <tbody className="divide-y divide-gray-100">
-    //                     {wallet?.transactions?.map((tx: any) => (
-    //                         <tr key={tx.id} className="hover:bg-gray-50">
-    //                             <td className="py-3 px-4">{new Date(tx.createdAt).toLocaleDateString()}</td>
-    //                             <td className="py-3 px-4">
-    //                                 <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">
-    //                                     CREDIT
-    //                                 </span>
-    //                             </td>
-    //                             <td className="py-3 px-4 font-bold">+₹{tx.amount}</td>
-    //                             <td className="py-3 px-4 text-gray-600">{tx.purpose}</td>
-    //                             <td className="py-3 px-4">
-    //                                 <span className="text-xs font-bold text-gray-500 uppercase">{tx.status}</span>
-    //                             </td>
-    //                         </tr>
-    //                     ))}
-    //                     {(!wallet?.transactions || wallet.transactions.length === 0) && (
-    //                         <tr>
-    //                             <td colSpan={5} className="py-6 text-center text-gray-500">No payments received yet.</td>
-    //                         </tr>
-    //                     )}
-    //                 </tbody>
-    //             </table>
-    //         </div>
-    //     </div>
-    // );
 
 
 }

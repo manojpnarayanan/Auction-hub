@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  # 1. Safety Check: Make sure the code isn't horribly broken before deploying
+  
   build:
     runs-on: ubuntu-latest
     steps:
@@ -21,9 +21,9 @@ jobs:
         working-directory: backend
         run: npm ci
 
-      # We skip 'npm run build' here because your backend runs using 'tsx' directly!
+      
 
-  # 2. Deploy to EC2
+  #  Deploy to EC2
   deploy:
     needs: build
     runs-on: ubuntu-latest

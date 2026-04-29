@@ -80,8 +80,6 @@ export default function AdminDisputes() {
         }
     };
 
-    // const getBuyerName = (buyer: UserRef | string) => typeof buyer === 'string' ? buyer : buyer.name || buyer._id;
-
     return (
         <div className="text-white min-h-[80vh]">
             <div className="flex justify-between items-center mb-8">
@@ -115,9 +113,7 @@ export default function AdminDisputes() {
                         <div key={dispute.id} className="bg-[#1c2128] p-6 rounded-xl border border-gray-800">
                             <div className="flex justify-between mb-4">
                                 <div>
-                                    {/* <h3 className="font-bold text-lg text-white">Auction ID: {dispute.auctionid}</h3>
-                                    <p className="text-sm text-gray-400 mt-1">User Name: {getBuyerName(dispute.buyerId)}</p> */}
-                                    {/* <p className="text-sm text-gray-400 mt-1">Raised by: {getBuyerName(dispute.buyerId)} • on {new Date(dispute.createdAt).toLocaleDateString()}</p> */}
+                                    
                                     <h3 className="font-bold text-lg text-white">Item: {dispute.auctionId?.title || 'Unknown Item'}</h3>
                                     <p className="text-sm text-gray-400 mt-1">Claim by: <span className="text-blue-400 font-semibold">{dispute.buyerId?.name}</span></p>
                                 </div>
@@ -173,7 +169,7 @@ export default function AdminDisputes() {
 
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
-            {/* RESOLUTION MODAL */}
+            
             {resolvingId && (
                 <div className="fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
                     <div className="bg-[#1c2128] rounded-xl shadow-2xl border border-gray-700 p-6 w-full max-w-md relative z-50">
@@ -204,7 +200,7 @@ export default function AdminDisputes() {
                     </div>
                 </div>
             )}
-            {/* --- PHOTO PREVIEW MODAL --- */}
+            
             {previewImage && (
                 <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-8" onClick={() => setPreviewImage(null)}>
                     <div className="relative max-w-4xl max-h-full">
@@ -224,7 +220,7 @@ export default function AdminDisputes() {
             )}
 
 
-            {/* INFO MODAL REPLACING ALERTS */}
+            
             <InfoModal
                 isOpen={infoModalOpen}
                 onClose={() => setInfoModalOpen(false)}

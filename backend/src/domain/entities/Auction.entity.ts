@@ -4,7 +4,7 @@ export class Auction{
     constructor(
         public title:string,
         public description:string,
-        public category:string, //"Real Estate","Vehicles","Art"
+        public category:string,
         public startingPrice:number,
         public currentPrice:number,
         public endDate:Date,

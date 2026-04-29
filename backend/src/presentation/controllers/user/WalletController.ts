@@ -22,7 +22,8 @@ export class WalletController{
             if (!userId) { res.status(HttpStatus.UNAUTHORIZED).json(ApiResponse.error(CustomMessages.UNAUTHORIZED)); return }
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-            const result = await this._getWalletUseCase.execute(userId, page, limit);
+            const purpose = req.query.purpose as string;
+            const result = await this._getWalletUseCase.execute(userId, page, limit, purpose);
             res.status(HttpStatus.OK).json(ApiResponse.success(result, CustomMessages.WALLET_FETCHED));
         } catch (error) {
             next(error);

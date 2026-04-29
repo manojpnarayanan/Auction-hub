@@ -203,10 +203,7 @@ export default function Dashboard() {
                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                         {auction.category}
                       </span>
-                      {/* Show End Date for Timed */}
-                      {/* <span className="text-xs text-red-500 bg-red-50 px-2 py-1 rounded">
-                        Ends: {new Date(auction.endDate).toLocaleDateString()}
-                      </span> */}
+                      
                       <span className={`text-xs px-2 py-1 rounded-full ${auction.status === 'active' ? 'bg-green-100 text-green-700' :
                         auction.status === 'sold' ? 'bg-blue-100 text-blue-700' :
                           'bg-red-100 text-red-700'

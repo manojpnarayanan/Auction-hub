@@ -40,7 +40,7 @@ export class ResolveDisputeUseCase implements IResolveDisputeUseCase {
         if (data.resolution === 'refund') {
             // 1. REFUND FLOW: Return money from admin escrow directly to buyer
             const pendingTransactions = await this._walletRepo.getPendingRelease(adminId);
-            const escrowTx = pendingTransactions.find(tx => tx.auctionId?.toString() === auction.id && tx.userId === adminId);
+            const escrowTx = pendingTransactions.find(tx => tx.auctionId?.toString() === auction.id );
 
             if (!escrowTx) throw new Error("Escrow transaction not found! Cannot process refund.");
 
@@ -67,7 +67,7 @@ export class ResolveDisputeUseCase implements IResolveDisputeUseCase {
             });
 
             await this._walletRepo.createTransactions({
-                userId: buyerId,
+                userId: adminId,
                 walletId: buyerWallet!.id,
                 amount: escrowTx.amount,
                 type: 'credit',
@@ -80,7 +80,6 @@ export class ResolveDisputeUseCase implements IResolveDisputeUseCase {
             // Mark original escrow transaction as released to close the loop
             await this._walletRepo.markTransactionAsReleased(escrowTx.id!);
 
-            // Update statuses
             await this._disputeRepo.updateStatus(dispute.id!, 'resolved_refunded', data.adminNote);
             await this._auctionRepo.update(auction.id!, { deliveryStatus: 'disputed' }); // remains disputed forever
             await this._createNotificationUseCase.execute({
@@ -99,13 +98,11 @@ export class ResolveDisputeUseCase implements IResolveDisputeUseCase {
             });
 
         } else if (data.resolution === 'reject') {
-            // 2. REJECT FLOW: Dispute is rejected, admin sides with seller. Release funds!
             const pendingTransactions = await this._walletRepo.getPendingRelease(adminId);
-            const escrowTx = pendingTransactions.find(tx => tx.auctionId?.toString() === auction.id && tx.userId === adminId);
+            const escrowTx = pendingTransactions.find(tx => tx.auctionId?.toString() === auction.id );
 
             if (!escrowTx) throw new Error("Escrow transaction not found! Cannot release funds.");
 
-            // Call ReleasePaymentUseCase to pay the seller normally
             await this._releasePaymentUseCase.execute({
                 auctionId: auction.id!,
                 sellerId: auction.sellerId,
@@ -118,7 +115,7 @@ export class ResolveDisputeUseCase implements IResolveDisputeUseCase {
 
             // Update statuses
             await this._disputeRepo.updateStatus(dispute.id!, 'resolved_rejected', data.adminNote);
-            await this._auctionRepo.update(auction.id!, { deliveryStatus: 'delivered' }); // mark delivered since dispute failed
+            await this._auctionRepo.update(auction.id!, { deliveryStatus: 'delivered' });
             await this._createNotificationUseCase.execute({
                 userId: buyerId,
                 title: "Dispute Resolved",

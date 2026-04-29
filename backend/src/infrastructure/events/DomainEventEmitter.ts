@@ -11,7 +11,6 @@ export class DomainEventEmitter extends EventEmitter implements IEventEmitter {
 
     dispatch(event: IDomainEvent): void {
         const eventName=event.constructor.name;
-        // We use the constructor name as the event name (e.g., "BidPlacedEvent")
         super.emit(eventName, event);
     }
 }

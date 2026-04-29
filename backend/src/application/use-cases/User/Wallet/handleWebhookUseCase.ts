@@ -25,20 +25,17 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
             const intent = event.data.object;
             const adminId = process.env.ADMIN_WALLET_USER_ID!;
 
-            //  Check if we already processed this
             const existing = await this._walletRepository.findTransactionByIntentId(intent.id);
             if (existing && existing.status === 'completed') return;
 
             await this._walletRepository.credit(adminId, intent.amount / 100);
             
-            //  Create or Update the Escrow Transaction record
             const adminWallet = await this._walletRepository.findByUserId(adminId);
             if (adminWallet) {
                 if (!existing) {
-                    // Record missing (User was redirected)! Create it now.
                     await this._walletRepository.createTransactions({
                         walletId: adminWallet.id,
-                        userId: adminId,
+                        userId: intent.metadata.buyerId,
                         amount: intent.amount / 100,
                         type: 'credit',
                         status: 'completed',
@@ -49,12 +46,10 @@ export class HandleWebhookUseCase implements IHandleWebhookUseCase {
                         isReleased: false
                     });
                 } else {
-                    // Record exists, just mark it completed
                     await this._walletRepository.updateTransactions(intent.id, 'completed');
                 }
             }
-            
-            //  Update Auction Status
+        
             if (intent.metadata && intent.metadata.auctionId) {
                 await this._auctionRepository.updatePaymentStatus(intent.metadata.auctionId, 'completed');
                 logger.info(`Auction ${intent.metadata.auctionId} finalized via Webhook.`);

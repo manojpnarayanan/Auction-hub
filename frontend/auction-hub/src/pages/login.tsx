@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../redux/slices/authSlices";
 import { login } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { LoginCredentials } from "../types/auth";
 import { AxiosError } from "axios";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -14,6 +14,8 @@ import { ROUTES } from "../Constants/routes";
 export default function Login() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location=useLocation();
+    const redirectUrl=new URLSearchParams(location.search).get('redirect') || ROUTES.USER.DASHBOARD;
     const [form, setForm] = useState<LoginCredentials>({ email: "", password: "" });
     const [msg, setMsg] = useState('');
     const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ export default function Login() {
                 );
 
                 toast.success(res.data.message);
-                navigate(ROUTES.USER.DASHBOARD);
+                navigate(redirectUrl);
             } catch (error: unknown) {
                 console.error("Google login failed", error);
                 const err = error as AxiosError<{ message: string }>;
@@ -74,7 +76,7 @@ export default function Login() {
             );
 
             await new Promise(resolve => setTimeout(resolve, 100));
-            navigate(ROUTES.USER.DASHBOARD);
+            navigate(redirectUrl);
         } catch (error: unknown) {
             console.error("login failed", error);
             const err = error as AxiosError<{ message: string }>

@@ -1,15 +1,17 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 
 
 export const PublicRoute = ({ children }: { children: React.ReactElement }) => {
     const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
+    const location=useLocation();
     if (isAuthenticated && user?.id) {
+        const redirectUrl=new URLSearchParams(location.search).get('redirect');
         if (user.role === 'admin') {
             return <Navigate to='/admin/dashboard' replace />
         }
-        return <Navigate to='/user/dashboard' replace />
+        return <Navigate to={redirectUrl || '/user/dashboard'} replace />
     }
     return children;
 }

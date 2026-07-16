@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { signup } from "../api/auth";
 import OTPModal from "../components/OTPModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import type { SignupCredentials } from "../types/auth";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../api/auth";
@@ -29,6 +29,9 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location=useLocation();
+  const redirectParams=new URLSearchParams(location.search)
+  const redirectUrl=redirectParams.get("redirect")||ROUTES.USER.DASHBOARD
 
   const signupWithGoogle = useGoogleLogin({
     onSuccess: async (codeResponse) => {
@@ -44,7 +47,7 @@ export default function Signup() {
         );
 
         toast.success(res.data.message);
-        navigate(ROUTES.USER.DASHBOARD);
+        navigate(redirectUrl);
       } catch (error: unknown) {
         console.error("Google signup failed", error);
         const err = error as AxiosError<{ message: string }>;
@@ -131,7 +134,11 @@ export default function Signup() {
     localStorage.removeItem("otpExpiry");
     setShowOTP(false);
     setTimeout(() => {
-      navigate('/login')
+      if(redirectParams.get('redirect')){
+        navigate(`/login?redirect=${redirectUrl}`)
+      }else{
+        navigate('/login')
+      }
     }, 2000)
   };
 

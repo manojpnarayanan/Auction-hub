@@ -22,6 +22,9 @@ const AdminAuctions = () => {
     const [isReasonModalOpen, setIsReasonModalopen] = useState(false);
     const [selectedAuctionId, setSelectedAuctionId] = useState<string | null>(null);
     const [reasonModal, setReasonModal] = useState<'reject' | 'cancel'>('reject')
+    const [isConfirmModalOpen,setIsConfirmModalOpen]=useState(false)
+    const [confirmActionData,setConfirmedActionData]=useState<{id:string;status:"active" | 'approved' |'cancelled';actionName:string}| null>(null);
+
 
 
 
@@ -103,6 +106,17 @@ const AdminAuctions = () => {
             toast.error(err.response?.data?.message ||"Failed to cancel live auction");
         }
     }
+    const handleOpenConfirmModal=(id:string,status:"active"|"approved"|"cancelled",actionName:string)=>{
+        setConfirmedActionData({id,status,actionName});
+        setIsConfirmModalOpen(true);
+    }
+    const executeConfirmAction=()=>{
+        if(confirmActionData){
+            handleStatusUpdate(confirmActionData.id,confirmActionData.status)
+        }
+        setIsConfirmModalOpen(false);
+        setConfirmedActionData(null);
+    }
 
     return (
         <div className="p-6 bg-[#0d1117] min-h-screen">
@@ -168,13 +182,15 @@ const AdminAuctions = () => {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => handleStatusUpdate(auction.id, 'cancelled')}
+                                                        // onClick={() => handleStatusUpdate(auction.id, 'cancelled')}
+                                                        onClick={() => handleOpenConfirmModal(auction.id, 'cancelled', 'Approve Cancellation')}
                                                         className="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2 py-1 rounded font-bold transition"
                                                     >
                                                         Approve
                                                     </button>
                                                     <button
-                                                        onClick={() => handleStatusUpdate(auction.id, 'active')}
+                                                        // onClick={() => handleStatusUpdate(auction.id, 'active')}
+                                                        onClick={()=>handleOpenConfirmModal(auction.id,'active',"Decline Cancellation")}
                                                         className="bg-gray-700 hover:bg-gray-600 text-white text-[10px] px-2 py-1 rounded font-bold transition"
                                                     >
                                                         Decline
@@ -186,7 +202,8 @@ const AdminAuctions = () => {
                                         {auction.status === 'pending' && (
                                             <>
                                                 <button
-                                                    onClick={() => handleStatusUpdate(auction.id, auction.type === 'live' ? 'approved' : 'active')}
+                                                    // onClick={() => handleStatusUpdate(auction.id, auction.type === 'live' ? 'approved' : 'active')}
+                                                    onClick={() => handleOpenConfirmModal(auction.id, auction.type === 'live' ? 'approved' : 'active','Approve Auction')}
                                                     className="text-green-500 hover:text-green-700 hover:bg-green-500/10 px-3 py-1 rounded transition text-sm font-medium"
                                                 >
                                                     Approve
@@ -254,6 +271,15 @@ const AdminAuctions = () => {
                 onConfirm={reasonModal === 'reject' ? handleRejectConfirm : handleCancelLiveConfirm}
                 title={reasonModal === 'reject' ? "Reject Auction" : "Cancel live Auction"}
                 options={reasonModal === 'reject' ? ["Blurry Images", "Incorrect Category", "Suspecious Item", "Wrong Pricing", "Others"] : ["Emergency", "Violation", "Seller  Request", "Others"]}
+            />
+            <ConfirmModal
+            isOpen={isConfirmModalOpen}
+            onClose={()=>setIsConfirmModalOpen(false)}
+            onConfirm={executeConfirmAction}
+            title={`Confirm ${confirmActionData?.actionName}`}
+            message={`Are you sure you want to ${confirmActionData?.actionName?.toLowerCase()} ? `}
+            confirmText="Yes,Confirm"
+            isDanger={confirmActionData?.actionName.includes("Decline")}
             />
         </div>
     );

@@ -15,7 +15,6 @@ export class NotificationDTOMapper{
         }
     }
 
-
     static toResponseDTOs(docs:Notification[]):NotificationResponseDTO[]{
         return docs.map(n=>this.toResponseDTO(n))
     }

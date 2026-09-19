@@ -2,7 +2,6 @@ import { Review } from "../../domain/entities/Review.entity";
 import { ReviewResponseDTO } from "../dtos/ReviewDTO";
 
 
-
 export class ReviewDTOMapper{
     static toDTO(doc:Review):ReviewResponseDTO{
         return {

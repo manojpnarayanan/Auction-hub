@@ -2,7 +2,6 @@ import { Auction } from "../../domain/entities/Auction.entity";
 import { AuctionResponseDTO } from "../dtos/AuctionDTO";
 
 
-
 export class AuctionDTOMapper {
     static toResponseDTO(
         auction: Auction): AuctionResponseDTO {

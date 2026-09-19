@@ -128,7 +128,7 @@ export default function Dashboard() {
                 <p className="text-sm text-gray-400 mt-1">Check back later or list your own!</p>
               </div>
             ) : (
-              // 2. SHOW THIS IF ITEMS EXIST
+              
               liveAuction.map((auction: AuctionItem) => (
                 <div key={auction.id}
                   onClick={() => navigate(auction.type === 'live' ? `/live-auction/${auction.id}` : `/auction/${auction.id}`)}
@@ -219,7 +219,7 @@ export default function Dashboard() {
         
         
       </main>
-      {/* 6. Footer */}
+      
       <Footer/>
       
     </div>

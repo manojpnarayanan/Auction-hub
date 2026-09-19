@@ -2,7 +2,6 @@ import { Subscription } from "../../domain/entities/Subscription.entity";
 import { SubscriptionResponseDTO } from "../dtos/SubscriptionDTO";
 
 
-
 export class SubscriptionDTOMapper{
     static toResponseDTO(doc:Subscription):SubscriptionResponseDTO{
         return {

@@ -6,7 +6,7 @@ import { ROUTES } from "../Constants/routes";
 
 export default function ForgotPassword() {
     const navigate = useNavigate();
-    const [step, setStep] = useState(1); //1=email,2=otp+newPassword
+    const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
